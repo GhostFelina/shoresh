@@ -1,3 +1,11 @@
+## 1.0.1
+
+- **Düzeltme:** Canlı ortamda derin bağlantılar (`/verb`, `/seviye/a1`, `/kaliplar`,
+  `/oyunlar`) 404 veriyordu. Tek sayfa uygulamasında bütün rotaların `index.html`e
+  düşmesi gerekir; `vercel.json` içinde yönlendirme kuralı eksikti. Sunucu `/verb`
+  diye bir dosya arıyordu. Gerçek dosyalar (`assets/`, `sw.js`, ikonlar) kuralın
+  dışında bırakıldı.
+
 # Sürüm geçmişi
 
 **Sürüm kuralı** (anlamsal sürümleme): her push + deploy'da numara
