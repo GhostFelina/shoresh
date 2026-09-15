@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+/* İbranice için iki yazı tipi: gövde metni Heebo, öğretim harfleri
+   Frank Ruhl Libre. Harf biçimlerini ayırt etmek yeni başlayan için
+   kritik — okuma alıştırmasında serif kesitler ד ile ר'yi ayırır. */
+@import '@fontsource-variable/inter';
+@import '@fontsource/heebo/400.css';
+@import '@fontsource/heebo/500.css';
+@import '@fontsource/heebo/700.css';
+@import '@fontsource/frank-ruhl-libre/400.css';
+@import '@fontsource/frank-ruhl-libre/700.css';
+
+@theme {
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-hebrew: 'Heebo', 'Frank Ruhl Libre', serif;
+  --font-serif-he: 'Frank Ruhl Libre', 'Heebo', serif;
+
+  --color-ink-950: #05070d;
+  --color-ink-900: #0a0e18;
+  --color-ink-850: #0e1422;
+  --color-ink-800: #141b2d;
+  --color-ink-700: #1e2740;
+  --color-ink-600: #2c3757;
+  --color-ink-400: #64748b;
+  --color-ink-200: #cbd5e1;
+
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-accent-400: #818cf8;
+  --color-accent-500: #6366f1;
+}
+
+:root {
+  --bg: var(--color-ink-950);
+  --surface: var(--color-ink-900);
+  --surface-2: var(--color-ink-850);
+  --border: var(--color-ink-700);
+  --text: #e6edf7;
+  --text-dim: #8b9bb4;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #eef2f9;
+  --border: #d7dfeb;
+  --text: #0d1524;
+  --text-dim: #5a6b85;
+  color-scheme: light;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- *
+ * İbranice metin — sağdan sola
+ *
+ * Uygulamanın arayüz dili Türkçe (soldan sağa), içeriği İbranice
+ * (sağdan sola). İkisi aynı sayfada. Bu yüzden RTL kökten değil,
+ * yalnızca İbranice taşıyan öğelere veriliyor — aksi hâlde Türkçe
+ * etiketler ve noktalama ters akar.
+ * ---------------------------------------------------------------- */
+.he {
+  direction: rtl;
+  unicode-bidi: isolate;
+  font-family: var(--font-hebrew);
+  font-feature-settings: 'kern' 1;
+}
+
+.he-serif {
+  font-family: var(--font-serif-he);
+}
+
+/* Harekeli metin biraz daha açık satır ister; işaretler harfin
+   altına iniyor ve dar satırda üst satırın kuyruğuna değiyor. */
+.he-vocalized {
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.card-2 {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+/* Odak halkası — klavyeyle gezinme görünür kalmalı. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

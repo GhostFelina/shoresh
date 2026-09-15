@@ -1,0 +1,247 @@
+import { useMemo, useState } from 'react';
+import { Search, Volume2 } from 'lucide-react';
+import { CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
+import { speak } from '@/lib/speech';
+import {
+  BINYAN_LABEL,
+  FORM_LABEL,
+  HEBREW_FORMS,
+  IMPERATIVE_LABEL,
+  MODERN_PERSONS,
+  PERSON_LABEL,
+  PRESENT_LABEL,
+  PRESENT_SLOTS,
+  type Conjugation,
+  type HebrewForm,
+  type HebrewVerb,
+} from '@/types/hebrew';
+
+/** Tek bir çekilmiş biçim — harekeli, harekesiz ve okunuşuyla. */
+function Cell({ label, c }: { label: string; c: Conjugation | undefined }) {
+  if (!c) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => speak(c.plain)}
+      className="card-2 group flex w-full items-center gap-3 px-3 py-2 text-right transition hover:brightness-125"
+    >
+      <span className="w-24 shrink-0 text-left text-[11px]" style={{ color: 'var(--text-dim)' }}>
+        {label}
+      </span>
+      <span className="he he-vocalized flex-1 text-xl font-medium">{c.vocalized}</span>
+      <span className="he hidden flex-1 text-base sm:block" style={{ color: 'var(--text-dim)' }}>
+        {c.plain}
+      </span>
+      <span className="w-28 shrink-0 text-left text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+        {c.translit}
+      </span>
+      <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
+    </button>
+  );
+}
+
+function FormBlock({ verb, form }: { verb: HebrewVerb; form: HebrewForm }) {
+  const t = verb.table;
+
+  if (form === 'infinitive') {
+    return <Cell label="mastar" c={t.infinitive} />;
+  }
+  if (form === 'present') {
+    return (
+      <div className="space-y-1">
+        {PRESENT_SLOTS.map((s) => (
+          <Cell key={s} label={PRESENT_LABEL[s].tr} c={t.present[s]} />
+        ))}
+      </div>
+    );
+  }
+  if (form === 'imperative') {
+    const entries = Object.entries(t.imperative);
+    if (entries.length === 0) {
+      return (
+        <p className="px-1 text-xs" style={{ color: 'var(--text-dim)' }}>
+          Bu binyanda emir kipi yoktur — edilgen bir kalıba emir verilemez.
+        </p>
+      );
+    }
+    return (
+      <div className="space-y-1">
+        {entries.map(([slot, c]) => (
+          <Cell
+            key={slot}
+            label={IMPERATIVE_LABEL[slot as keyof typeof IMPERATIVE_LABEL].tr}
+            c={c}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  const table = form === 'past' ? t.past : t.future;
+  return (
+    <div className="space-y-1">
+      {MODERN_PERSONS.map((p) => (
+        <Cell key={p} label={PERSON_LABEL[p].tr} c={table[p]} />
+      ))}
+    </div>
+  );
+}
+
+export default function VerbsPage() {
+  const [query, setQuery] = useState('');
+  const [selectedId, setSelectedId] = useState(VERBS[0]?.id ?? '');
+  const [form, setForm] = useState<HebrewForm>('present');
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return VERBS;
+    return VERBS.filter(
+      (v) =>
+        v.tr.some((m) => m.toLowerCase().includes(q)) ||
+        v.lemma.translit.toLowerCase().includes(q) ||
+        v.lemma.plain.includes(q) ||
+        v.root.join('').includes(q),
+    );
+  }, [query]);
+
+  const verb = VERBS.find((v) => v.id === selectedId) ?? filtered[0];
+  const siblings = verb ? siblingsOf(verb) : [];
+
+  return (
+    <div className="space-y-5">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-bold tracking-tight">Fiiller</h1>
+        <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
+          {CATALOG_STATS.total} kök+binyan çifti, kural motoruyla üretilmiş{' '}
+          {CATALOG_STATS.totalForms.toLocaleString('tr-TR')} çekim biçimi. Bir biçme tıklayınca
+          seslendirilir.
+        </p>
+      </header>
+
+      <div className="grid gap-4 lg:grid-cols-[18rem_1fr]">
+        {/* Fiil listesi */}
+        <aside className="space-y-2">
+          <label className="card-2 flex items-center gap-2 px-3 py-2">
+            <Search className="size-4 shrink-0" style={{ color: 'var(--text-dim)' }} />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Türkçe, okunuş veya kök ara…"
+              className="w-full bg-transparent text-sm outline-none"
+            />
+          </label>
+
+          <ul className="max-h-[28rem] space-y-1 overflow-y-auto pr-1">
+            {filtered.map((v) => {
+              const active = v.id === verb?.id;
+              return (
+                <li key={v.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedId(v.id)}
+                    className="card-2 flex w-full items-center gap-2 px-3 py-2 transition hover:brightness-125"
+                    style={{
+                      borderColor: active ? 'var(--color-brand-400)' : 'var(--border)',
+                    }}
+                  >
+                    <span className="he he-vocalized text-lg">{v.lemma.vocalized}</span>
+                    <span className="mr-auto truncate text-xs" style={{ color: 'var(--text-dim)' }}>
+                      {v.tr[0]}
+                    </span>
+                    <span
+                      className="shrink-0 rounded px-1.5 py-0.5 text-[10px]"
+                      style={{ background: 'var(--surface)', color: 'var(--color-accent-400)' }}
+                    >
+                      {BINYAN_LABEL[v.binyan].tr}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+            {filtered.length === 0 && (
+              <li className="px-1 py-4 text-sm" style={{ color: 'var(--text-dim)' }}>
+                Eşleşme yok.
+              </li>
+            )}
+          </ul>
+        </aside>
+
+        {/* Çekim tablosu */}
+        {verb && (
+          <section className="space-y-3">
+            <div className="card space-y-3 p-4">
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className="he he-vocalized he-serif text-4xl font-bold">
+                  {verb.lemma.vocalized}
+                </span>
+                <span className="text-lg italic" style={{ color: 'var(--color-brand-300)' }}>
+                  {verb.lemma.translit}
+                </span>
+                <span className="text-lg">{verb.tr.join(', ')}</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="card-2 px-2 py-1">
+                  Kök: <span className="he font-semibold">{verb.rootDisplay}</span>
+                </span>
+                <span className="card-2 px-2 py-1">
+                  Binyan: <span className="font-semibold">{BINYAN_LABEL[verb.binyan].tr}</span>{' '}
+                  <span className="he">{BINYAN_LABEL[verb.binyan].he}</span>
+                </span>
+                <span className="card-2 px-2 py-1">{verb.cefr}</span>
+              </div>
+
+              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                {BINYAN_LABEL[verb.binyan].sense}
+              </p>
+
+              {siblings.length > 0 && (
+                <div className="card-2 space-y-1 p-3">
+                  <h3 className="text-xs font-semibold" style={{ color: 'var(--color-brand-300)' }}>
+                    Aynı kök, başka binyan — anlam değişir
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {siblings.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setSelectedId(s.id)}
+                        className="flex items-center gap-2 rounded px-2 py-1 text-sm transition hover:brightness-125"
+                        style={{ background: 'var(--surface)' }}
+                      >
+                        <span className="he he-vocalized">{s.lemma.vocalized}</span>
+                        <span style={{ color: 'var(--text-dim)' }}>{s.tr[0]}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Zaman seçici */}
+            <div className="flex flex-wrap gap-1.5">
+              {HEBREW_FORMS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setForm(f)}
+                  className="card-2 px-3 py-1.5 text-xs transition hover:brightness-125"
+                  style={{
+                    borderColor: form === f ? 'var(--color-brand-400)' : 'var(--border)',
+                    color: form === f ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                  }}
+                >
+                  {FORM_LABEL[f].tr}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <FormBlock verb={verb} form={form} />
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,40 @@
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+.vite/
+*.local
+
+# Secrets — asla commit edilmez
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+.supabase/
+supabase/.temp/
+supabase/.branches/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test artefaktları
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# Vercel
+.vercel
+
+.vercel
+.env*
+
+# Üçüncü taraf veri kaynakları (CMUdict vb.) — yerel kalır
+data-sources/
