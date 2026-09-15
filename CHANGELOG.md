@@ -1,3 +1,11 @@
+## 1.0.2
+
+- **Erişim:** Vercel Deployment Protection (SSO) kapatıldı. Önceden
+  `shoresh-ivrit.vercel.app` Vercel giriş duvarına çarpıyordu; artık
+  uygulamanın bütün adresleri herkese açık.
+- Takma adın her deploy’da eskidiği, yayına alma yordamıyla birlikte
+  README’ye yazıldı.
+
 ## 1.0.1
 
 - **Düzeltme:** Canlı ortamda derin bağlantılar (`/verb`, `/seviye/a1`, `/kaliplar`,

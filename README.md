@@ -63,6 +63,35 @@ src/lib/speech.ts      he-IL seslendirme (Web Speech API)
 `engine/` hiçbir zaman `lib/` veya `pages/` içe aktarmaz — saf kalır, böylece
 her kural birim testle kilitlenebilir.
 
+## Yayına alma
+
+```bash
+npm run verify          # typecheck + lint + 112 test
+npm run build
+npx vercel --yes --prod
+```
+
+**Adresler**
+
+| Adres | Davranış |
+|---|---|
+| `shoresh-three.vercel.app` | **Kanonik adres.** Üretim alanı; her deploy'da kendiliğinden güncellenir. |
+| `shoresh-ivrit.vercel.app` | Dağıtım takma adı. Kendiliğinden güncellenmez. |
+
+Takma ad her deploy'dan sonra elle yeniden bağlanmalı, yoksa ESKİ sürümü
+sunmaya devam eder:
+
+```bash
+npx vercel alias set <yeni-dagitim-url> shoresh-ivrit.vercel.app
+```
+
+Bu bir kez ısırdı: `shoresh-ivrit` v1.0.0'da kalıp derin bağlantılarda 404
+vermeye devam etti, oysa `shoresh-three` çoktan düzelmişti. Paylaşırken
+`shoresh-three` verilmesi daha güvenli.
+
+**Erişim:** Proje herkese açık — Vercel Deployment Protection (SSO) kapalı.
+Durumu görmek için: `npx vercel project protection shoresh --json`
+
 ## Veri kaynağı
 
 Kök listesi, anlamlar ve öğretim notları bu proje için yazıldı. Çekimler
