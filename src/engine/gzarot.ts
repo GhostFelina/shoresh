@@ -23,6 +23,7 @@ import {
   HIRIK_MALE,
   HOLAM_MALE,
   KAMATZ,
+  METATHESIS,
   PAST_SHAPE,
   PAST_SUFFIX,
   PAST_SUFFIX_OPEN,
@@ -185,40 +186,66 @@ const LAMED_HEY_HIFIL: BinyanTemplate = {
   },
 };
 
+
+/**
+ * ל״ה hitpa'el başı — metatez burada da geçerlidir.
+ * Kök ıslıklı bir harfle başlıyorsa ön ekin ת'si onunla yer değiştirir:
+ *   ש־נ־ה → הִשְׁתַּנָּה   (הִתְשַׁנָּה DEĞİL)
+ * Üç harfli hitpa'el şablonunda bu kural zaten vardı; ל״ה ailesinde de
+ * olmazsa en sık kullanılan "değişmek" fiili yanlış üretilir.
+ */
+function lamedHeyHitpaelHead(first: string, head: string): Segment[] {
+  const swapped = METATHESIS[first];
+  if (!swapped) return [affix(head + 'ת' + SHVA)];
+  return [affix(head), rt(v(first, SHVA)), affix(swapped + DAGESH + PATAH)];
+}
+
+/** Metatezde ilk kök harfi ön eke taşındığı için gövdeden düşer. */
+const lamedHeyBody = (a: string, b: string): [string, string] =>
+  METATHESIS[a] ? [b, b] : [a, b];
+
 /** ל״ה + hitpa'el — הִתְנַסָּה, הִתְרַצָּה, הִשְׁתַּנָּה, הִתְכַּסָּה */
 const LAMED_HEY_HITPAEL: BinyanTemplate = {
-  infinitive: ([a, b]) => [
-    affix('ל' + SHVA + 'ה' + HIRIK + 'ת' + SHVA),
-    rt(v(a, PATAH)),
-    rt(vs(b)),
-    affix('וֹת'),
-  ],
+  infinitive: ([a, b]) => {
+    const [x, y] = lamedHeyBody(a, b);
+    const head = lamedHeyHitpaelHead(a, 'ל' + SHVA + 'ה' + HIRIK);
+    return METATHESIS[a]
+      ? [...head, rt(vs(y)), affix('וֹת')]
+      : [...head, rt(v(x, PATAH)), rt(vs(y)), affix('וֹת')];
+  },
 
   past: ([a, b], p) => {
     const shape = PAST_SHAPE[p];
-    const head: Segment[] = [affix('ה' + HIRIK + 'ת' + SHVA), rt(v(a, PATAH))];
-    if (shape === 'bare') return [...head, rt(vs(b, KAMATZ)), affix('ה')];
-    if (p === 'hi') return [...head, rt(vs(b, SHVA)), affix('תָה')];
-    if (p === 'hem') return [...head, rt(vs(b)), affix(SHURUK)];
-    return [...head, rt(vs(b) + HIRIK_MALE), affix(PAST_SUFFIX_OPEN[p])];
+    const head = lamedHeyHitpaelHead(a, 'ה' + HIRIK);
+    const [x, y] = lamedHeyBody(a, b);
+    const stem: Segment[] = METATHESIS[a] ? [] : [rt(v(x, PATAH))];
+    const body = [...head, ...stem];
+    if (shape === 'bare') return [...body, rt(vs(y, KAMATZ)), affix('ה')];
+    if (p === 'hi') return [...body, rt(vs(y, SHVA)), affix('תָה')];
+    if (p === 'hem') return [...body, rt(vs(y)), affix(SHURUK)];
+    return [...body, rt(vs(y) + HIRIK_MALE), affix(PAST_SUFFIX_OPEN[p])];
   },
 
-  present: ([a, b], s) => [
-    affix('מ' + HIRIK + 'ת' + SHVA),
-    rt(v(a, PATAH)),
-    rt(vs(b)),
-    ...lamedHeyPresentTail(s),
-  ],
+  present: ([a, b], s) => {
+    const swapped = METATHESIS[a];
+    const [x, y] = lamedHeyBody(a, b);
+    const head: Segment[] = swapped
+      ? [affix('מ' + HIRIK), rt(v(a, SHVA)), affix(swapped + DAGESH + PATAH)]
+      : [affix('מ' + HIRIK + 'ת' + SHVA), rt(v(x, PATAH))];
+    return [...head, rt(vs(y)), ...lamedHeyPresentTail(s)];
+  },
 
   future: ([a, b], p) => {
     const pre = FUTURE_PREFIX_LETTER[p]!;
-    const head: Segment[] = [
-      affix(vl(pre, p === 'ani' ? SEGOL : HIRIK) + 'ת' + SHVA),
-      rt(v(a, PATAH)),
-    ];
-    if (p === 'at') return [...head, rt(vs(b) + HIRIK_MALE)];
-    if (FUTURE_SUFFIXED.has(p)) return [...head, rt(vs(b)), affix(SHURUK)];
-    return [...head, rt(vs(b, SEGOL)), affix('ה')];
+    const swapped = METATHESIS[a];
+    const [x, y] = lamedHeyBody(a, b);
+    const prefix = vl(pre, p === 'ani' ? SEGOL : HIRIK);
+    const head: Segment[] = swapped
+      ? [affix(prefix), rt(v(a, SHVA)), affix(swapped + DAGESH + PATAH)]
+      : [affix(prefix + 'ת' + SHVA), rt(v(x, PATAH))];
+    if (p === 'at') return [...head, rt(vs(y) + HIRIK_MALE)];
+    if (FUTURE_SUFFIXED.has(p)) return [...head, rt(vs(y)), affix(SHURUK)];
+    return [...head, rt(vs(y, SEGOL)), affix('ה')];
   },
 };
 

@@ -115,6 +115,18 @@ function parseRow(line: string): HebrewVerb | null {
    * ayrılıyor; uzayan biçim için henüz şablon yok, o kökler reddediliyor.
    */
   const mid = letters[1]?.charAt(0);
+  const MID_NO_DAGESH = 'אהחער'; // א ה ח ע ר
+  const PIEL_FAMILY = binyan === 'piel' || binyan === 'pual' || binyan === 'hitpael';
+
+  /**
+   * ל״ה + pi'el ailesinde ORTA harf dageş alır (נִסָּה, חִכָּה). Orta harf
+   * dageş alamayan bir harfse (א ה ח ע ר) kalıp bozulur — זִהָה, הִתְחָרָה.
+   * Şablon dageşi koşulsuz eklediği için bu kökler burada durduruluyor.
+   */
+  if (!isQuad && gizra === 'lamed-hey' && PIEL_FAMILY && mid && MID_NO_DAGESH.includes(mid)) {
+    return fail(line, `orta harf ${mid} dages alamaz — l"h pi'el kalibi bozulur, sablon yok`);
+  }
+
   if (
     !isQuad &&
     gizra === 'ayin-guttural' &&

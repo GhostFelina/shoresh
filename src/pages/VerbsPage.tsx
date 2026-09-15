@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Search, Volume2 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { MessageSquareText, Search, Volume2 } from 'lucide-react';
 import { CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
+import { sentenceSet } from '@/engine/sentence';
 import { speak } from '@/lib/speech';
 import {
   BINYAN_LABEL,
@@ -87,9 +89,69 @@ function FormBlock({ verb, form }: { verb: HebrewVerb; form: HebrewForm }) {
   );
 }
 
+
+/**
+ * Örnek cümleler — çekim tablosundan üretilir.
+ *
+ * Tablo tek başına "bu biçim var" der; cümle "bu biçim nerede kullanılır"
+ * der. İkisi yan yana olmazsa öğrenci כּוֹתֵב biçimini tanır ama cümle
+ * kuramaz.
+ */
+function Examples({ verb }: { verb: HebrewVerb }) {
+  const sentences = sentenceSet(verb);
+  if (sentences.length === 0) return null;
+
+  return (
+    <section className="card space-y-2 p-4">
+      <h3 className="flex items-center gap-2 text-sm font-semibold">
+        <MessageSquareText className="size-4" style={{ color: 'var(--color-accent-400)' }} />
+        Örnek cümleler
+      </h3>
+      <p className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
+        Cümleler bu fiilin kendi çekim tablosundan üretildi — tablo doğruysa cümle de doğrudur.
+      </p>
+      <ul className="space-y-1">
+        {sentences.map((s, i) => (
+          <li key={`${s.form}-${i}`}>
+            <button
+              type="button"
+              onClick={() => speak(s.plain)}
+              className="card-2 group flex w-full items-center gap-3 px-3 py-2 text-left transition hover:brightness-125"
+            >
+              <span
+                className="w-16 shrink-0 text-[10px] uppercase tracking-wide"
+                style={{ color: 'var(--text-dim)' }}
+              >
+                {FORM_LABEL[s.form].short}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="he he-vocalized block text-lg">{s.he}</span>
+                <span className="block text-[11px] italic" style={{ color: 'var(--color-brand-300)' }}>
+                  {s.translit}
+                </span>
+              </span>
+              <span className="w-32 shrink-0 text-xs" style={{ color: 'var(--text-dim)' }}>
+                {s.tr}
+              </span>
+              <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function VerbsPage() {
+  /**
+   * Seçili fiil adres çubuğunda tutuluyor. Seviye sayfasından "tam çekim
+   * tablosu" bağlantısıyla gelen kullanıcı doğrudan o fiile düşsün diye;
+   * ayrıca bağlantı paylaşılabilir hâle geliyor.
+   */
+  const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState('');
-  const [selectedId, setSelectedId] = useState(VERBS[0]?.id ?? '');
+  const selectedId = params.get('id') ?? VERBS[0]?.id ?? '';
+  const setSelectedId = (id: string) => setParams({ id }, { replace: true });
   const [form, setForm] = useState<HebrewForm>('present');
 
   const filtered = useMemo(() => {
@@ -110,11 +172,10 @@ export default function VerbsPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Fiiller</h1>
+        <h1 className="text-2xl font-bold tracking-tight">VERB Hebrew</h1>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
           {CATALOG_STATS.total} kök+binyan çifti, kural motoruyla üretilmiş{' '}
-          {CATALOG_STATS.totalForms.toLocaleString('tr-TR')} çekim biçimi. Bir biçme tıklayınca
-          seslendirilir.
+          {CATALOG_STATS.totalForms.toLocaleString('tr-TR')} çekim biçimi. Her biçim tıklanınca seslendirilir.
         </p>
       </header>
 
@@ -239,6 +300,8 @@ export default function VerbsPage() {
             <div className="space-y-1">
               <FormBlock verb={verb} form={form} />
             </div>
+
+            <Examples verb={verb} />
           </section>
         )}
       </div>

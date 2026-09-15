@@ -59,7 +59,6 @@ export const B1_PIEL = `
 קלט|piel|kaydetmek (ses, görüntü)|B1|48,46,46,54
 שקר|piel|yalan söylemek|B1|56,58,60,48
 כסה|piel|örtmek; kapatmak|B1|58,60,58,58
-זהה|piel|tanımlamak; teşhis etmek|B1|56,50,50,68
 נצל|piel|kullanmak; sömürmek|B1|58,54,54,66
 פחד|piel|korkutmak|B1|40,42,42,38
 שכנע|piel|ikna etmek|B1|62,58,60,68|shlemim

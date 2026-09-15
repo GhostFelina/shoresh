@@ -34,6 +34,7 @@ import {
   PRESENT_ALL,
   SHURUK,
   SHVA,
+  METATHESIS,
   TABLE_PERSONS,
   affix,
   dot,
@@ -380,16 +381,6 @@ const HUFAL: BinyanTemplate = {
  * uygulanmazsa üretilen fiil yanlış olur.
  * ================================================================== */
 
-/** Metatez tetikleyen harfler ve ת'nin aldığı biçim. */
-const METATHESIS: Record<string, string> = {
-  ס: 'ת',
-  ש: 'ת',
-  שׂ: 'ת',
-  צ: 'ט', // הִצְטַדֵּק — ת vurgulu ט olur
-  ז: 'ד', // הִזְדַּקֵּן — ת sesli ד olur
-  ד: 'ד',
-  ט: 'ט',
-};
 
 /** Hitpa'el ön ekini kök birinci harfine göre kurar. */
 function hitpaelPrefix(first: string, headVowel: string): Segment[] {

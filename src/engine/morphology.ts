@@ -191,6 +191,31 @@ export function lamedHeyPresentTail(s: PresentSlot): Segment[] {
   return [affix(HOLAM_MALE + 'ת')]; // fp
 }
 
+
+/**
+ * Hitpa'el metatezi (שיכול אותיות) — ıslıklı kök harfi ile ön ekin ת'si
+ * YER DEĞİŞTİRİR. İbranicenin en çok gözden kaçan kurallarından biridir
+ * ve uygulanmazsa üretilen fiil yanlış olur:
+ *   ס → הִסְתַּדֵּר   (הִתְסַדֵּר değil)
+ *   שׁ → הִשְׁתַּמֵּשׁ
+ *   צ → הִצְטַדֵּק   (ת vurgulu ט'ye döner)
+ *   ז → הִזְדַּקֵּן   (ת sesli ד'ye döner)
+ * Hem üç harfli hem ל״ה hitpa'el şablonları buna bakar; tek yerde
+ * durmazsa biri düzeltilip diğeri unutulur.
+ */
+export const METATHESIS: Record<string, string> = {
+  ס: 'ת',
+  ש: 'ת',
+  צ: 'ט',
+  ז: 'ד',
+  ד: 'ד',
+  ט: 'ט',
+};
+
+/** Kökün ilk harfi metatez tetikliyor mu? */
+export const swapsWithTav = (letter: string): string | undefined =>
+  METATHESIS[letter.charAt(0)];
+
 /** Modern konuşma İvritinde tabloya yazılan kişiler. */
 export const TABLE_PERSONS: Person[] = [
   'ani',

@@ -320,3 +320,21 @@ describe('motor sözleşmesi — desteklenmeyen birleşim reddedilir', () => {
     }
   });
 });
+
+describe("ל״ה hitpa'el metatezi — ש־נ־ה (değişmek)", () => {
+  const t = conjugate(['ש', 'נ', 'ה'], 'hitpael', 'lamed-hey');
+
+  it('הִשְׁתַּנָּה üretir, הִתְשַׁנָּה değil', () => {
+    expect(V(t.past.hu!.vocalized)).toBe(V('הִשְׁתַּנָּה'));
+    expect(t.past.hu!.plain).toBe('השתנה');
+  });
+
+  it('şimdiki zamanda da metatez korunur: מִשְׁתַּנֶּה', () => {
+    expect(V(t.present.ms.vocalized)).toBe(V('מִשְׁתַּנֶּה'));
+  });
+
+  it('metatez gerektirmeyen kök normal kalır: הִתְנַסָּה', () => {
+    const n = conjugate(['נ', 'ס', 'ה'], 'hitpael', 'lamed-hey');
+    expect(V(n.past.hu!.vocalized)).toBe(V('הִתְנַסָּה'));
+  });
+});
