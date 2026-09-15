@@ -168,7 +168,8 @@ export function toPlain(segments: Segment[]): string {
         // חוֹלָם מָלֵא zaten ו taşıyor; o ו bir önceki adımda yazıldı.
         const prev = out.at(-1);
         if (prev?.ch === 'ו') prev.vocalic = true;
-        else push('ו', true);
+        // Ardından א geliyorsa "o" sesini o א taşır, ו yazılmaz: יֹאכַל → יאכל.
+        else if (nextLetter(flat, i) !== 'א') push('ו', true);
       } else if (ch === KUBUTZ) {
         push('ו', true);
       }
@@ -192,6 +193,14 @@ export function toPlain(segments: Segment[]): string {
  *   סִפֵּר   → סיפר   (yod)
  *   הִגִּיעַ → הגיע   (zaten yod var, ikincisi yazılmaz)
  */
+/** Verilen konumdan sonraki ilk gerçek harf (hareke değil). */
+function nextLetter(flat: Array<{ ch: string }>, from: number): string | undefined {
+  for (let i = from + 1; i < flat.length; i++) {
+    if (!isMark(flat[i]!.ch)) return flat[i]!.ch;
+  }
+  return undefined;
+}
+
 function needsYod(flat: Array<{ ch: string }>, hirikIndex: number): boolean {
   // Bu harfin kalan işaretlerini atla, sonraki harfi bul.
   let j = hirikIndex + 1;

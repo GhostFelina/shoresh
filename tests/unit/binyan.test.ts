@@ -251,8 +251,8 @@ describe('harekesizleştirme ve okunuş', () => {
 });
 
 describe('motor sözleşmesi', () => {
-  it('üç harfli olmayan kök reddedilir', () => {
-    expect(() => conjugate(['ק', 'ו'], 'paal')).toThrow(/üç harfli/);
+  it('üç ya da dört harfli olmayan kök reddedilir', () => {
+    expect(() => conjugate(['ק', 'ו'], 'paal')).toThrow(/üç ya da dört harfli/);
   });
 
   it('edilgen binyanlarda emir kipi üretilmez', () => {

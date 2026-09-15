@@ -3,172 +3,60 @@
  *
  * TEMEL FİKİR: İbranice fiil ezberlenmez, TÜRETİLİR. Üç harfli kök
  * (שורש) bir kalıba (בניין) oturur ve bütün tablo kalıptan çıkar.
- * Bu yüzden 2000 fiil için 2000 × 40 = 80.000 biçim elle yazılmaz;
- * 2000 kök + 7 kalıp yazılır, gerisini bu dosya üretir.
+ * Bu yüzden 1500 fiil için 1500 × 40 = 60.000 biçim elle yazılmaz;
+ * kökler + kalıplar yazılır, gerisini bu dosya üretir.
  *
- * KAPSAM: Buradaki şablonlar SHLEMIM (tam kök) içindir — kalıbın
- * bozulmadığı köklerdir ve söz varlığının çoğunluğunu oluşturur.
- * Zayıf kökler (gzarot: ל״ה, ע״ו, פ״נ ...) kalıbı kırar; onlar
- * `data/irregular.ts` içinde AÇIK tabloyla durur. Bu ayrım
- * "düzenliyi türet, düzensizi sakla" kuralının İbranice karşılığıdır.
+ * İKİ ŞABLON AİLESİ:
+ *  - Bu dosya  → SHLEMIM (tam kök): kalıbın hiç bozulmadığı kökler.
+ *  - gzarot.ts → ZAYIF kökler: ל״ה, ע״ו, פ״נ, פ״י, gırtlaksılar…
+ *    Bunlarda kök harflerinden biri düşer, ünlüye dönüşür ya da
+ *    komşusunu değiştirir; kalıp aynı kalmaz, ayrı şablon ister.
+ *
+ * `conjugate()` doğru aileyi gizraya bakarak seçer. Eşleşen şablon
+ * yoksa SESSİZCE yanlış çekim üretmek yerine hata fırlatır.
  *
  * Dosya SAF kalır: DOM, veritabanı, ağ yok.
  */
+import { buildConjugation, normalizeFinals, type Segment } from './niqqud';
 import {
   DAGESH,
-  HATAF_PATAH,
+  FUTURE_PREFIX_LETTER,
+  FUTURE_SUFFIX,
+  FUTURE_SUFFIXED,
   HIRIK,
-  HOLAM,
+  HIRIK_MALE,
+  HOLAM_MALE,
+  IMPERATIVE_ALL,
   KAMATZ,
-  KUBUTZ,
+  PAST_SHAPE,
+  PAST_SUFFIX,
   PATAH,
-  SEGOL,
-  SHIN_DOT,
+  PRESENT_ALL,
+  SHURUK,
   SHVA,
-  TZERE,
-  BEGADKEFAT,
+  TABLE_PERSONS,
   affix,
-  buildConjugation,
-  root as rt,
-  type Segment,
-} from './niqqud';
+  dot,
+  presentTail,
+  rt,
+  v,
+  vl,
+  vs,
+  type BinyanTemplate,
+  type Root3,
+} from './morphology';
+import { SEGOL, TZERE, KUBUTZ, HATAF_PATAH } from './niqqud';
+import { GIZRA_TEMPLATES, SHLEMIM_COMPATIBLE } from './gzarot';
+import { conjugateQuad, supportsQuad } from './meruba';
 import type {
   Binyan,
   Conjugation,
   ConjugationTable,
+  Gizra,
   ImperativeSlot,
   Person,
   PresentSlot,
 } from '@/types/hebrew';
-
-/* ------------------------------------------------------------------ *
- * Harf yardımcıları
- * ------------------------------------------------------------------ */
-
-/** Şin noktası — ש yazıldığında ׁ işareti zorunludur, שׂ (sin) ayrı verilir. */
-function dot(letter: string): string {
-  return letter === 'ש' ? 'ש' + SHIN_DOT : letter;
-}
-
-/**
- * Dageş hazak (כפול) — harfi ikizleyen dageş.
- * Pi'el / Pu'al / Hitpa'el kalıplarının ortak imzası. Gırtlaksılar ve
- * ר dageş almaz; o kökler zaten ayrı gizraya düşer, burada gelmezler.
- */
-function strong(letter: string): string {
-  return letter === 'ש' ? 'ש' + DAGESH + SHIN_DOT : letter + DAGESH;
-}
-
-/**
- * Dageş kal — yalnızca begadkefat harflerinde, kelime başında ya da
- * şva nah'tan sonra. לִכְתּוֹב'daki ת bunu alır, לִשְׁמוֹר'daki מ almaz.
- */
-function light(letter: string): string {
-  return BEGADKEFAT.has(letter) ? strong(letter) : dot(letter);
-}
-
-/** Harf + hareke(ler) — okunurluk için kısa sarmalayıcı. */
-const v = (letter: string, ...marks: string[]): string => dot(letter) + marks.join('');
-const vs = (letter: string, ...marks: string[]): string => strong(letter) + marks.join('');
-const vl = (letter: string, ...marks: string[]): string => light(letter) + marks.join('');
-
-/** Holam male — חוֹלָם מָלֵא, yani ו + ֹ. Modern yazımda standart. */
-const HOLAM_MALE = 'ו' + HOLAM;
-/** Şuruk — וּ. */
-const SHURUK = 'ו' + DAGESH;
-/** Hirik male — ִי. */
-const HIRIK_MALE = HIRIK + 'י';
-
-/* ------------------------------------------------------------------ *
- * Çekim ekleri — bütün binyanlarda ortak
- * ------------------------------------------------------------------ */
-
-/** Geçmiş zaman kişi ekleri. Kök harfi hangi harekeyi alacak ayrı belirlenir. */
-const PAST_SUFFIX: Record<Person, string> = {
-  ani: 'תִּי',
-  ata: 'תָּ',
-  at: 'תְּ',
-  hu: '',
-  hi: KAMATZ + 'ה', // R3 kamatz alır, sonra ה — 'reduced' biçimde ayrıca kurulur
-  anachnu: 'נוּ',
-  atem: 'תֶּם',
-  aten: 'תֶּן',
-  hem: 'וּ',
-};
-
-/**
- * Geçmiş zamanda kök son harfinin (R3) harekesi kişiye göre değişir:
- *  - hu           → hareke yok        (כָּתַב)
- *  - hi / hem     → kök sesli düşer   (כָּתְבָה / כָּתְבוּ)
- *  - diğerleri    → şva nah           (כָּתַבְתִּי)
- */
-type PastShape = 'bare' | 'reduced' | 'shva';
-
-const PAST_SHAPE: Record<Person, PastShape> = {
-  ani: 'shva',
-  ata: 'shva',
-  at: 'shva',
-  hu: 'bare',
-  hi: 'reduced',
-  anachnu: 'shva',
-  atem: 'shva',
-  aten: 'shva',
-  hem: 'reduced',
-};
-
-/** Gelecek zaman ön ekleri — binyana göre harekesi değişir, harfi değişmez. */
-const FUTURE_PREFIX_LETTER: Record<Person, string> = {
-  ani: 'א',
-  ata: 'ת',
-  at: 'ת',
-  hu: 'י',
-  hi: 'ת',
-  anachnu: 'נ',
-  atem: 'ת',
-  aten: 'ת',
-  hem: 'י',
-};
-
-/** Gelecek zamanda sonek alan kişiler — kök sesi düşer. */
-const FUTURE_SUFFIXED = new Set<Person>(['at', 'atem', 'aten', 'hem']);
-
-const FUTURE_SUFFIX: Partial<Record<Person, string>> = {
-  at: HIRIK_MALE,
-  atem: SHURUK,
-  aten: 'נָה',
-  hem: SHURUK,
-};
-
-/* ------------------------------------------------------------------ *
- * Şablon tipi
- * ------------------------------------------------------------------ */
-
-type Root3 = [string, string, string];
-
-/** Bir binyanın bütün biçimlerini üreten şablon kümesi. */
-interface BinyanTemplate {
-  infinitive?: (r: Root3) => Segment[];
-  past: (r: Root3, p: Person) => Segment[];
-  present: (r: Root3, s: PresentSlot) => Segment[];
-  future?: (r: Root3, p: Person) => Segment[];
-  imperative?: (r: Root3, s: ImperativeSlot) => Segment[];
-}
-
-/**
- * Şimdiki zaman kuyruğu — son kök harfi + çoğul eki.
- *
- * Çoğul ekinin ünlüsü SON KÖK HARFİNE yazılır, ekin kendisine değil:
- *   כּוֹתֵב → כּוֹתְבִים   (ב hirik alır, ardından ים)
- *   כּוֹתֵב → כּוֹתְבוֹת   (ב holam alır, ardından ת)
- * Bu yüzden ek dizesi 'ים' / 'ות' diye tek parça tutulamaz; tutulursa
- * ünlü iki kez yazılır (כּוֹתְבוֹות gibi). Dişil tekil binyandan binyana
- * değiştiği için burada değil, her şablonun içinde kurulur.
- */
-function presentTail(last: string, s: PresentSlot): Segment[] {
-  if (s === 'ms') return [rt(dot(last))];
-  if (s === 'mp') return [rt(dot(last) + HIRIK), affix('ים')];
-  return [rt(dot(last) + HOLAM_MALE), affix('ת')]; // fp
-}
 
 /* ================================================================== *
  * PA'AL — פָּעַל (קל). Temel etken binyan.
@@ -607,11 +495,13 @@ function hitpaelStem(
   return [rt(v(x, PATAH)), rt(vs(y, stemVowel)), rt(dot(z) + lastVowel)];
 }
 
+
 /* ------------------------------------------------------------------ *
- * Genel arayüz
+ * Şablon seçimi ve genel arayüz
  * ------------------------------------------------------------------ */
 
-const TEMPLATES: Record<Binyan, BinyanTemplate> = {
+/** Tam kök şablonları — kalıbın bozulmadığı kökler. */
+export const SHLEMIM_TEMPLATES: Record<Binyan, BinyanTemplate> = {
   paal: PAAL,
   nifal: NIFAL,
   piel: PIEL,
@@ -621,39 +511,77 @@ const TEMPLATES: Record<Binyan, BinyanTemplate> = {
   hitpael: HITPAEL,
 };
 
-/** Modern konuşma İvritinde tabloya yazılan kişiler. */
-const TABLE_PERSONS: Person[] = [
-  'ani', 'ata', 'at', 'hu', 'hi', 'anachnu', 'atem', 'hem',
-];
-
-const PRESENT_ALL: PresentSlot[] = ['ms', 'fs', 'mp', 'fp'];
-const IMPERATIVE_ALL: ImperativeSlot[] = ['ata', 'at', 'atem'];
-
-/** Bu binyanda mastar ve emir kipi var mı? Edilgenlerde yoktur. */
-export function hasInfinitive(binyan: Binyan): boolean {
-  return TEMPLATES[binyan].infinitive !== undefined;
+/**
+ * Bir binyan+gizra çifti için şablon bulur.
+ *
+ * Sıra önemli: önce gizraya özel şablon aranır, yoksa tam kök şablonuna
+ * DÜŞÜLMEZ. Zayıf bir kökü shlemim şablonuyla çekmek sessizce yanlış
+ * biçim üretir — קָנָה yerine קָנַה gibi. Bu yüzden eşleşme yoksa
+ * `undefined` döner ve çağıran taraf kökü reddeder.
+ */
+export function templateFor(binyan: Binyan, gizra: Gizra): BinyanTemplate | undefined {
+  if (gizra === 'shlemim') return SHLEMIM_TEMPLATES[binyan];
+  const specific = GIZRA_TEMPLATES[`${binyan}:${gizra}`];
+  if (specific) return specific;
+  // Kalıbın gerçekten bozulmadığı, açıkça listelenmiş birleşimler.
+  if (SHLEMIM_COMPATIBLE.has(`${binyan}:${gizra}`)) return SHLEMIM_TEMPLATES[binyan];
+  return undefined;
 }
 
-export function hasImperative(binyan: Binyan): boolean {
-  return TEMPLATES[binyan].imperative !== undefined;
+/** Bu binyan+gizra çifti motorla üretilebiliyor mu? */
+export function isSupported(binyan: Binyan, gizra: Gizra, rootLength = 3): boolean {
+  if (rootLength === 4) return supportsQuad(binyan);
+  return templateFor(binyan, gizra) !== undefined;
+}
+
+/** Bu şablonda mastar var mı? Edilgen binyanlarda yoktur. */
+export function hasInfinitive(binyan: Binyan, gizra: Gizra = 'shlemim'): boolean {
+  return templateFor(binyan, gizra)?.infinitive !== undefined;
+}
+
+export function hasImperative(binyan: Binyan, gizra: Gizra = 'shlemim'): boolean {
+  return templateFor(binyan, gizra)?.imperative !== undefined;
 }
 
 /**
- * Bir kök+binyan çiftinin tam çekim tablosunu üretir.
+ * Bir kök+binyan+gizra üçlüsünün tam çekim tablosunu üretir.
  *
- * Yalnızca SHLEMIM kökler için doğrudur. Zayıf kök verildiğinde de
- * bir tablo döner — ama o tablo yanlıştır; çağıran taraf gizrayı
- * kontrol edip zayıf kökleri açık tablodan almak zorundadır.
- * `catalog.ts` bu kontrolü yapar ve ihlali test düşürür.
+ * Gizra verilmezse kök tam kök varsayılır. Yanlış gizra vermek yanlış
+ * tablo demektir; `catalog.ts` gizrayı kökten DOĞRULAR ve uyuşmazlığı
+ * rapor eder, böylece veri hatası testte görünür.
  */
-export function conjugate(rootLetters: string[], binyan: Binyan): ConjugationTable {
+export function conjugate(
+  rootLetters: string[],
+  binyan: Binyan,
+  gizra: Gizra = 'shlemim',
+): ConjugationTable {
+  /**
+   * Dört harfli kökler (מְרֻבָּעִים) ayrı bir ailedir: תִּכְנֵן, אִרְגֵּן,
+   * טִלְפֵּן. Üç harfli şablonlarla çekilemezler, kendi motorlarına gider.
+   */
+  if (rootLetters.length === 4) return conjugateQuad(rootLetters, binyan);
+
   if (rootLetters.length !== 3) {
     throw new Error(
-      `Çekim motoru üç harfli kök bekler, ${rootLetters.length} harf geldi: ${rootLetters.join('')}`,
+      `Çekim motoru üç ya da dört harfli kök bekler, ${rootLetters.length} harf geldi: ` +
+        rootLetters.join(''),
     );
   }
-  const r = rootLetters as Root3;
-  const t = TEMPLATES[binyan];
+  const t = templateFor(binyan, gizra);
+  if (!t) {
+    throw new Error(
+      `Bu birleşim için şablon yok: ${binyan} + ${gizra} (${rootLetters.join('')}). ` +
+        `gzarot.ts içine eklenmeli.`,
+    );
+  }
+
+  /**
+   * Kök harfleri sofit biçimde gelmiş olabilir (ק־ו־ם gibi). Çekimde
+   * ek aldığı anda harf kelime ortasına düşer ve normal biçime dönmek
+   * zorundadır — קָמָה, קָםָה değil. Sofit dönüşümü en sonda, bir kez,
+   * `applyFinalForm` tarafından uygulanır.
+   */
+  const r = rootLetters.map((ch) => normalizeFinals(ch)) as Root3;
 
   const past: Partial<Record<Person, Conjugation>> = {};
   for (const p of TABLE_PERSONS) past[p] = buildConjugation(t.past(r, p));
