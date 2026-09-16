@@ -4,8 +4,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  Check as CheckIcon,
   GraduationCap,
   Lightbulb,
+  PlayCircle,
   MicOff,
   RotateCcw,
   Volume2,
@@ -13,8 +15,13 @@ import {
 } from 'lucide-react';
 import {
   LESSON_BY_ID,
+  LESSON_GROUPS,
   answerMatches,
   availableLessons,
+  clearLessonOpen,
+  markLessonDone,
+  markLessonOpen,
+  readLessonProgress,
   type Lesson,
   type LessonStep,
   type Piece,
@@ -149,7 +156,7 @@ function StepBody({
   const check = useCallback(
     (given: string) => {
       if (!q || answer.checked) return;
-      const ok = answerMatches(given, q.answer);
+      const ok = answerMatches(given, q.answer, q.exact);
       const line = voiceOn ? coachReact(ok ? 'correct' : 'wrong') : ok ? 'Doğru.' : 'Olmadı.';
       setAnswer((a) => ({ ...a, checked: true, correct: ok, reaction: line }));
       onScored(ok, answer.hintOpen, Date.now() - shownAt.current);
@@ -195,7 +202,7 @@ function StepBody({
         <div className="grid gap-2 sm:grid-cols-2">
           {q.choices.map((c) => {
             const isChosen = answer.chosen === c;
-            const isRight = answerMatches(c, q.answer);
+            const isRight = answerMatches(c, q.answer, q.exact);
             const show = answer.checked && (isChosen || isRight);
             return (
               <button
@@ -316,14 +323,16 @@ function LessonRunner({
   onExit,
   onRestart,
   voiceOn,
+  startAt = 0,
 }: {
   lesson: Lesson;
   level: CEFR;
   onExit: () => void;
   onRestart: () => void;
   voiceOn: boolean;
+  startAt?: number;
 }) {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => Math.min(startAt, lesson.steps.length - 1));
   const [answers, setAnswers] = useState<Record<number, AnswerState>>({});
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const spokenFor = useRef<number>(-1);
@@ -385,7 +394,19 @@ function LessonRunner({
   const go = (d: number) => {
     stopCoach();
     stopSpeaking();
-    setIndex((i) => Math.min(lesson.steps.length - 1, Math.max(0, i + d)));
+    setIndex((i) => {
+      const next = Math.min(lesson.steps.length - 1, Math.max(0, i + d));
+      // "Nerede kaldım" her adımda yazılıyor: ders yarıda bırakılıp
+      // sayfa kapatılsa bile listeye dönünce kaldığı yer görünüyor.
+      markLessonOpen(lesson.id, next);
+      return next;
+    });
+  };
+
+  const finish = () => {
+    markLessonDone(lesson.id);
+    clearLessonOpen();
+    onExit();
   };
 
   const blocked = step.question !== undefined && !answer.checked;
@@ -477,8 +498,9 @@ function LessonRunner({
         ) : (
           <button
             type="button"
-            onClick={onExit}
-            className="card-2 card-interactive px-4 py-2 text-sm"
+            onClick={finish}
+            className="rounded-lg px-4 py-2 text-sm font-semibold"
+            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
           >
             Dersi bitir
           </button>
@@ -506,6 +528,13 @@ export default function TeacherPage() {
 
   const coachAvailable = useMemo(() => canCoachSpeak(), []);
   const lessons = useMemo(() => availableLessons(level), [level]);
+  const [progress, setProgress] = useState(() => readLessonProgress());
+
+  // Listeye her dönüşte ilerleme tazeleniyor; ders bitince kart hemen
+  // "tamamlandı" görünsün.
+  useEffect(() => {
+    if (!lessonId) setProgress(readLessonProgress());
+  }, [lessonId]);
 
   const lesson = useMemo(() => {
     if (!lessonId) return null;
@@ -520,6 +549,7 @@ export default function TeacherPage() {
         lesson={lesson}
         level={level}
         voiceOn={voiceOn && coachAvailable}
+        startAt={progress.open?.id === lessonId ? progress.open.step : 0}
         onExit={() => navigate('/ogretmen')}
         onRestart={() => setSeed(Date.now() % 100000)}
       />
@@ -578,30 +608,88 @@ export default function TeacherPage() {
         </p>
       )}
 
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {lessons.map((m) => (
-          <li key={m.id}>
-            <button
-              type="button"
-              onClick={() => navigate(`/ogretmen/${m.id}`)}
-              className="card card-interactive h-full w-full space-y-1 p-4 text-start"
-            >
-              <span
-                className="text-[11px] font-medium uppercase tracking-wide"
-                style={{ color: 'var(--accent-text)' }}
-              >
-                {m.from}
+      {/* Kaldığın yerden devam — yarıda bırakılan ders varsa en üstte. */}
+      {progress.open && LESSON_BY_ID.has(progress.open.id) && (
+        <button
+          type="button"
+          onClick={() => navigate(`/ogretmen/${progress.open!.id}`)}
+          className="card card-interactive flex w-full items-center gap-3 p-4 text-start"
+          style={{ borderColor: 'var(--color-brand-400)' }}
+        >
+          <PlayCircle className="size-6 shrink-0" style={{ color: 'var(--accent-text)' }} />
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs" style={{ color: 'var(--text-dim)' }}>
+              Kaldığın yerden devam et
+            </span>
+            <span className="block truncate text-sm font-semibold">
+              <MixedText>{LESSON_BY_ID.get(progress.open.id)!.title}</MixedText>
+            </span>
+          </span>
+        </button>
+      )}
+
+      {/*
+        Dersler KÜMELERE ayrılmış. Yetmiş ders tek bir uzun liste olsaydı
+        öğrenci nereden başlayacağını bilemezdi; kümeler kolaydan zora
+        değil, BAĞIMLILIĞA göre sıralı — harfleri tanımadan hareke
+        çalışılmaz.
+      */}
+      {LESSON_GROUPS.map((group) => {
+        const inGroup = lessons.filter((m) => m.group === group.id);
+        if (inGroup.length === 0) return null;
+        const doneCount = inGroup.filter((m) => progress.done[m.id]).length;
+
+        return (
+          <section key={group.id} className="space-y-2">
+            <div className="flex flex-wrap items-baseline gap-2">
+              <h2 className="text-sm font-semibold">{group.title}</h2>
+              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                {group.blurb}
               </span>
-              <h3 className="text-sm font-semibold">
-                <MixedText>{m.title}</MixedText>
-              </h3>
-              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                {m.subtitle}
-              </p>
-            </button>
-          </li>
-        ))}
-      </ul>
+              <span
+                className="ms-auto numeric text-xs"
+                style={{ color: doneCount === inGroup.length ? 'var(--accent-text)' : 'var(--text-dim)' }}
+              >
+                {doneCount} / {inGroup.length}
+              </span>
+            </div>
+
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {inGroup.map((m) => {
+                const done = Boolean(progress.done[m.id]);
+                return (
+                  <li key={m.id}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/ogretmen/${m.id}`)}
+                      className="card card-interactive h-full w-full space-y-1 p-4 text-start"
+                      style={done ? { borderColor: 'var(--color-brand-400)' } : undefined}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="text-[11px] font-medium uppercase tracking-wide"
+                          style={{ color: 'var(--accent-text)' }}
+                        >
+                          {m.from}
+                        </span>
+                        {done && (
+                          <CheckIcon className="size-3.5" style={{ color: 'var(--color-brand-400)' }} />
+                        )}
+                      </span>
+                      <h3 className="text-sm font-semibold">
+                        <MixedText>{m.title}</MixedText>
+                      </h3>
+                      <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                        {m.subtitle}
+                      </p>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
 
       {lessons.length === 0 && (
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>

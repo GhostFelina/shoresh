@@ -56,6 +56,37 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.14.0',
+    date: '2026-09-16',
+    title: 'Öğretmen Modu iki katına çıktı',
+    summary:
+      'Ders sayısı 30’dan 71’e çıktı ve dersler altı öğrenme kümesine ayrıldı. Artık her ders iki ipuçlu, iki ipuçsuz soru soruyor ve yarıda bıraktığın yerden devam edebiliyorsun.',
+    changes: [
+      { kind: 'yeni', text: 'Gelecek zaman ve emir kipi dersleri — beş binyan için ayrı ayrı.' },
+      { kind: 'yeni', text: '“Kalıbı tanı” dersleri: harekesiz metinde hangi binyan olduğunu ek harflerden ayırt etme.' },
+      { kind: 'yeni', text: 'Benzeyen harfler: ב/כ, ד/ר, ה/ח/ת, ו/ז/ן, ם/ס, ע/צ, ג/נ — okuma hatalarının büyük kısmı buradan çıkıyor.' },
+      { kind: 'yeni', text: 'Hareke aileleri: aynı sesi veren farklı işaretler.' },
+      { kind: 'yeni', text: 'Aynı kök farklı kalıpta — כתב kökünün dört yüzü bir arada.' },
+      { kind: 'yeni', text: 'Sayılarda ters uyum ve edat çekimi (לִי / לְךָ / לוֹ) dersleri.' },
+      { kind: 'yeni', text: 'Cümle kurma dersleri: sözdizimi, אֶת işareti ve fiilin istediği edat.' },
+      { kind: 'gelisme', text: 'Dersler altı kümeye ayrıldı: Okuma, Zamanlar, Kalıplar, Kökler, Söz varlığı, Yapı.' },
+      { kind: 'gelisme', text: 'Tamamlanan dersler işaretleniyor; yarıda bırakılan ders listenin başında “devam et” olarak duruyor.' },
+      { kind: 'gelisme', text: 'Her derste artık iki ipuçlu, iki ipuçsuz soru var — tek soru konuyu anlatır ama oturtmaz.' },
+      { kind: 'duzeltme', text: 'Hareke dersinde iki şık aynı cevaba dönüşüyordu; o derste karşılaştırma artık harekeyi koruyor.' },
+      { kind: 'duzeltme', text: 'Gelecek zamanda “sen (erkek)” ile “o (kadın)” aynı biçim olduğu için şıklar yineleniyordu.' },
+    ],
+    benefits: [
+      {
+        title: 'Okumayı gerçekten öğreniyorsun',
+        text: 'Şimdiye kadarki dersler fiil çekmeyi öğretiyordu. Yeni dersler asıl engeli hedefliyor: benzeyen harfleri ayırmak ve harekesiz bir kelimenin hangi kalıpta olduğunu ek harflerden çıkarmak. Bunu yapabilen biri hiç görmediği bir fiilin anlamını bile tahmin edebilir.',
+      },
+      {
+        title: 'Nerede kaldığını uygulama hatırlıyor',
+        text: 'Ders yarıda kalırsa listeye dönünce en üstte “kaldığın yerden devam et” duruyor. Yetmiş dersin içinde hangisini bitirdiğini hatırlamak zorunda değilsin; tamamlananlar işaretli.',
+      },
+    ],
+  },
+  {
     version: '1.13.0',
     date: '2026-09-16',
     title: 'İlerleme ve ödül sistemi',

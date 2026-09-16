@@ -17,6 +17,7 @@ import {
 import { VERB_BY_ID } from '@/data/catalog';
 import { WORD_BY_ID } from '@/data/lexicon';
 import { PHRASES } from '@/data/phrases';
+import { LETTER_BY_ID, NIQQUD_BY_ID } from '@/data/alefbet';
 import type { CEFR } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -56,16 +57,24 @@ describe('ders kurulumu', () => {
 describe('ders içeriği', () => {
   const all: Lesson[] = LESSONS.map((m) => m.build('B2', 7)).filter((l): l is Lesson => l !== null);
 
-  it('her ders altı adımla akar: tanıtım, kural, örnek, birlikte, tek başına, özet', () => {
+  it('her ders aynı sırayla akar: tanıtım → kural → örnek → birlikte → tek başına → özet', () => {
+    /*
+     * Adım SAYISI derse göre değişebilir (bazı dersler iki "birlikte" ve
+     * iki "tek başına" soruyor), ama SIRA değişmez. Sıra sabit çünkü
+     * öğrenme sırası sabit; her dersin kendi düzenini kurması öğrenciyi
+     * her derste yeniden yönünü bulmaya zorlardı.
+     */
     for (const l of all) {
-      expect(l.steps.map((s) => s.kind), l.id).toEqual([
-        'intro',
-        'rule',
-        'model',
-        'guided',
-        'solo',
-        'summary',
-      ]);
+      const kinds = l.steps.map((s) => s.kind);
+      expect(kinds.slice(0, 3), l.id).toEqual(['intro', 'rule', 'model']);
+      expect(kinds.at(-1), l.id).toBe('summary');
+
+      const orta = kinds.slice(3, -1);
+      expect(orta.length, `${l.id} soru adımı yok`).toBeGreaterThanOrEqual(2);
+      // Önce bütün ipuçlular, sonra bütün ipuçsuzlar.
+      const ilkSolo = orta.indexOf('solo');
+      expect(orta.slice(0, ilkSolo).every((k) => k === 'guided'), l.id).toBe(true);
+      expect(orta.slice(ilkSolo).every((k) => k === 'solo'), l.id).toBe(true);
     }
   });
 
@@ -88,12 +97,14 @@ describe('ders içeriği', () => {
     }
   });
 
-  it('her ders iki soru sorar: biri ipuçlu, biri değil', () => {
+  it('her derste en az bir ipuçlu ve bir ipuçsuz soru var', () => {
     for (const l of all) {
       const withQ = l.steps.filter((s) => s.question);
-      expect(withQ.length, l.id).toBe(2);
-      expect(withQ[0]!.kind).toBe('guided');
-      expect(withQ[1]!.kind).toBe('solo');
+      expect(withQ.length, l.id).toBeGreaterThanOrEqual(2);
+      expect(withQ.filter((s) => s.kind === 'guided').length, `${l.id} ipuçlu yok`)
+        .toBeGreaterThanOrEqual(1);
+      expect(withQ.filter((s) => s.kind === 'solo').length, `${l.id} ipuçsuz yok`)
+        .toBeGreaterThanOrEqual(1);
     }
   });
 });
@@ -114,7 +125,7 @@ describe('sorular', () => {
     for (const { lesson, q } of questions) {
       if (!q.choices) continue;
       expect(new Set(q.choices).size, `${lesson} şıkları yineleniyor`).toBe(q.choices.length);
-      const hits = q.choices.filter((c) => answerMatches(c, q.answer));
+      const hits = q.choices.filter((c) => answerMatches(c, q.answer, q.exact));
       expect(hits.length, `${lesson} doğru şık sayısı`).toBe(1);
     }
   });
@@ -143,7 +154,11 @@ describe('sorular', () => {
             ? WORD_BY_ID.has(id)
             : kind === 'phrase'
               ? PHRASES.some((p) => p.id === id)
-              : false;
+              : kind === 'letter'
+                ? LETTER_BY_ID.has(id)
+                : kind === 'niqqud'
+                  ? NIQQUD_BY_ID.has(id)
+                  : false;
       expect(exists, `${lesson}: ${kind}:${id} katalogda yok`).toBe(true);
     }
   });

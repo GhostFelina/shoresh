@@ -21,6 +21,22 @@
 import { VERBS } from '@/data/catalog';
 import { WORDS } from '@/data/lexicon';
 import { PHRASES } from '@/data/phrases';
+import {
+  LETTER_GROUP_IDS,
+  LETTER_GROUP_TITLES,
+  NIQQUD_GROUPS,
+  familyRoots,
+  futureLesson,
+  imperativeLesson,
+  letterPairLesson,
+  niqqudGroupLesson,
+  numberAgreementLesson,
+  prepositionLesson,
+  rootAcrossBinyanimLesson,
+  SIGN_BINYANIM,
+  binyanSignLesson,
+  sentenceLesson,
+} from './lessons-extra';
 import type { ItemKind } from '@/engine/srs';
 import {
   BINYAN_LABEL,
@@ -96,6 +112,15 @@ export interface LessonQuestion {
    * o soru SRS'e hiç yazılmaz.
    */
   source?: { kind: ItemKind; id: string; axis?: string };
+  /**
+   * Cevap HAREKELERİYLE karşılaştırılsın mı?
+   *
+   * Varsayılan hayır: öğrenci ekran klavyesiyle hareke yazmak zorunda
+   * kalmasın diye karşılaştırma harekeleri atıyor. Ama hareke dersinde
+   * konu tam olarak harekenin kendisi — orada atmak iki farklı şıkkı
+   * aynı cevaba çevirir.
+   */
+  exact?: boolean;
 }
 
 export interface Lesson {
@@ -712,6 +737,8 @@ export interface LessonMeta {
   subtitle: string;
   /** Hangi seviyeden itibaren anlamlı. */
   from: CEFR;
+  /** Hangi öğrenme kümesine ait. */
+  group: LessonGroupId;
   build: (level: CEFR, seed: number) => Lesson | null;
 }
 
@@ -736,12 +763,32 @@ const TAUGHT_GZAROT: Gizra[] = [
 
 const TAUGHT_TOPICS = ['aile', 'ev', 'yemek', 'şehir', 'zaman', 'vücut', 'iş', 'doğa', 'sağlık'];
 
+/**
+ * Ders kümeleri — sol menüdeki sıra değil, ÖĞRENME sırası.
+ *
+ * Kümeler olmadan yetmiş ders tek bir uzun liste olurdu ve öğrenci
+ * nereden başlayacağını bilemezdi. Sıra kolaydan zora değil, BAĞIMLILIĞA
+ * göre: harfleri tanımadan hareke çalışılmaz, şimdiki zamanı görmeden
+ * geçmiş zaman anlatılmaz.
+ */
+export type LessonGroupId = 'okuma' | 'zaman' | 'kalip' | 'kok' | 'soz' | 'yapi';
+
+export const LESSON_GROUPS: Array<{ id: LessonGroupId; title: string; blurb: string }> = [
+  { id: 'okuma', title: 'Okuma', blurb: 'Harfler ve harekeler' },
+  { id: 'zaman', title: 'Zamanlar', blurb: 'Şimdiki, geçmiş, gelecek, emir' },
+  { id: 'kalip', title: 'Kalıplar', blurb: 'Yedi binyanın işi' },
+  { id: 'kok', title: 'Kökler', blurb: 'Zayıf kökler ve kök aileleri' },
+  { id: 'soz', title: 'Söz varlığı', blurb: 'Kelime ve hazır ifadeler' },
+  { id: 'yapi', title: 'Yapı', blurb: 'Sayı, edat, cümle' },
+];
+
 export const LESSONS: LessonMeta[] = [
   ...TAUGHT_BINYANIM.map((b) => ({
     id: `binyan-present-${b}`,
     title: `${BINYAN_LABEL[b].tr} — şimdiki zaman`,
     subtitle: BINYAN_LABEL[b].sense,
     from: (b === 'paal' ? 'A1' : 'A2') as CEFR,
+    group: 'zaman' as LessonGroupId,
     build: (level: CEFR, seed: number) => binyanPresentLesson(b, level, makeRng(seed)),
   })),
   ...TAUGHT_BINYANIM.map((b) => ({
@@ -749,6 +796,7 @@ export const LESSONS: LessonMeta[] = [
     title: `${BINYAN_LABEL[b].tr} — geçmiş zaman`,
     subtitle: 'Kişi ekleri',
     from: (b === 'paal' ? 'A1' : 'A2') as CEFR,
+    group: 'zaman' as LessonGroupId,
     build: (level: CEFR, seed: number) => pastLesson(b, level, makeRng(seed)),
   })),
   ...TAUGHT_GZAROT.map((g) => ({
@@ -756,6 +804,7 @@ export const LESSONS: LessonMeta[] = [
     title: `${GIZRA_LABEL[g].he} — zayıf kök`,
     subtitle: GIZRA_LABEL[g].tr,
     from: 'A2' as CEFR,
+    group: 'kok' as LessonGroupId,
     build: (level: CEFR, seed: number) => gizraLesson(g, level, makeRng(seed)),
   })),
   ...TAUGHT_TOPICS.map((t) => ({
@@ -763,6 +812,7 @@ export const LESSONS: LessonMeta[] = [
     title: `${t} — kelimeler`,
     subtitle: 'İsimler ve cinsiyetleri',
     from: 'A1' as CEFR,
+    group: 'soz' as LessonGroupId,
     build: (level: CEFR, seed: number) => topicLesson(t, level, makeRng(seed)),
   })),
   {
@@ -770,8 +820,84 @@ export const LESSONS: LessonMeta[] = [
     title: 'Kalıplar',
     subtitle: 'Olduğu gibi öğrenilen ifadeler',
     from: 'A1' as CEFR,
+    group: 'soz' as LessonGroupId,
     build: (level: CEFR, seed: number) => phraseLesson(level, makeRng(seed)),
   },
+
+  /* ---- İkinci parti: lessons-extra.ts ---- */
+
+  ...LETTER_GROUP_IDS.map((g) => ({
+    id: `letters-${g}`,
+    title: `${LETTER_GROUP_TITLES.get(g) ?? g} — benzeyen harfler`,
+    subtitle: 'Okuma tuzakları',
+    from: 'A1' as CEFR,
+    group: 'okuma' as LessonGroupId,
+    build: (_level: CEFR, seed: number) => letterPairLesson(g, makeRng(seed)),
+  })),
+  ...NIQQUD_GROUPS.map((n) => ({
+    id: `niqqud-${n}`,
+    title: `"${n}" sesi — hareke ailesi`,
+    subtitle: 'Aynı ses, farklı işaret',
+    from: 'A1' as CEFR,
+    group: 'okuma' as LessonGroupId,
+    build: (_level: CEFR, seed: number) => niqqudGroupLesson(n, makeRng(seed)),
+  })),
+  ...TAUGHT_BINYANIM.map((b) => ({
+    id: `binyan-future-${b}`,
+    title: `${BINYAN_LABEL[b].tr} — gelecek zaman`,
+    subtitle: 'Ön ekler: א ת י נ',
+    from: (b === 'paal' ? 'A2' : 'B1') as CEFR,
+    group: 'zaman' as LessonGroupId,
+    build: (level: CEFR, seed: number) => futureLesson(b, level, makeRng(seed)),
+  })),
+  ...TAUGHT_BINYANIM.map((b) => ({
+    id: `binyan-imperative-${b}`,
+    title: `${BINYAN_LABEL[b].tr} — emir kipi`,
+    subtitle: 'Olumlu ve olumsuz ayrı',
+    from: (b === 'paal' ? 'A2' : 'B1') as CEFR,
+    group: 'zaman' as LessonGroupId,
+    build: (level: CEFR, seed: number) => imperativeLesson(b, level, makeRng(seed)),
+  })),
+  ...familyRoots('B2').map((r) => ({
+    id: `root-family-${r}`,
+    title: `${r.split('').join('־')} — aynı kök, çok kalıp`,
+    subtitle: 'Kalıp anlamı nasıl değiştiriyor',
+    from: 'A2' as CEFR,
+    group: 'kok' as LessonGroupId,
+    build: (level: CEFR, seed: number) => rootAcrossBinyanimLesson(r, level, makeRng(seed)),
+  })),
+  {
+    id: 'sayi-uyumu',
+    title: 'Sayılar — ters uyum',
+    subtitle: 'İbranicenin en şaşırtıcı kuralı',
+    from: 'A2' as CEFR,
+    group: 'yapi' as LessonGroupId,
+    build: (_level: CEFR, seed: number) => numberAgreementLesson(makeRng(seed)),
+  },
+  {
+    id: 'edat-cekimi',
+    title: 'Edatlar kişiye göre çekilir',
+    subtitle: 'לִי · לְךָ · לוֹ',
+    from: 'A2' as CEFR,
+    group: 'yapi' as LessonGroupId,
+    build: (_level: CEFR, seed: number) => prepositionLesson(makeRng(seed)),
+  },
+  ...SIGN_BINYANIM.map((b) => ({
+    id: `binyan-sign-${b}`,
+    title: `${BINYAN_LABEL[b].tr} — kalıbı tanı`,
+    subtitle: 'Harekesiz metinde ayırt etme',
+    from: (b === 'paal' ? 'A1' : 'A2') as CEFR,
+    group: 'kalip' as LessonGroupId,
+    build: (level: CEFR, seed: number) => binyanSignLesson(b, level, makeRng(seed)),
+  })),
+  ...(['A1', 'A2', 'B1', 'B2'] as CEFR[]).map((l) => ({
+    id: `cumle-${l.toLowerCase()}`,
+    title: `Cümle kurma — ${l}`,
+    subtitle: 'Sözdizimi ve fiilin edatı',
+    from: l,
+    group: 'yapi' as LessonGroupId,
+    build: (_level: CEFR, seed: number) => sentenceLesson(l, makeRng(seed)),
+  })),
 ];
 
 export const LESSON_BY_ID = new Map(LESSONS.map((l) => [l.id, l]));
@@ -789,11 +915,11 @@ export function availableLessons(level: CEFR): LessonMeta[] {
  * ekrandaki klavyeyle yazarken sofit biçimi seçmek zorunda kalmasın diye.
  * Yanlış cevabı yakalamak amaç; yazım tuzağı kurmak değil.
  */
-export function answerMatches(given: string, expected: string): boolean {
+export function answerMatches(given: string, expected: string, exact = false): boolean {
   const norm = (s: string): string =>
     s
       .normalize('NFC')
-      .replace(/[֑-ׇ]/g, '')
+      .replace(/[֑-ׇ]/g, exact ? '$&' : '')
       .replace(/ך/g, 'כ')
       .replace(/ם/g, 'מ')
       .replace(/ן/g, 'נ')
@@ -802,4 +928,65 @@ export function answerMatches(given: string, expected: string): boolean {
       .replace(/[\s'"׳״]/g, '')
       .toLocaleLowerCase('tr');
   return norm(given) === norm(expected);
+}
+
+/* ------------------------------------------------------------------ *
+ * Ders ilerlemesi
+ * ------------------------------------------------------------------ */
+
+const PROGRESS_KEY = 'shoresh.lessons';
+
+export interface LessonProgress {
+  /** Tamamlanan ders kimlikleri → tamamlanma anı (epoch ms). */
+  done: Record<string, number>;
+  /** Yarıda bırakılan ders ve kalınan adım. */
+  open?: { id: string; step: number };
+}
+
+const EMPTY_PROGRESS: LessonProgress = { done: {} };
+
+/**
+ * NEDEN localStorage, IndexedDB DEĞİL: Burada tutulan şey birkaç yüz
+ * baytlık bir "nerede kaldım" notu; cevap geçmişi değil. Cevaplar zaten
+ * SRS tablosuna yazılıyor. Küçük ve eşzamanlı okunması gereken bir
+ * tercih için IndexedDB'nin eşzamansızlığı arayüzde bir kare gecikme
+ * demek olurdu — ders listesi önce boş, sonra dolu görünürdü.
+ */
+export function readLessonProgress(): LessonProgress {
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return EMPTY_PROGRESS;
+    const parsed = JSON.parse(raw) as LessonProgress;
+    return { done: parsed.done ?? {}, ...(parsed.open ? { open: parsed.open } : {}) };
+  } catch {
+    // Bozuk kayıt ya da erişilemeyen depo: ilerleme sıfırdan görünür,
+    // uygulama çalışmaya devam eder.
+    return EMPTY_PROGRESS;
+  }
+}
+
+function writeLessonProgress(p: LessonProgress): void {
+  try {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  } catch {
+    /* yazamadıysak bu oturumda doğru görünür, yeter */
+  }
+}
+
+export function markLessonDone(id: string): LessonProgress {
+  const p = readLessonProgress();
+  const next: LessonProgress = { done: { ...p.done, [id]: Date.now() } };
+  writeLessonProgress(next);
+  return next;
+}
+
+/** Yarıda bırakılan dersi kaydeder; ders bitince temizlenir. */
+export function markLessonOpen(id: string, step: number): void {
+  const p = readLessonProgress();
+  writeLessonProgress({ done: p.done, open: { id, step } });
+}
+
+export function clearLessonOpen(): void {
+  const p = readLessonProgress();
+  writeLessonProgress({ done: p.done });
 }
