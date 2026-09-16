@@ -26,6 +26,193 @@ export interface WrittenSentence {
 }
 
 export const WRITTEN_SENTENCES: Record<string, WrittenSentence[]> = {
+  'הלכ:paal': [
+    {
+      he: 'אֲנִי הוֹלֵךְ לָעֲבוֹדָה בָּרֶגֶל',
+      plain: 'אני הולך לעבודה ברגל',
+      translit: 'ani holeh la-avoda ba-regel',
+      tr: 'İşe yürüyerek gidiyorum.',
+      form: 'present',
+      note: 'בָּרֶגֶל = "ayakla", yani yürüyerek. Araçla gitmek לִנְסֹעַ fiiliyle söylenir.',
+    },
+    {
+      he: 'לְאָן אַתָּה הוֹלֵךְ',
+      plain: 'לאן אתה הולך',
+      translit: 'lean ata holeh',
+      tr: 'Nereye gidiyorsun?',
+      form: 'present',
+    },
+    {
+      he: 'מָחָר נֵלֵךְ לַיָּם',
+      plain: 'מחר נלך לים',
+      translit: 'mahar nelah la-yam',
+      tr: 'Yarın denize gideceğiz.',
+      form: 'future',
+      note: 'Gelecek zamanda kök ה düşer: הוֹלֵךְ → נֵלֵךְ.',
+    },
+  ],
+
+  'היה:paal': [
+    {
+      he: 'הָיִיתִי בְּיִשְׂרָאֵל בַּקַּיִץ',
+      plain: 'הייתי בישראל בקיץ',
+      translit: 'hayiti be-yisrael ba-kayits',
+      tr: "Yazın İsrail'deydim.",
+      form: 'past',
+      note: 'Türkçedeki "-ydim" burada ayrı bir fiildir.',
+    },
+    {
+      he: 'יִהְיֶה בְּסֵדֶר',
+      plain: 'יהיה בסדר',
+      translit: 'yihye beseder',
+      tr: 'Her şey yoluna girecek.',
+      form: 'future',
+      note: 'İsrail\u2019de en çok duyulan cümlelerden biri.',
+    },
+  ],
+
+  'בוא:paal': [
+    {
+      he: 'הִיא בָּאָה מֵחוּ״ל',
+      plain: 'היא באה מחו״ל',
+      translit: 'hi baa me-hul',
+      tr: 'Yurt dışından geliyor.',
+      form: 'present',
+      note: 'חוּ״ל = חוּץ לָאָרֶץ, "ülke dışı" kısaltması.',
+    },
+    {
+      he: 'בּוֹא נְדַבֵּר מָחָר',
+      plain: 'בוא נדבר מחר',
+      translit: 'bo nedaber mahar',
+      tr: 'Hadi yarın konuşalım.',
+      form: 'imperative',
+      note: 'בּוֹא + 1. çoğul gelecek = "hadi …elim".',
+    },
+  ],
+
+  'נתן:paal': [
+    {
+      he: 'תֵּן לִי אֶת הַמֶּלַח בְּבַקָּשָׁה',
+      plain: 'תן לי את המלח בבקשה',
+      translit: 'ten li et ha-melah bevakaşa',
+      tr: 'Tuzu bana ver lütfen.',
+      form: 'imperative',
+      note: 'Emir kipinde kökten tek harf kalır: נָתַן → תֵּן.',
+    },
+    {
+      he: 'נָתַתִּי לוֹ אֶת הַמַּפְתֵּחַ',
+      plain: 'נתתי לו את המפתח',
+      translit: 'natati lo et ha-mafteah',
+      tr: 'Anahtarı ona verdim.',
+      form: 'past',
+    },
+  ],
+
+  'לקח:paal': [
+    {
+      he: 'קַח מַעֲטָפָה וְתֵלֵךְ',
+      plain: 'קח מעטפה ותלך',
+      translit: 'kah maatafa ve-telah',
+      tr: 'Bir zarf al ve git.',
+      form: 'imperative',
+    },
+    {
+      he: 'זֶה לוֹקֵחַ הַרְבֵּה זְמַן',
+      plain: 'זה לוקח הרבה זמן',
+      translit: 'ze lokeah harbe zman',
+      tr: 'Bu çok zaman alıyor.',
+      form: 'present',
+    },
+  ],
+
+  'ידע:paal': [
+    {
+      he: 'אֲנִי לֹא יוֹדֵעַ מָה לַעֲשׂוֹת',
+      plain: 'אני לא יודע מה לעשות',
+      translit: 'ani lo yodea ma laasot',
+      tr: 'Ne yapacağımı bilmiyorum.',
+      form: 'present',
+      note: 'Soru sözcüğü + mastar: מָה לַעֲשׂוֹת "ne yapmalı".',
+    },
+    {
+      he: 'הִיא יוֹדַעַת שָׁלֹשׁ שָׂפוֹת',
+      plain: 'היא יודעת שלוש שפות',
+      translit: 'hi yodaat şaloş safot',
+      tr: 'Üç dil biliyor.',
+      form: 'present',
+    },
+  ],
+
+  'יכל:paal': [
+    {
+      he: 'אֲנִי לֹא יָכוֹל לָבוֹא הַיּוֹם',
+      plain: 'אני לא יכול לבוא היום',
+      translit: 'ani lo yahol lavo hayom',
+      tr: 'Bugün gelemem.',
+      form: 'present',
+      note: 'יָכוֹל her zaman bir MASTARLA kullanılır; tek başına durmaz.',
+    },
+    {
+      he: 'תּוּכַל לַעֲזֹר לִי',
+      plain: 'תוכל לעזור לי',
+      translit: 'tuhal laazor li',
+      tr: 'Bana yardım edebilir misin?',
+      form: 'future',
+      note: 'Gelecek zaman kibar rica olarak kullanılır.',
+    },
+  ],
+
+  'יצא:paal': [
+    {
+      he: 'הָרַכֶּבֶת יוֹצֵאת בְּשָׁלֹשׁ',
+      plain: 'הרכבת יוצאת בשלוש',
+      translit: 'ha-rakevet yotset be-şaloş',
+      tr: 'Tren üçte kalkıyor.',
+      form: 'present',
+      note: 'רַכֶּבֶת dişildir, bu yüzden fiil de dişil: יוֹצֵאת.',
+    },
+  ],
+
+  'אמר:paal': [
+    {
+      he: 'מָה אָמַרְתָּ',
+      plain: 'מה אמרת',
+      translit: 'ma amarta',
+      tr: 'Ne dedin?',
+      form: 'past',
+    },
+    {
+      he: 'הוּא אָמַר שֶׁהוּא יָבוֹא',
+      plain: 'הוא אמר שהוא יבוא',
+      translit: 'hu amar şe-hu yavo',
+      tr: 'Geleceğini söyledi.',
+      form: 'past',
+      note: 'שֶׁ־ yan cümleyi bağlar ve bitişik yazılır.',
+    },
+  ],
+
+  'נסע:paal': [
+    {
+      he: 'נָסַעְנוּ בְּאוֹטוֹבּוּס לִירוּשָׁלַיִם',
+      plain: 'נסענו באוטובוס לירושלים',
+      translit: 'nasanu be-otobus li-yruşalayim',
+      tr: "Kudüs'e otobüsle gittik.",
+      form: 'past',
+      note: 'Araçla gitmek לִנְסֹעַ, yürüyerek gitmek לָלֶכֶת.',
+    },
+  ],
+
+  'עלה:paal': [
+    {
+      he: 'כַּמָּה זֶה עוֹלֶה',
+      plain: 'כמה זה עולה',
+      translit: 'kama ze ole',
+      tr: 'Bu kaç para?',
+      form: 'present',
+      note: 'Aynı fiil hem "çıkmak" hem "mal olmak" demektir.',
+    },
+  ],
+
   'כתב:paal': [
     {
       he: 'אֲנִי כּוֹתֵב מִכְתָּב לְאִמָּא שֶׁלִּי',

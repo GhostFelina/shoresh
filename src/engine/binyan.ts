@@ -579,7 +579,7 @@ export function conjugate(
 
   const present = Object.fromEntries(
     PRESENT_ALL.map((s) => [s, buildConjugation(t.present(r, s))]),
-  ) as Record<PresentSlot, Conjugation>;
+  ) as Partial<Record<PresentSlot, Conjugation>>;
 
   const future: Partial<Record<Person, Conjugation>> = {};
   if (t.future) for (const p of TABLE_PERSONS) future[p] = buildConjugation(t.future(r, p));
@@ -599,5 +599,5 @@ export function conjugate(
 
 /** Sözlük biçimi — İbranice sözlükler fiili 3. tekil eril geçmişle listeler. */
 export function lemmaOf(table: ConjugationTable): Conjugation {
-  return table.past.hu ?? table.present.ms;
+  return table.past.hu ?? table.present.ms ?? table.infinitive;
 }

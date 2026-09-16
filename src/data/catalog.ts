@@ -26,6 +26,7 @@ import {
   type HebrewVerb,
 } from '@/types/hebrew';
 import { ALL_ROOT_TABLES } from './roots';
+import { IRREGULAR_SEEDS, tableFromSeed } from './irregular';
 
 export interface CatalogIssue {
   line: string;
@@ -181,10 +182,52 @@ function parseRow(line: string): HebrewVerb | null {
   };
 }
 
+/**
+ * Düzensiz fiiller — motorun üretemediği, elle yazılmış tablolar.
+ *
+ * İbranicenin EN SIK fiilleri (הָלַךְ, הָיָה, לָקַח, נָתַן) hiçbir kalıba
+ * uymaz. Kural yazmaya çalışmak her seferinde başka bir fiili bozar;
+ * doğrusu olduğu gibi yazmaktır. Bunlar üretilen fiillerle aynı listeye
+ * karışır — arayüz açısından fark yoktur, yalnızca `source` alanı ayrılır.
+ */
+function irregularVerbs(): HebrewVerb[] {
+  return IRREGULAR_SEEDS.map((seed) => {
+    const table = tableFromSeed(seed);
+    return {
+      id: verbId(seed.root, seed.binyan),
+      root: seed.root,
+      rootDisplay: seed.root.join('\u05be'),
+      binyan: seed.binyan,
+      gizra: 'irregular' as Gizra,
+      lemma: lemmaOf(table),
+      tr: seed.tr,
+      cefr: seed.cefr,
+      scores: seed.scores,
+      table,
+      source: 'explicit' as const,
+      // Elle yazıldığı ve tek tek denetlendiği için tam güven.
+      confidence: 1,
+      traps: [
+        {
+          kind: 'spelling' as const,
+          note: seed.why,
+        },
+      ],
+    };
+  });
+}
+
 /** Kanonik fiil listesi — öncelik skoruna göre sıralı. */
 export const VERBS: HebrewVerb[] = (() => {
   const out: HebrewVerb[] = [];
   const seen = new Set<string>();
+
+  // Düzensizler ÖNCE eklenir: aynı kök+binyan hem burada hem ham tabloda
+  // varsa elle yazılmış olan kazanmalı, üretilmiş olan değil.
+  for (const verb of irregularVerbs()) {
+    seen.add(verb.id);
+    out.push(verb);
+  }
 
   for (const table of ALL_ROOT_TABLES) {
     for (const line of rows(table)) {
@@ -255,4 +298,6 @@ export const CATALOG_STATS = {
   totalForms: VERBS.reduce((n, v) => n + formCount(v), 0),
   /** Kaç ayrı üç harfli kök geçiyor (aynı kök birden çok binyanda olabilir). */
   distinctRoots: new Set(VERBS.map((v) => v.root.join(''))).size,
+  /** Elle yazılmış düzensiz fiil sayısı. */
+  irregular: VERBS.filter((v) => v.gizra === 'irregular').length,
 };

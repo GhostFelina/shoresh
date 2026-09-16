@@ -322,6 +322,20 @@ export function transliterate(vocalized: string): string {
     const hasDagesh = marks.includes(DAGESH);
     const hasSinDot = marks.includes(SIN_DOT);
 
+    /*
+     * Kelime SONUNDAKİ ה sessizdir — yalnızca kendinden önceki ünlüyü
+     * taşır: קָנָה "kana" (kanah değil), עוֹשֶׂה "ose" (oseh değil).
+     * Ses çıkarması için içinde mappiq denen nokta bulunmalıdır (שֶׁלָּהּ
+     * "şela-h"). Bu kural uygulanmazsa bütün ל״ה fiilleri yanlış okunur —
+     * ki bunlar İbranicenin en kalabalık fiil sınıfıdır.
+     */
+    const isLast = chars.slice(j).every(isMark);
+    if (base === 'ה' && isLast && !hasDagesh) {
+      i = j - 1;
+      letterIndex++;
+      continue;
+    }
+
     // Ünsüz sesi
     let sound: string;
     if (base === 'ש') sound = hasSinDot ? 's' : 'ş';

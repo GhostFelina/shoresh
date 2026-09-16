@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Languages, Type } from 'lucide-react';
 import { CATALOG_STATS, CATALOG_ISSUES } from '@/data/catalog';
+import { WRITTEN_SENTENCE_COUNT } from '@/data/sentences';
+import { PHRASES } from '@/data/phrases';
 import { LETTERS_ALPHABETIC } from '@/data/alefbet';
-import { canSpeakHebrew } from '@/lib/speech';
+import { canSpeakHebrew, speechStatus } from '@/lib/speech';
 
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
@@ -33,7 +35,7 @@ const PATH = [
     body: 'Ünlüler harfin altındadır. Dokuz işaretle her kelimeyi okuyabilir hâle gel.',
   },
   {
-    to: '/fiiller',
+    to: '/verb',
     icon: Languages,
     step: '3',
     title: 'Kökten çek',
@@ -68,10 +70,16 @@ export default function HomePage() {
           </p>
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Stat value={LETTERS_ALPHABETIC.length} label="alfabe harfi" />
             <Stat value={CATALOG_STATS.total} label="kök + binyan" />
-            <Stat value={CATALOG_STATS.totalForms} label="üretilen çekim" />
+            <Stat value={CATALOG_STATS.totalForms} label="çekim biçimi" />
+            <Stat value={PHRASES.length} label="kalıp ifade" />
+            <Stat value={WRITTEN_SENTENCE_COUNT} label="örnek cümle" />
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Stat value={LETTERS_ALPHABETIC.length} label="alfabe harfi" />
             <Stat value={7} label="binyan kalıbı" />
+            <Stat value={CATALOG_STATS.irregular} label="düzensiz fiil" />
+            <Stat value={9} label="alıştırma oyunu" />
           </div>
         </div>
       </section>
@@ -135,19 +143,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Dürüst durum bilgisi */}
-      {!speechReady && (
-        <section className="card-2 space-y-1 p-4">
-          <h2 className="text-xs font-semibold" style={{ color: 'var(--color-accent-400)' }}>
-            Seslendirme bu cihazda kapalı
-          </h2>
-          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-            Tarayıcında kurulu bir İbranice ses bulunamadı, bu yüzden hoparlör düğmeleri sessiz
-            kalır. Windows'ta Ayarlar → Saat ve Dil → Konuşma'dan İbranice ses paketi eklenebilir;
-            Android ve macOS'ta genelde hazır gelir.
-          </p>
-        </section>
-      )}
+      {/* Dürüst durum bilgisi — ne çalıştığını saklamıyoruz */}
+      <section className="card-2 space-y-1 p-4">
+        <h2
+          className="text-xs font-semibold"
+          style={{ color: speechReady ? 'var(--color-brand-300)' : '#fbbf24' }}
+        >
+          Seslendirme: {speechStatus().layer === 'device-voice'
+            ? 'cihaz sesi'
+            : speechStatus().layer === 'online'
+              ? 'çevrimiçi'
+              : 'şu an kullanılamıyor'}
+        </h2>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+          {speechStatus().message}{' '}
+          <Link to="/ses" className="underline" style={{ color: 'var(--color-brand-300)' }}>
+            Ses sayfasından
+          </Link>{' '}
+          sınayabilir ve kalıcı çözümün adımlarını görebilirsin.
+        </p>
+      </section>
 
       {CATALOG_ISSUES.length > 0 && (
         <section className="card-2 space-y-1 p-4">

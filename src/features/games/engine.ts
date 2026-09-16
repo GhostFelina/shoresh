@@ -141,6 +141,21 @@ function verbPool(level: CEFR): HebrewVerb[] {
   return pool.length > 0 ? pool : VERBS;
 }
 
+/**
+ * Şimdiki zamanı OLAN fiiller.
+ *
+ * הָיָה ("olmak") fiilinin modern İvritte şimdiki zamanı yoktur. Şimdiki
+ * zaman biçimi soran bir oyun onu seçerse ya çöker ya da boş bir soru
+ * üretir; bu yüzden o üreteçler bu havuzdan beslenir.
+ */
+function presentPool(level: CEFR): HebrewVerb[] {
+  const pool = verbPool(level).filter((v) => v.table.present.ms !== undefined);
+  return pool.length > 0 ? pool : VERBS.filter((v) => v.table.present.ms !== undefined);
+}
+
+/** Şimdiki zaman eril tekil — havuz süzüldüğü için burada kesin vardır. */
+const presentMs = (v: HebrewVerb) => v.table.present.ms!;
+
 /* ================================================================== *
  * 1) HARF AVI — harf tanıma ve karıştırılan harfleri ayırma
  * ================================================================== */
@@ -200,12 +215,12 @@ export function harekeUstasi(rng: Rng, level: CEFR): ChoiceQuestion {
     };
   }
 
-  const pool = verbPool(level);
+  const pool = presentPool(level);
   const verb = pick(pool, rng);
-  const c = verb.table.present.ms;
+  const c = presentMs(verb);
   const { options, answer } = buildOptions(
     c.translit,
-    pool.map((v) => v.table.present.ms.translit),
+    pool.map((v) => presentMs(v).translit),
     rng,
   );
   return {
@@ -237,8 +252,8 @@ export function kokAvcisi(rng: Rng, level: CEFR): ChoiceQuestion {
     verb.table.past.ani,
     verb.table.infinitive,
     verb.table.present.fs,
-  ].filter(Boolean);
-  const form = pick(candidates, rng)!;
+  ].filter((c): c is NonNullable<typeof c> => c !== undefined);
+  const form = pick(candidates, rng);
 
   const { options, answer } = buildOptions(
     verb.rootDisplay,
@@ -265,9 +280,9 @@ export function kokAvcisi(rng: Rng, level: CEFR): ChoiceQuestion {
  * ================================================================== */
 
 export function binyanEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
-  const pool = verbPool(level);
+  const pool = presentPool(level);
   const verb = pick(pool, rng);
-  const form = pick([verb.table.present.ms, verb.table.past.hu ?? verb.table.present.ms], rng);
+  const form = pick([presentMs(verb), verb.table.past.hu ?? presentMs(verb)], rng);
 
   const { options, answer } = buildOptions(
     BINYAN_LABEL[verb.binyan].tr,
@@ -300,14 +315,14 @@ const TYPE_PERSONS: Person[] = ['ani', 'ata', 'at', 'hu', 'hi', 'anachnu', 'atem
 const TYPE_SLOTS: PresentSlot[] = ['ms', 'fs', 'mp', 'fp'];
 
 export function zamanMakinesi(rng: Rng, level: CEFR): TypeQuestion {
-  const pool = verbPool(level);
+  const pool = presentPool(level);
   const verb = pick(pool, rng);
   const forms = ['present', 'past', 'future'] as const;
   const form = pick(forms, rng);
 
   if (form === 'present') {
     const slot = pick(TYPE_SLOTS, rng);
-    const c = verb.table.present[slot];
+    const c = verb.table.present[slot] ?? presentMs(verb);
     return {
       kind: 'type',
       prompt: `"${verb.tr[0]}" — şimdiki zaman, ${PRESENT_LABEL[slot].tr}`,
@@ -326,7 +341,7 @@ export function zamanMakinesi(rng: Rng, level: CEFR): TypeQuestion {
 
   const person = pick(TYPE_PERSONS, rng);
   const table = form === 'past' ? verb.table.past : verb.table.future;
-  const c = table[person] ?? verb.table.present.ms;
+  const c = table[person] ?? presentMs(verb);
   return {
     kind: 'type',
     prompt: `"${verb.tr[0]}" — ${FORM_LABEL[form].tr}, ${PERSON_LABEL[person].tr}`,
@@ -370,9 +385,9 @@ export function kulakTesti(rng: Rng, level: CEFR): ChoiceQuestion {
     };
   }
 
-  const pool = verbPool(level);
+  const pool = presentPool(level);
   const verb = pick(pool, rng);
-  const c = verb.table.present.ms;
+  const c = presentMs(verb);
   const { options, answer } = buildOptions(
     verb.tr[0]!,
     pool.map((v) => v.tr[0]!),
@@ -516,7 +531,7 @@ export function kelimeEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
  * tahmin edebilir hale gelir.
  */
 export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
-  const pool = verbPool(level);
+  const pool = presentPool(level);
 
   // Yalnizca birden cok binyanda gecen kokler ise yarar.
   const byRoot = new Map<string, HebrewVerb[]>();
@@ -537,8 +552,8 @@ export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
   );
 
   const { options, answer } = buildOptions(
-    target.table.present.ms.vocalized,
-    pool.map((v) => v.table.present.ms.vocalized),
+    presentMs(target).vocalized,
+    pool.map((v) => presentMs(v).vocalized),
     rng,
   );
 
@@ -547,14 +562,14 @@ export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
     prompt:
       from.rootDisplay + ' koku ' + BINYAN_LABEL[target.binyan].tr +
       ' kalibinda hangisi? (anlami: "' + target.tr[0] + '")',
-    display: from.table.present.ms.vocalized,
-    audio: from.table.present.ms.plain,
+    display: presentMs(from).vocalized,
+    audio: presentMs(from).plain,
     options,
     answer,
     optionsAreHebrew: true,
     explain:
-      from.table.present.ms.vocalized + ' (' + BINYAN_LABEL[from.binyan].tr + ', "' +
-      from.tr[0] + '") \u2192 ' + target.table.present.ms.vocalized + ' (' +
+      presentMs(from).vocalized + ' (' + BINYAN_LABEL[from.binyan].tr + ', "' +
+      from.tr[0] + '") \u2192 ' + presentMs(target).vocalized + ' (' +
       BINYAN_LABEL[target.binyan].tr + ', "' + target.tr[0] +
       '"). Ayni kok ' + from.rootDisplay + ', degisen yalnizca kalip.',
   };

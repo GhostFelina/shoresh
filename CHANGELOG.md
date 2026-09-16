@@ -1,3 +1,29 @@
+## 1.2.0
+
+**Düzensiz fiiller eklendi — en büyük içerik boşluğu kapandı.** İbranicenin
+EN SIK kullanılan fiilleri (הָלַךְ, הָיָה, בָּא, נָתַן, לָקַח, יָדַע, יָכוֹל, יָצָא,
+אָמַר, נָסַע, עָלָה, חַי, שָׁב, נִגַּשׁ) hiçbir kalıba uymadıkları için motor
+tarafından elenip katalog dışında kalıyordu. Yani öğrenci "gidiyorum",
+"verdim", "biliyorum" diyemiyordu. 14 fiil elle yazıldı; her birinde NEDEN
+düzensiz olduğu da yazılı — "ezberle" demek öğretmek değildir, kalıbın tam
+olarak nerede kırıldığını göstermek öğretir.
+
+**Tip düzeltmesi:** `הָיָה` fiilinin modern İvritte şimdiki zamanı YOKTUR
+("ben öğrenciyim" derken fiil kullanılmaz). Çekim tablosu tipi bunu
+taşıyamıyordu; taşıyamayınca o boşluğu uydurma bir biçimle doldurmak
+gerekirdi. Şimdiki zaman artık kısmi olabiliyor ve bu, fiilin öğretilecek
+en önemli özelliği olarak gösteriliyor.
+
+**Okunuş hatası düzeltildi:** Kelime sonundaki ה sessizdir. Motor onu
+seslendiriyordu, bu yüzden BÜTÜN ל״ה fiilleri yanlış okunuyordu —
+"kanah/oseh/rotseh" yerine doğrusu "kana/ose/rotse". Bu, İbranicenin en
+kalabalık fiil sınıfı; hata her birini etkiliyordu.
+
+Ayrıca: düzensiz fiiller için 24 örnek cümle, ana sayfa sayaçları,
+ses durumunun ana sayfada dürüstçe gösterilmesi.
+
+367 fiil · 295 kök · 8.696 çekim biçimi · 163 birim testi.
+
 ## 1.1.0
 
 **Ses — kök neden bulundu ve giderildi.** Çevrimiçi seslendirme katmanı hiç

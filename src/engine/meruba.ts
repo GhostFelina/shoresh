@@ -268,7 +268,7 @@ export function conjugateQuad(rootLetters: string[], binyan: Binyan): Conjugatio
 
   const present = Object.fromEntries(
     PRESENT_ALL.map((s) => [s, buildConjugation(t.present(r, s))]),
-  ) as Record<PresentSlot, Conjugation>;
+  ) as Partial<Record<PresentSlot, Conjugation>>;
 
   const future: Partial<Record<Person, Conjugation>> = {};
   for (const p of TABLE_PERSONS) future[p] = buildConjugation(t.future(r, p));

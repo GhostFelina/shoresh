@@ -40,12 +40,12 @@ describe("pa'al — כ־ת־ב (yazmak)", () => {
   });
 
   it('şimdiki dört biçim: כּוֹתֵב / כּוֹתֶבֶת / כּוֹתְבִים / כּוֹתְבוֹת', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('כּוֹתֵב'));
-    expect(norm(t.present.fs.vocalized)).toBe(norm('כּוֹתֶבֶת'));
-    expect(norm(t.present.mp.vocalized)).toBe(norm('כּוֹתְבִים'));
-    expect(norm(t.present.fp.vocalized)).toBe(norm('כּוֹתְבוֹת'));
-    expect(t.present.ms.plain).toBe('כותב');
-    expect(t.present.mp.plain).toBe('כותבים');
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('כּוֹתֵב'));
+    expect(norm(t.present.fs!.vocalized)).toBe(norm('כּוֹתֶבֶת'));
+    expect(norm(t.present.mp!.vocalized)).toBe(norm('כּוֹתְבִים'));
+    expect(norm(t.present.fp!.vocalized)).toBe(norm('כּוֹתְבוֹת'));
+    expect(t.present.ms!.plain).toBe('כותב');
+    expect(t.present.mp!.plain).toBe('כותבים');
   });
 
   it('gelecek: אֶכְתּוֹב / תִּכְתּוֹב / יִכְתּוֹב / נִכְתּוֹב', () => {
@@ -79,8 +79,8 @@ describe("pa'al — ש־מ־ר (korumak): begadkefat olmayan orta harf dageş al
   });
 
   it('şimdiki: שׁוֹמֵר', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('שׁוֹמֵר'));
-    expect(t.present.ms.plain).toBe('שומר');
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('שׁוֹמֵר'));
+    expect(t.present.ms!.plain).toBe('שומר');
   });
 });
 
@@ -99,10 +99,10 @@ describe("pi'el — ד־ב־ר (konuşmak)", () => {
   });
 
   it('şimdiki: מְדַבֵּר / מְדַבֶּרֶת / מְדַבְּרִים', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('מְדַבֵּר'));
-    expect(norm(t.present.fs.vocalized)).toBe(norm('מְדַבֶּרֶת'));
-    expect(norm(t.present.mp.vocalized)).toBe(norm('מְדַבְּרִים'));
-    expect(t.present.ms.plain).toBe('מדבר');
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('מְדַבֵּר'));
+    expect(norm(t.present.fs!.vocalized)).toBe(norm('מְדַבֶּרֶת'));
+    expect(norm(t.present.mp!.vocalized)).toBe(norm('מְדַבְּרִים'));
+    expect(t.present.ms!.plain).toBe('מדבר');
   });
 
   it('mastar: לְדַבֵּר', () => {
@@ -138,8 +138,8 @@ describe("hif'il — כ־ת־ב (yazdırmak)", () => {
   });
 
   it('şimdiki: מַכְתִּיב', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('מַכְתִּיב'));
-    expect(t.present.ms.plain).toBe('מכתיב');
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('מַכְתִּיב'));
+    expect(t.present.ms!.plain).toBe('מכתיב');
   });
 
   it('mastar: לְהַכְתִּיב', () => {
@@ -161,7 +161,7 @@ describe("nif'al — כ־ת־ב (yazılmak)", () => {
   });
 
   it('şimdiki: נִכְתָּב', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('נִכְתָּב'));
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('נִכְתָּב'));
   });
 
   it('gelecek: יִכָּתֵב', () => {
@@ -178,8 +178,8 @@ describe("hitpa'el — ל־ב־ש (giyinmek)", () => {
   });
 
   it('şimdiki: מִתְלַבֵּשׁ / מִתְלַבֶּשֶׁת', () => {
-    expect(norm(t.present.ms.vocalized)).toBe(norm('מִתְלַבֵּשׁ'));
-    expect(norm(t.present.fs.vocalized)).toBe(norm('מִתְלַבֶּשֶׁת'));
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('מִתְלַבֵּשׁ'));
+    expect(norm(t.present.fs!.vocalized)).toBe(norm('מִתְלַבֶּשֶׁת'));
   });
 
   it('mastar: לְהִתְלַבֵּשׁ', () => {
@@ -207,7 +207,7 @@ describe("hitpa'el metatezi — ıslıklı kök harfi ת ile yer değiştirir", 
 
   it('şimdiki zamanda da metatez korunur: מִשְׁתַּמֵּשׁ', () => {
     const t = conjugate(['ש', 'מ', 'ש'], 'hitpael');
-    expect(norm(t.present.ms.vocalized)).toBe(norm('מִשְׁתַּמֵּשׁ'));
+    expect(norm(t.present.ms!.vocalized)).toBe(norm('מִשְׁתַּמֵּשׁ'));
   });
 });
 
@@ -224,7 +224,7 @@ describe('sofit — kelime sonundaki harf biçim değiştirir', () => {
 
   it('ש־כ־ן şimdiki eril: son נ sofit olur → שוכן', () => {
     const t = conjugate(['ש', 'כ', 'ן'], 'paal');
-    expect(t.present.ms.plain.endsWith('ן')).toBe(true);
+    expect(t.present.ms!.plain.endsWith('ן')).toBe(true);
   });
 });
 
@@ -236,7 +236,7 @@ describe('harekesizleştirme ve okunuş', () => {
   it('okunuş Türkçe ses değerleriyle üretilir', () => {
     const t = conjugate(['כ', 'ת', 'ב'], 'paal');
     expect(t.past.hu!.translit).toBe('katav');
-    expect(t.present.ms.translit).toBe('kotev');
+    expect(t.present.ms!.translit).toBe('kotev');
   });
 
   it('ש harfi ş olarak okunur', () => {

@@ -231,7 +231,8 @@ export type Gizra =
   | 'lamed-hey' // 3. harf ה — קנה, רצה, עשה
   | 'lamed-alef' // 3. harf א — מצא, קרא
   | 'lamed-guttural' // 3. harf ע/ח — שמע, שלח
-  | 'kfulim'; // ikiz kök — סבב, תמם
+  | 'kfulim' // ikiz kök — סבב, תמם
+  | 'irregular'; // hicbir kaliba uymaz - הלך, היה, לקח
 
 export const GZAROT: readonly Gizra[] = [
   'shlemim',
@@ -245,6 +246,7 @@ export const GZAROT: readonly Gizra[] = [
   'lamed-alef',
   'lamed-guttural',
   'kfulim',
+  'irregular',
 ] as const;
 
 export const GIZRA_LABEL: Record<Gizra, { he: string; tr: string }> = {
@@ -259,6 +261,7 @@ export const GIZRA_LABEL: Record<Gizra, { he: string; tr: string }> = {
   'lamed-alef': { he: 'ל״א', tr: 'Son harf א — sessizleşir' },
   'lamed-guttural': { he: 'ל״גרונית', tr: 'Son harf ע/ח — patah alır' },
   kfulim: { he: 'כְּפוּלִים', tr: 'İkiz kök — 2. ve 3. harf aynı' },
+  irregular: { he: 'חֲרִיגִים', tr: 'Düzensiz — kalıba uymaz, ezberlenir' },
 };
 
 /** CEFR seviyesi — seviye testinde ve günlük dozda kullanılır. */
@@ -290,7 +293,13 @@ export interface Conjugation {
 export interface ConjugationTable {
   infinitive: Conjugation;
   past: Partial<Record<Person, Conjugation>>;
-  present: Record<PresentSlot, Conjugation>;
+  /**
+   * Şimdiki zaman KİSMİ olabilir: הָיָה ("olmak") fiilinin
+   * modern İvritte şimdiki zamanı YOKTUR — "ben öğrenciyim" derken
+   * fiil kullanılmaz. Tip bunu taşıyamazsa o boşluğu uydurma bir
+   * biçimle doldurmak zorunda kalırdık.
+   */
+  present: Partial<Record<PresentSlot, Conjugation>>;
   future: Partial<Record<Person, Conjugation>>;
   imperative: Partial<Record<ImperativeSlot, Conjugation>>;
 }

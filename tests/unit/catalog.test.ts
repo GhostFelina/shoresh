@@ -36,11 +36,25 @@ describe('katalog bütünlüğü', () => {
     }
   });
 
-  it('her etken fiil tam çekim tablosu üretir', () => {
+  it('her fiil sekiz kişilik geçmiş zaman üretir', () => {
     for (const v of VERBS) {
       expect(Object.keys(v.table.past).length, v.id).toBe(8);
-      expect(Object.keys(v.table.present).length, v.id).toBe(4);
     }
+  });
+
+  it('şimdiki zaman ya dört biçim taşır ya da hiç yoktur', () => {
+    /*
+     * "Hiç yok" tek bir fiil için geçerli ve KASITLI: הָיָה ("olmak")
+     * modern İvritte şimdiki zamanda kullanılmaz — "ben öğrenciyim"
+     * derken fiil yoktur. Aradaki bir sayı (1-3 biçim) ise veri
+     * hatasıdır ve burada yakalanır.
+     */
+    for (const v of VERBS) {
+      const n = Object.keys(v.table.present).length;
+      expect([0, 4], `${v.id} → ${n} biçim`).toContain(n);
+    }
+    const noPresent = VERBS.filter((v) => Object.keys(v.table.present).length === 0);
+    expect(noPresent.map((v) => v.id)).toEqual(['היה:paal']);
   });
 
   it('aynı kökün farklı binyanları kardeş olarak bulunur', () => {
@@ -61,7 +75,7 @@ describe('dört harfli kökler (מרובעים)', () => {
   it("תכנן pi'el: תִּכְנֵן / מְתַכְנֵן / לְתַכְנֵן", () => {
     const t = conjugate(['ת', 'כ', 'נ', 'ן'], 'piel');
     expect(t.past.hu!.vocalized.normalize('NFC')).toBe('תִּכְנֵן'.normalize('NFC'));
-    expect(t.present.ms.vocalized.normalize('NFC')).toBe('מְתַכְנֵן'.normalize('NFC'));
+    expect(t.present.ms!.vocalized.normalize('NFC')).toBe('מְתַכְנֵן'.normalize('NFC'));
     expect(t.infinitive.vocalized.normalize('NFC')).toBe('לְתַכְנֵן'.normalize('NFC'));
     expect(t.past.hu!.plain).toBe('תכנן');
   });
@@ -69,7 +83,7 @@ describe('dört harfli kökler (מרובעים)', () => {
   it("ארגן hitpa'el: הִתְאַרְגֵּן / מִתְאַרְגֵּן", () => {
     const t = conjugate(['א', 'ר', 'ג', 'ן'], 'hitpael');
     expect(t.past.hu!.vocalized.normalize('NFC')).toBe('הִתְאַרְגֵּן'.normalize('NFC'));
-    expect(t.present.ms.vocalized.normalize('NFC')).toBe('מִתְאַרְגֵּן'.normalize('NFC'));
+    expect(t.present.ms!.vocalized.normalize('NFC')).toBe('מִתְאַרְגֵּן'.normalize('NFC'));
   });
 
   it('geçmiş zamanda kişi ekleri doğru bağlanır: תִּכְנַנְתִּי', () => {

@@ -30,11 +30,11 @@ describe("ל״ה pa'al — ק־נ־ה (satın almak)", () => {
   });
 
   it('şimdiki: קוֹנֶה / קוֹנָה / קוֹנִים / קוֹנוֹת — ה eklerde düşer', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('קוֹנֶה'));
-    expect(V(t.present.fs.vocalized)).toBe(V('קוֹנָה'));
-    expect(V(t.present.mp.vocalized)).toBe(V('קוֹנִים'));
-    expect(V(t.present.fp.vocalized)).toBe(V('קוֹנוֹת'));
-    expect(t.present.mp.plain).toBe('קונים');
+    expect(V(t.present.ms!.vocalized)).toBe(V('קוֹנֶה'));
+    expect(V(t.present.fs!.vocalized)).toBe(V('קוֹנָה'));
+    expect(V(t.present.mp!.vocalized)).toBe(V('קוֹנִים'));
+    expect(V(t.present.fp!.vocalized)).toBe(V('קוֹנוֹת'));
+    expect(t.present.mp!.plain).toBe('קונים');
   });
 
   it('gelecek: יִקְנֶה / תִּקְנִי / יִקְנוּ', () => {
@@ -54,14 +54,14 @@ describe("ל״ה pa'al — ר־צ־ה (istemek), ש־ת־ה (içmek)", () => {
   it('רָצָה / רוֹצֶה / רוֹצִים', () => {
     const t = conjugate(['ר', 'צ', 'ה'], 'paal', 'lamed-hey');
     expect(V(t.past.hu!.vocalized)).toBe(V('רָצָה'));
-    expect(V(t.present.ms.vocalized)).toBe(V('רוֹצֶה'));
-    expect(t.present.mp.plain).toBe('רוצים');
+    expect(V(t.present.ms!.vocalized)).toBe(V('רוֹצֶה'));
+    expect(t.present.mp!.plain).toBe('רוצים');
   });
 
   it('ש־ת־ה mastarı dageşli: לִשְׁתּוֹת', () => {
     const t = conjugate(['ש', 'ת', 'ה'], 'paal', 'lamed-hey');
     expect(V(t.infinitive.vocalized)).toBe(V('לִשְׁתּוֹת'));
-    expect(t.present.ms.plain).toBe('שותה');
+    expect(t.present.ms!.plain).toBe('שותה');
   });
 });
 
@@ -81,13 +81,13 @@ describe("ע״ו pa'al — ק־ו־ם (kalkmak)", () => {
   });
 
   it('şimdiki: קָם / קָמָה / קָמִים / קָמוֹת', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('קָם'));
-    expect(V(t.present.mp.vocalized)).toBe(V('קָמִים'));
-    expect(V(t.present.fp.vocalized)).toBe(V('קָמוֹת'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('קָם'));
+    expect(V(t.present.mp!.vocalized)).toBe(V('קָמִים'));
+    expect(V(t.present.fp!.vocalized)).toBe(V('קָמוֹת'));
   });
 
   it('3. tekil eril geçmiş ile şimdiki AYNI yazılır — bu gizranın imzası', () => {
-    expect(t.past.hu!.vocalized).toBe(t.present.ms.vocalized);
+    expect(t.past.hu!.vocalized).toBe(t.present.ms!.vocalized);
   });
 
   it('gelecek: יָקוּם / תָּקוּמִי', () => {
@@ -117,7 +117,7 @@ describe("פ״נ pa'al — נ־פ־ל (düşmek)", () => {
 
   it('geçmiş ve şimdiki normal: נָפַל / נוֹפֵל', () => {
     expect(V(t.past.hu!.vocalized)).toBe(V('נָפַל'));
-    expect(V(t.present.ms.vocalized)).toBe(V('נוֹפֵל'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('נוֹפֵל'));
   });
 
   it('gelecekte נ DÜŞER, פ dageş alır: יִפּוֹל (יִנְפּוֹל değil)', () => {
@@ -145,8 +145,8 @@ describe("פ״י pa'al — י־ש־ב (oturmak)", () => {
   });
 
   it('şimdiki: יוֹשֵׁב', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('יוֹשֵׁב'));
-    expect(t.present.ms.plain).toBe('יושב');
+    expect(V(t.present.ms!.vocalized)).toBe(V('יוֹשֵׁב'));
+    expect(t.present.ms!.plain).toBe('יושב');
   });
 
   it('gelecekte י düşer, ön ek tzere alır: יֵשֵׁב', () => {
@@ -169,9 +169,9 @@ describe("פ״א pa'al — א־כ־ל (yemek)", () => {
   });
 
   it('şimdiki: אוֹכֵל / אוֹכֶלֶת', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('אוֹכֵל'));
-    expect(V(t.present.fs.vocalized)).toBe(V('אוֹכֶלֶת'));
-    expect(t.present.ms.plain).toBe('אוכל');
+    expect(V(t.present.ms!.vocalized)).toBe(V('אוֹכֵל'));
+    expect(V(t.present.fs!.vocalized)).toBe(V('אוֹכֶלֶת'));
+    expect(t.present.ms!.plain).toBe('אוכל');
   });
 
   it('gelecekte א ön ekle kaynaşır: יֹאכַל → יאכל (יואכל DEĞİL)', () => {
@@ -200,9 +200,9 @@ describe("ל״א pa'al — מ־צ־א (bulmak)", () => {
   });
 
   it('şimdiki: מוֹצֵא / מוֹצֵאת / מוֹצְאִים', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('מוֹצֵא'));
-    expect(V(t.present.fs.vocalized)).toBe(V('מוֹצֵאת'));
-    expect(V(t.present.mp.vocalized)).toBe(V('מוֹצְאִים'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('מוֹצֵא'));
+    expect(V(t.present.fs!.vocalized)).toBe(V('מוֹצֵאת'));
+    expect(V(t.present.mp!.vocalized)).toBe(V('מוֹצְאִים'));
   });
 
   it('gelecek: יִמְצָא', () => {
@@ -219,12 +219,12 @@ describe("ל״גרונית pa'al — ש־מ־ע (duymak)", () => {
   const t = conjugate(['ש', 'מ', 'ע'], 'paal', 'lamed-guttural');
 
   it('şimdiki erilde kaçak patah: שׁוֹמֵעַ', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('שׁוֹמֵעַ'));
-    expect(t.present.ms.plain).toBe('שומע');
+    expect(V(t.present.ms!.vocalized)).toBe(V('שׁוֹמֵעַ'));
+    expect(t.present.ms!.plain).toBe('שומע');
   });
 
   it('şimdiki dişil: שׁוֹמַעַת', () => {
-    expect(V(t.present.fs.vocalized)).toBe(V('שׁוֹמַעַת'));
+    expect(V(t.present.fs!.vocalized)).toBe(V('שׁוֹמַעַת'));
   });
 
   it('geçmiş: שָׁמַע / שָׁמַעְתִּי', () => {
@@ -248,7 +248,7 @@ describe("פ״גרונית pa'al — ע־ב־ד (çalışmak), ח־ש־ב (düş
     expect(V(t.infinitive.vocalized)).toBe(V('לַעֲבוֹד'));
     expect(V(t.future.hu!.vocalized)).toBe(V('יַעֲבוֹד'));
     expect(V(t.past.hu!.vocalized)).toBe(V('עָבַד'));
-    expect(V(t.present.ms.vocalized)).toBe(V('עוֹבֵד'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('עוֹבֵד'));
     expect(t.infinitive.plain).toBe('לעבוד');
   });
 
@@ -256,7 +256,7 @@ describe("פ״גרונית pa'al — ע־ב־ד (çalışmak), ח־ש־ב (düş
     const t = conjugate(['ח', 'ש', 'ב'], 'paal', 'pe-guttural');
     expect(V(t.infinitive.vocalized)).toBe(V('לַחְשׁוֹב'));
     expect(V(t.future.hu!.vocalized)).toBe(V('יַחְשׁוֹב'));
-    expect(V(t.present.ms.vocalized)).toBe(V('חוֹשֵׁב'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('חוֹשֵׁב'));
   });
 });
 
@@ -268,8 +268,8 @@ describe("ע״גרונית pa'al — ש־א־ל (sormak)", () => {
   });
 
   it('şimdiki: שׁוֹאֵל', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('שׁוֹאֵל'));
-    expect(t.present.ms.plain).toBe('שואל');
+    expect(V(t.present.ms!.vocalized)).toBe(V('שׁוֹאֵל'));
+    expect(t.present.ms!.plain).toBe('שואל');
   });
 
   it('gelecekte kök ünlüsü patah: יִשְׁאַל', () => {
@@ -281,7 +281,7 @@ describe("ל״ה pi'el — נ־ס־ה (denemek), ח־כ־ה (beklemek)", () => {
   it('נִסָּה / מְנַסֶּה / לְנַסּוֹת', () => {
     const t = conjugate(['נ', 'ס', 'ה'], 'piel', 'lamed-hey');
     expect(V(t.past.hu!.vocalized)).toBe(V('נִסָּה'));
-    expect(V(t.present.ms.vocalized)).toBe(V('מְנַסֶּה'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('מְנַסֶּה'));
     expect(V(t.infinitive.vocalized)).toBe(V('לְנַסּוֹת'));
     expect(t.past.hu!.plain).toBe('ניסה');
   });
@@ -289,7 +289,7 @@ describe("ל״ה pi'el — נ־ס־ה (denemek), ח־כ־ה (beklemek)", () => {
   it('ח־כ־ה → חִכָּה / מְחַכֶּה', () => {
     const t = conjugate(['ח', 'כ', 'ה'], 'piel', 'lamed-hey');
     expect(V(t.past.hu!.vocalized)).toBe(V('חִכָּה'));
-    expect(V(t.present.ms.vocalized)).toBe(V('מְחַכֶּה'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('מְחַכֶּה'));
     expect(t.past.hu!.plain).toBe('חיכה');
   });
 });
@@ -330,7 +330,7 @@ describe("ל״ה hitpa'el metatezi — ש־נ־ה (değişmek)", () => {
   });
 
   it('şimdiki zamanda da metatez korunur: מִשְׁתַּנֶּה', () => {
-    expect(V(t.present.ms.vocalized)).toBe(V('מִשְׁתַּנֶּה'));
+    expect(V(t.present.ms!.vocalized)).toBe(V('מִשְׁתַּנֶּה'));
   });
 
   it('metatez gerektirmeyen kök normal kalır: הִתְנַסָּה', () => {

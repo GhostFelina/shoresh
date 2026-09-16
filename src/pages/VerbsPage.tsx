@@ -8,6 +8,7 @@ import { speak } from '@/lib/speech';
 import {
   BINYAN_LABEL,
   FORM_LABEL,
+  GIZRA_LABEL,
   HEBREW_FORMS,
   IMPERATIVE_LABEL,
   MODERN_PERSONS,
@@ -306,11 +307,38 @@ export default function VerbsPage() {
                   <span className="he">{BINYAN_LABEL[verb.binyan].he}</span>
                 </span>
                 <span className="card-2 px-2 py-1">{verb.cefr}</span>
+                <span
+                  className="card-2 px-2 py-1"
+                  style={{
+                    color:
+                      verb.gizra === 'irregular' ? '#fbbf24' : 'var(--text-dim)',
+                  }}
+                >
+                  {GIZRA_LABEL[verb.gizra].tr}
+                </span>
               </div>
 
               <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
                 {BINYAN_LABEL[verb.binyan].sense}
               </p>
+
+              {/* Düzensiz fiillerde NEDEN düzensiz olduğu söylenmeli.
+                  "Bu fiil düzensiz, ezberle" demek öğretmek değildir;
+                  kalıbın tam olarak nerede kırıldığını göstermek öğretir. */}
+              {verb.gizra === 'irregular' && verb.traps?.[0] && (
+                <div
+                  className="space-y-1 rounded-lg p-3"
+                  style={{
+                    background: 'var(--surface-2)',
+                    boxShadow: 'inset 3px 0 0 #fbbf24',
+                  }}
+                >
+                  <h3 className="text-xs font-semibold" style={{ color: '#fbbf24' }}>
+                    Bu fiil düzensiz
+                  </h3>
+                  <p className="text-xs leading-relaxed">{verb.traps[0].note}</p>
+                </div>
+              )}
 
               {siblings.length > 0 && (
                 <div className="card-2 space-y-1 p-3">
