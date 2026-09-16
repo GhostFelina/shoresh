@@ -1,9 +1,12 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Languages, Type } from 'lucide-react';
+import { ArrowLeft, BookOpen, Flame, Languages, Type } from 'lucide-react';
 import { CATALOG_STATS, CATALOG_ISSUES } from '@/data/catalog';
 import { WRITTEN_SENTENCE_COUNT } from '@/data/sentences';
 import { PHRASES } from '@/data/phrases';
 import { LEXICON_STATS } from '@/data/lexicon';
+import { MixedText } from '@/components/MixedText';
+import { overallStats, type OverallStats } from '@/lib/progress';
 import { LETTERS_ALPHABETIC } from '@/data/alefbet';
 import { canSpeakHebrew, speechStatus } from '@/lib/speech';
 
@@ -44,6 +47,85 @@ const PATH = [
   },
 ];
 
+/**
+ * Bugünün dersi.
+ *
+ * NEDEN ANA SAYFADA: Aralıklı tekrarın işe yaraması için öğrencinin
+ * "bugün ne yapmalıyım" sorusuna tek bakışta cevap bulması gerekir.
+ * Menüde gizli bir sayfada dursaydı kimse vadesi gelen tekrarları
+ * zamanında yapmazdı ve sistem kâğıt üzerinde kalırdı.
+ */
+function TodayCard() {
+  const [stats, setStats] = useState<OverallStats | null>(null);
+
+  useEffect(() => {
+    void overallStats().then(setStats);
+  }, []);
+
+  // Hiç çalışılmamışsa şerit gösterilmez — boş sayaçlar cesaret kırar.
+  if (!stats || stats.attempts === 0) return null;
+
+  return (
+    <section className="card space-y-3 p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="mr-auto text-sm font-semibold">Bugünün dersi</h2>
+        {stats.streak > 0 && (
+          <span
+            className="flex items-center gap-1 text-xs font-semibold"
+            style={{ color: '#fb923c' }}
+          >
+            <Flame className="size-3.5" />
+            {stats.streak} günlük seri
+          </span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <div className="card-2 px-3 py-2">
+          <div className="text-xl font-bold tabular-nums" style={{ color: '#fbbf24' }}>
+            {stats.due}
+          </div>
+          <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
+            tekrar bekliyor
+          </div>
+        </div>
+        <div className="card-2 px-3 py-2">
+          <div className="text-xl font-bold tabular-nums" style={{ color: '#f87171' }}>
+            {stats.weak}
+          </div>
+          <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
+            zayıf
+          </div>
+        </div>
+        <div className="card-2 px-3 py-2">
+          <div
+            className="text-xl font-bold tabular-nums"
+            style={{ color: 'var(--color-brand-300)' }}
+          >
+            {stats.strong}
+          </div>
+          <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
+            oturmuş
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Link
+          to="/oyunlar"
+          className="rounded-lg px-4 py-2 text-sm font-semibold transition hover:brightness-110"
+          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+        >
+          {stats.due > 0 ? `${stats.due} tekrarı çöz` : 'Çalışmaya devam et'}
+        </Link>
+        <Link to="/ilerleme" className="card-2 px-4 py-2 text-sm transition hover:brightness-125">
+          İlerlemeyi gör
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const speechReady = canSpeakHebrew();
 
@@ -65,7 +147,8 @@ export default function HomePage() {
           </div>
 
           <p className="max-w-2xl text-sm leading-relaxed">
-            İbranicede her fiil üç harfli bir <strong>kökten</strong> (שורש) doğar. O kök yedi
+            İbranicede her fiil üç harfli bir <strong>kökten</strong> (
+            <MixedText>שורש</MixedText>) doğar. O kök yedi
             kalıptan birine oturur ve bütün çekim tablosu kalıptan çıkar. Bu uygulama sana tek tek
             fiil ezberletmez — <strong>kalıbı</strong> öğretir, gerisini motor üretir.
           </p>
@@ -84,6 +167,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <TodayCard />
 
       {/* Öğrenme yolu */}
       <section className="space-y-3">
@@ -109,7 +194,7 @@ export default function HomePage() {
                 <ArrowLeft className="mr-auto size-4 rotate-180 opacity-0 transition group-hover:opacity-60" />
               </div>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-                {s.body}
+                <MixedText>{s.body}</MixedText>
               </p>
             </Link>
           ))}

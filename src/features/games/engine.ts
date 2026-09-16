@@ -13,6 +13,7 @@ import { VERBS } from '@/data/catalog';
 import { PHRASES } from '@/data/phrases';
 import { WRITTEN_SENTENCES } from '@/data/sentences';
 import { WORDS } from '@/data/lexicon';
+import { itemKey, type ItemKey } from '@/engine/srs';
 import {
   BINYAN_LABEL,
   FORM_LABEL,
@@ -37,8 +38,19 @@ export type GameId =
   | 'cinsiyet-ustasi'
   | 'kelime-avi';
 
+/**
+ * Sorunun ÖLÇTÜĞÜ öğe.
+ *
+ * Bu anahtar olmadan cevap kaydedilemez: ilerleme "kaç soru çözdün" değil
+ * "hangi öğeyi ne kadar biliyorsun" üzerinden tutuluyor. Fiillerde eksen de
+ * anahtara giriyor, çünkü geçmiş zamanı bilip geleceği bilmemek mümkün.
+ */
+export interface Measured {
+  itemKey: ItemKey;
+}
+
 /** Çoktan seçmeli soru — beş oyunun ortak biçimi. */
-export interface ChoiceQuestion {
+export interface ChoiceQuestion extends Measured {
   kind: 'choice';
   /** Soru metni (Türkçe). */
   prompt: string;
@@ -58,7 +70,7 @@ export interface ChoiceQuestion {
 }
 
 /** Yazarak cevaplanan soru. */
-export interface TypeQuestion {
+export interface TypeQuestion extends Measured {
   kind: 'type';
   prompt: string;
   display?: string;
@@ -81,7 +93,7 @@ export interface TypeQuestion {
  * (özne-fiil-nesne, sıfat isimden SONRA). Çoktan seçmeli bir soru bunu
  * ölçemez; öğrenci sırayı kendi kurmadan fark etmez.
  */
-export interface OrderQuestion {
+export interface OrderQuestion extends Measured {
   kind: 'order';
   prompt: string;
   /** Karıştırılmış sözcükler — ekranda bu sırayla çıkar. */
@@ -180,6 +192,7 @@ export function harfAvi(rng: Rng): ChoiceQuestion {
 
   return {
     kind: 'choice',
+    itemKey: itemKey('letter', letter.id),
     prompt: `"${letter.nameTr}" harfi hangisi?`,
     options,
     answer,
@@ -209,6 +222,7 @@ export function harekeUstasi(rng: Rng, level: CEFR): ChoiceQuestion {
     );
     return {
       kind: 'choice',
+      itemKey: itemKey('niqqud', n.id),
       prompt: 'Bu hareke hangi sesi verir?',
       display: n.id === 'shuruk' ? n.mark : 'בּ' + n.mark,
       serif: true,
@@ -228,6 +242,7 @@ export function harekeUstasi(rng: Rng, level: CEFR): ChoiceQuestion {
   );
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', verb.id, 'present'),
     prompt: 'Bu kelime nasıl okunur?',
     display: c.vocalized,
     audio: c.plain,
@@ -266,6 +281,7 @@ export function kokAvcisi(rng: Rng, level: CEFR): ChoiceQuestion {
 
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', verb.id, 'meaning'),
     prompt: 'Bu biçimin kökü hangisi?',
     display: form.vocalized,
     audio: form.plain,
@@ -295,6 +311,7 @@ export function binyanEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
 
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', verb.id, 'meaning'),
     prompt: 'Bu fiil hangi binyanda?',
     display: form.vocalized,
     audio: form.plain,
@@ -328,6 +345,7 @@ export function zamanMakinesi(rng: Rng, level: CEFR): TypeQuestion {
     const c = verb.table.present[slot] ?? presentMs(verb);
     return {
       kind: 'type',
+      itemKey: itemKey('verb', verb.id, 'present'),
       prompt: `"${verb.tr[0]}" — şimdiki zaman, ${PRESENT_LABEL[slot].tr}`,
       display: verb.rootDisplay,
       audio: c.plain,
@@ -347,6 +365,7 @@ export function zamanMakinesi(rng: Rng, level: CEFR): TypeQuestion {
   const c = table[person] ?? presentMs(verb);
   return {
     kind: 'type',
+    itemKey: itemKey('verb', verb.id, form),
     prompt: `"${verb.tr[0]}" — ${FORM_LABEL[form].tr}, ${PERSON_LABEL[person].tr}`,
     display: verb.rootDisplay,
     audio: c.plain,
@@ -380,6 +399,7 @@ export function kulakTesti(rng: Rng, level: CEFR): ChoiceQuestion {
     );
     return {
       kind: 'choice',
+      itemKey: itemKey('phrase', p.id),
       prompt: 'Ne duydun?',
       audio: p.plain,
       options,
@@ -398,6 +418,7 @@ export function kulakTesti(rng: Rng, level: CEFR): ChoiceQuestion {
   );
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', verb.id, 'meaning'),
     prompt: 'Ne duydun?',
     audio: c.plain,
     options,
@@ -465,6 +486,7 @@ export function cumleKurucu(rng: Rng, level: CEFR): OrderQuestion | ChoiceQuesti
 
   return {
     kind: 'order',
+    itemKey: itemKey('phrase', item.plain),
     prompt: 'Sozcukleri dogru siraya diz',
     tokens,
     order: answerOrder,
@@ -496,6 +518,7 @@ export function kelimeEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
     );
     return {
       kind: 'choice',
+      itemKey: itemKey('verb', verb.id, 'meaning'),
       prompt: 'Bu fiil ne demek?',
       display: c.vocalized,
       audio: c.plain,
@@ -514,6 +537,7 @@ export function kelimeEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
   );
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', verb.id, 'meaning'),
     prompt: '"' + verb.tr[0] + '" Ibranicede hangisi?',
     options,
     answer,
@@ -562,6 +586,7 @@ export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
 
   return {
     kind: 'choice',
+    itemKey: itemKey('verb', target.id, 'meaning'),
     prompt:
       from.rootDisplay + ' koku ' + BINYAN_LABEL[target.binyan].tr +
       ' kalibinda hangisi? (anlami: "' + target.tr[0] + '")',
@@ -612,6 +637,7 @@ export function cinsiyetUstasi(rng: Rng, level: CEFR): ChoiceQuestion {
 
   return {
     kind: 'choice',
+    itemKey: itemKey('word', word.id, 'gender'),
     prompt: 'Bu isim eril mi, disil mi?',
     display: word.vocalized,
     audio: word.plain,
@@ -652,6 +678,7 @@ export function kelimeAvi(rng: Rng, level: CEFR): ChoiceQuestion {
     );
     return {
       kind: 'choice',
+      itemKey: itemKey('word', word.id),
       prompt: 'Bu kelime ne demek?',
       display: word.vocalized,
       audio: word.plain,
@@ -671,6 +698,7 @@ export function kelimeAvi(rng: Rng, level: CEFR): ChoiceQuestion {
   );
   return {
     kind: 'choice',
+    itemKey: itemKey('word', word.id),
     prompt: '"' + word.tr[0] + '" Ibranicede hangisi?',
     options,
     answer,

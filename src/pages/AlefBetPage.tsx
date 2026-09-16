@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Volume2 } from 'lucide-react';
 import { FINAL_LETTERS, LETTERS_ALPHABETIC, LETTERS_BY_ORDER, LETTER_BY_ID } from '@/data/alefbet';
 import { speak } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
 import type { HebrewLetter } from '@/types/hebrew';
 
 function LetterCard({
@@ -138,7 +139,11 @@ export default function AlefBetPage() {
           </button>
         </div>
 
-        {selected.noteTr && <p className="text-sm leading-relaxed">{selected.noteTr}</p>}
+        {selected.noteTr && (
+          <p className="text-sm leading-relaxed">
+            <MixedText>{selected.noteTr}</MixedText>
+          </p>
+        )}
 
         {selected.confusedWith && selected.confusedWith.length > 0 && (
           <div className="card-2 space-y-2 p-3">

@@ -8,6 +8,7 @@ import {
   Type,
   BookA,
   Volume2,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
 import type { CEFR } from '@/types/hebrew';
@@ -83,6 +84,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: '/oyunlar', label: 'Oyunlar', hint: 'Alıştırma oyunları', icon: Gamepad2 },
       { to: '/ses', label: 'Ses', hint: 'Seslendirme ve tanılama', icon: Volume2 },
+      { to: '/ilerleme', label: 'İlerleme', hint: 'Ne biliyorsun, ne tekrar', icon: TrendingUp },
     ],
   },
 ];

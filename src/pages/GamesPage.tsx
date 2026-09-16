@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Lightbulb, RotateCcw, Volume2, X } from 'lucide-react';
 import {
@@ -12,6 +12,8 @@ import {
   type TypeQuestion,
 } from '@/features/games/engine';
 import { hasUserGesture, speak, speechStatus } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
+import { recordAnswer } from '@/lib/progress';
 import type { CEFR } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -115,6 +117,16 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
   const finished = s.index >= queue.length;
 
   /**
+   * Sorunun ekrana geldiği an. Cevap süresi buradan ölçülüyor ve SRS'e
+   * gidiyor: 2 saniyede hatırlanan kelime ile 9 saniyede sökülen kelime
+   * aynı derecede bilinmiyor, ikincisi daha erken tekrar etmeli.
+   */
+  const shownAtRef = useRef<number>(Date.now());
+  useEffect(() => {
+    shownAtRef.current = Date.now();
+  }, [q]);
+
+  /**
    * Sesli sorularda soru gelir gelmez bir kez çalsın — ama yalnızca
    * kullanıcı sayfayla etkileştiyse. Aksi hâlde tarayıcı engeller ve
    * boşuna bir hata üretiriz.
@@ -131,6 +143,18 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
   };
 
   const commit = (right: boolean) => {
+    if (q) {
+      /*
+       * Kayıt beklenmiyor: oyun akışı veritabanına bağlı olmamalı.
+       * Yazma başarısız olursa `recordAnswer` sessizce null döner.
+       */
+      void recordAnswer(q.itemKey, game.id, {
+        correct: right,
+        elapsedMs: Date.now() - shownAtRef.current,
+        hintsUsed: s.hintsUsed,
+        mode: q.kind,
+      });
+    }
     setS((prev) => {
       const streak = right ? prev.streak + 1 : 0;
       return {
@@ -331,7 +355,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
               )}
             </div>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-              {q.explain}
+              <MixedText>{q.explain}</MixedText>
             </p>
             <button
               type="button"
@@ -654,7 +678,7 @@ export default function GamesPage() {
                 </span>
               </div>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-                {g.why}
+                <MixedText>{g.why}</MixedText>
               </p>
               {blocked && (
                 <p className="text-[11px]" style={{ color: '#fbbf24' }}>

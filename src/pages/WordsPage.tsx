@@ -8,6 +8,7 @@ import {
   WORD_CLASS_LABEL,
 } from '@/data/lexicon';
 import { speak } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
 import type { CEFR, HebrewWord, WordClass } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -45,6 +46,11 @@ function WordRow({ word }: { word: HebrewWord }) {
             {word.translit}
           </span>
           <span className="block truncate text-sm">{word.tr.join(', ')}</span>
+          {word.noteTr && (
+            <span className="block text-[11px]" style={{ color: 'var(--text-dim)' }}>
+              <MixedText>{word.noteTr}</MixedText>
+            </span>
+          )}
         </span>
         <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
       </button>

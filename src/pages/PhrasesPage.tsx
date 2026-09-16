@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Volume2 } from 'lucide-react';
 import { PHRASES, PHRASE_TOPICS, TOPIC_LABEL, type PhraseTopic } from '@/data/phrases';
 import { speak } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
 
 export default function PhrasesPage() {
   const [topic, setTopic] = useState<PhraseTopic | 'all'>('all');
@@ -91,12 +92,12 @@ export default function PhrasesPage() {
                 </div>
                 {p.literal && (
                   <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
-                    Birebir: {p.literal}
+                    Birebir: <MixedText>{p.literal}</MixedText>
                   </div>
                 )}
                 {p.note && (
                   <div className="mt-1 text-[11px] leading-snug" style={{ color: 'var(--text-dim)' }}>
-                    {p.note}
+                    <MixedText>{p.note}</MixedText>
                   </div>
                 )}
               </div>

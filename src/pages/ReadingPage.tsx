@@ -1,6 +1,7 @@
 import { Volume2 } from 'lucide-react';
 import { NIQQUDIM } from '@/data/alefbet';
 import { speak } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
 
 /**
  * Okuma alıştırması için taşıyıcı harf: ב seçildi çünkü hem çok sık
@@ -58,7 +59,7 @@ export default function ReadingPage() {
               </div>
               {n.noteTr && (
                 <p className="text-[11px] leading-snug" style={{ color: 'var(--text-dim)' }}>
-                  {n.noteTr}
+                  <MixedText>{n.noteTr}</MixedText>
                 </p>
               )}
             </div>

@@ -1,3 +1,36 @@
+## 1.5.0
+
+**Öğrenme belleği eklendi — uygulama artık ne bildiğini hatırlıyor.**
+Analiz tek bir şeyi çok net gösterdi: `dexie`, `ts-fsrs` ve `zustand` kurulu
+ama HİÇBİR dosyada kullanılmıyordu. Yani uygulama bir başvuru kitabıydı,
+öğrenme sistemi değil — sekmeyi kapatınca her şey sıfırlanıyordu.
+
+- **SRS motoru (`engine/srs.ts`)**: FSRS üzerine kurulu. Sabit aralık
+  merdiveni yerine her öğe için ayrı kararlılık ve zorluk tutuluyor.
+  Üstüne cevap süresi ve ipucu sayısı ekleniyor: 2 saniyede hatırlanan
+  kelime ile 9 saniyede sökülen kelime aynı derecede bilinmiş sayılmıyor.
+- **Kalıcı kayıt (`lib/db.ts`)**: IndexedDB. Sunucu yok — uygulamanın
+  tamamı çevrimdışı çalıştığı için ilerlemeyi sunucuya bağlamak o özelliği
+  kırardı. Veritabanı açılamazsa (gizli sekme) kayıt sessizce atlanıyor,
+  uygulama çalışmaya devam ediyor.
+- **11 oyunun hepsi cevapları kaydediyor**, süre ölçümüyle birlikte.
+- **İlerleme sayfası**: hâkimiyet, doğruluk, günlük seri, son yedi gün
+  grafiği, zorlandığın öğeler ve sıfırlama.
+- **Ana sayfada "Bugünün dersi"**: kaç tekrar bekliyor, kaç zayıf, seri.
+
+**Arayüz denetimi ve iki yönlü metin düzeltmesi.** Otomatik bir denetim
+yazıldı (61 kontrol): her sayfa içerik basıyor mu, tek h1 var mı, düğmelerin
+erişilebilir adı var mı, bağlantılar var olan sayfalara gidiyor mu, İbranice
+metinlerin yönü işaretli mi.
+
+Denetim gerçek bir görsel hata buldu: Türkçe cümle içinde geçen İbranice
+parçalar izole edilmemişti. Bu, parçanın sınırındaki noktalamanın ters tarafa
+kaymasına yol açıyordu. `MixedText` bileşeni İbranice dizileri otomatik
+`<bdi>` içine alıyor; artık Türkçe soldan sağa akıyor, İbranice öbek kendi
+içinde sağdan sola çiziliyor ve noktalama yerinde kalıyor.
+
+275 birim testi (önceki 180).
+
 ## 1.4.0
 
 **Sürüm yerelde neden güncellenmiyordu — bulundu ve kökten çözüldü.**

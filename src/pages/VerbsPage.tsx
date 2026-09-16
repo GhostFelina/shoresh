@@ -5,6 +5,7 @@ import { CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
 import { sentenceSet } from '@/engine/sentence';
 import { writtenFor } from '@/data/sentences';
 import { speak } from '@/lib/speech';
+import { MixedText } from '@/components/MixedText';
 import {
   BINYAN_LABEL,
   FORM_LABEL,
@@ -141,7 +142,7 @@ function Examples({ verb }: { verb: HebrewVerb }) {
                   className="mt-1.5 border-t pt-1.5 text-[11px] leading-snug"
                   style={{ color: 'var(--text-dim)' }}
                 >
-                  {s.note}
+                  <MixedText>{s.note}</MixedText>
                 </p>
               )}
             </li>
@@ -336,7 +337,9 @@ export default function VerbsPage() {
                   <h3 className="text-xs font-semibold" style={{ color: '#fbbf24' }}>
                     Bu fiil düzensiz
                   </h3>
-                  <p className="text-xs leading-relaxed">{verb.traps[0].note}</p>
+                  <p className="text-xs leading-relaxed">
+                    <MixedText>{verb.traps[0].note}</MixedText>
+                  </p>
                 </div>
               )}
 

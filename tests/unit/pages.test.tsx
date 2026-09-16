@@ -128,6 +128,8 @@ describe('gezinme bütünlüğü', () => {
       '/kelimeler',
       '/oyunlar',
       '/ses',
+      '/ilerleme',
+    '/ilerleme',
     ];
     for (const item of NAV_ITEMS) {
       const matches = known.some((pattern) => {
