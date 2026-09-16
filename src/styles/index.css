@@ -564,3 +564,258 @@ body::before {
     transform: translateY(-12px);
   }
 }
+
+/* ================================================================== *
+ * TASARIM DİLİ v2 — "futuristik"
+ *
+ * NEDEN AYRI BİR BÖLÜM: Kullanıcı arayüzü "amatör ve garip" buldu ve
+ * ikonlar için "emoji gibi duruyor" dedi. İkinci şikâyet şaşırtıcıydı —
+ * kodda tek bir emoji yok. Sorun ikonların KENDİSİ değil, ÇIPLAK
+ * durmalarıydı: 16px'lik bir çizgi ikon, metnin yanında tek başına
+ * durunca ölçeksiz ve gelişigüzel görünüyor. Aynı ikon bir kaba
+ * oturduğunda, etrafında halka ve arkasında tonlu bir zemin olduğunda
+ * "tasarlanmış" görünüyor.
+ *
+ * Buradaki parçaların hepsi ORTAK: bir düğmenin nasıl görüneceği otuz
+ * ayrı dosyada satır içi stille yazılıyordu ve hiçbiri tam olarak
+ * öbürüne benzemiyordu. Tek tanım = tek dil.
+ * ================================================================== */
+
+/* ---- İkon kabı --------------------------------------------------- *
+ * Çıplak ikonu "tasarlanmış" hâle getiren şey bu: tonlu zemin, ince
+ * halka ve sabit ölçü. Ölçü SABİT çünkü ikonlar farklı boyutlarda
+ * yan yana gelince liste tırtıklı görünüyor.
+ * ------------------------------------------------------------------ */
+.icon-chip {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: var(--accent-text);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent-text) 18%, transparent),
+      color-mix(in srgb, var(--accent-text) 6%, transparent)
+    );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-text) 28%, transparent);
+}
+
+.icon-chip-sm {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.625rem;
+}
+
+.icon-chip-lg {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+}
+
+/* İkon kabı bir kartın içindeyse kart üzerine gelindiğinde canlanır. */
+.card-interactive:hover .icon-chip {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-text) 55%, transparent);
+}
+
+/* ---- Düğmeler ---------------------------------------------------- *
+ * Üç düzey var ve üçü de aynı ölçüyü paylaşıyor: birincil (dolu),
+ * ikincil (yüzey), sessiz (çerçevesiz). Satır içi stille yazıldıkları
+ * sürece her sayfada biraz farklı çıkıyorlardı.
+ * ------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  color: var(--on-accent);
+  background: linear-gradient(135deg, var(--color-brand-400), var(--color-brand-500));
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, #fff 25%, transparent) inset,
+    0 8px 24px -12px color-mix(in srgb, var(--color-brand-500) 90%, transparent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, #fff 35%, transparent) inset,
+    0 12px 32px -12px color-mix(in srgb, var(--color-brand-500) 100%, transparent);
+}
+
+.btn-secondary {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent-text) 45%, var(--border));
+}
+
+.btn-quiet {
+  color: var(--text-dim);
+  background: transparent;
+}
+
+.btn-quiet:hover:not(:disabled) {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+
+/* ---- Odak halkası ------------------------------------------------ *
+ * Klavyeyle gezen için TEK ve tutarlı bir işaret. Tarayıcının kendi
+ * anahatı koyu zeminde neredeyse görünmüyordu.
+ * ------------------------------------------------------------------ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* ---- Kart üstü ışık çizgisi -------------------------------------- *
+ * Kartın üst kenarında bir piksellik parlaklık. Tek başına fark
+ * edilmiyor ama kartı zeminden "kaldıran" şey bu.
+ * ------------------------------------------------------------------ */
+.card-lit {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-lit::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent-text) 60%, transparent),
+    transparent
+  );
+}
+
+/* ---- Giriş paneli (hero) ----------------------------------------- *
+ * Sayfanın en üstündeki büyük panel. Arkasındaki iki renk lekesi
+ * `background-position` ile çok yavaş geziniyor; boyama maliyeti tek
+ * katman olduğu için ölçülemez düzeyde.
+ * ------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(
+      36rem 22rem at 12% 0%,
+      color-mix(in srgb, var(--color-brand-500) 22%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      32rem 20rem at 92% 10%,
+      color-mix(in srgb, var(--color-accent-500) 20%, transparent),
+      transparent 65%
+    ),
+    color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--shadow-lift);
+}
+
+/*
+ * Teknik ızgara dokusu — "futuristik" hissin sessiz kaynağı.
+ * `mask` ile kenarlara doğru siliniyor; silinmeseydi tablo gibi
+ * görünür ve içeriği bastırırdı.
+ */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent-text) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-text) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3rem 3rem;
+  mask-image: radial-gradient(70% 60% at 50% 0%, #000 0%, transparent 75%);
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Büyük sayı göstergesi --------------------------------------- */
+.kpi {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-text), var(--accent-text-alt));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---- Saç teli ayraç ---------------------------------------------- */
+.hairline {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--border) 100%, transparent),
+    transparent
+  );
+}
+
+/* ---- Bölüm başlığı ----------------------------------------------- *
+ * Başlıkların hepsi aynı ritmi tutsun diye; her sayfada elle
+ * ayarlanınca sayfalar arası geçişte zıplıyorlardı.
+ * ------------------------------------------------------------------ */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+/* ---- Hareket azaltma --------------------------------------------- *
+ * Cihazında hareketi kısan kullanıcı için süs animasyonları durur.
+ * İçerik animasyonları (doğru/yanlış tepkisi) bilerek kalıyor: onlar
+ * süs değil, geri bildirim.
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .hero::after,
+  .card-interactive,
+  .btn {
+    transition: none;
+    animation: none;
+  }
+}

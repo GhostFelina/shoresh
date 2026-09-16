@@ -15,4 +15,4 @@
 export const APP_VERSION = '1.21.0';
 
 /** Derlemenin yapıldığı an — ISO 8601, UTC. */
-export const BUILD_TIME = '2026-09-16T23:13:42.654Z';
+export const BUILD_TIME = '2026-09-16T23:25:10.236Z';

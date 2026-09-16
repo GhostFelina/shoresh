@@ -52,7 +52,19 @@ const olcum = `(() => {
   const zemin = (el) => {
     let d = el;
     while (d) {
-      const c = ayikla(getComputedStyle(d).backgroundColor);
+      const st = getComputedStyle(d);
+      /*
+       * GEÇİŞLİ ZEMİN ÖLÇÜLEMİYOR. linear-gradient bir görüntü;
+       * backgroundColor saydam kalıyor ve düz bir okuma yapılırsa
+       * ölçüm sayfanın zeminine kadar tırmanıp "1.07:1" gibi anlamsız
+       * bir sonuç üretiyor — birincil düğme tam olarak böyle yanlış
+       * bildirildi. Bu öğeler atlanıyor ve SAYILIYOR; sessizce
+       * geçilseydi gerçek bir sorun da saklanabilirdi. Dolu düğmenin
+       * kontrastı zaten birim testinde ölçülüyor
+       * (tests/unit/semantic-colors.test.ts).
+       */
+      if (st.backgroundImage && st.backgroundImage !== 'none') return null;
+      const c = ayikla(st.backgroundColor);
       if (c && c.a > 0.5) return c;
       d = d.parentElement;
     }
@@ -72,6 +84,7 @@ const olcum = `(() => {
   };
 
   const sonuc = [];
+  let olculemeyen = 0;
   for (const el of document.querySelectorAll('main *, header *, aside *')) {
     // Yalnızca kendi metnini taşıyan öğeler; kapsayıcıları saymıyoruz.
     const kendiMetni = [...el.childNodes]
@@ -94,6 +107,10 @@ const olcum = `(() => {
     const on = ayikla(st.color);
     if (!on) continue;
     const arka = zemin(el);
+    if (!arka) {
+      olculemeyen++;
+      continue;
+    }
     const l1 = luma(on.r, on.g, on.b);
     const l2 = luma(arka.r, arka.g, arka.b);
     const oran = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
@@ -115,13 +132,14 @@ const olcum = `(() => {
       });
     }
   }
-  return sonuc;
+  return { sonuc, olculemeyen };
 })()`;
 
 const tarayici = await chromium.launch();
 const sayfa = await tarayici.newPage({ viewport: { width: 1440, height: 900 } });
 
 let toplam = 0;
+let atlanan = 0;
 for (const tema of ['light', 'dark']) {
   console.log(`\n===== ${tema.toUpperCase()} TEMA =====`);
   for (const yol of SAYFALAR) {
@@ -143,11 +161,13 @@ for (const tema of ['light', 'dark']) {
     await sayfa.waitForTimeout(900);
 
     const gercekTema = await sayfa.evaluate(() => document.documentElement.dataset.theme ?? '(yok)');
-    const bulgular = await sayfa.evaluate(olcum);
+    const { sonuc: bulgular, olculemeyen } = await sayfa.evaluate(olcum);
     toplam += bulgular.length;
+    atlanan += olculemeyen;
 
     if (bulgular.length === 0) {
-      console.log(`  ${yol}  (data-theme=${gercekTema})  temiz`);
+      const not = olculemeyen > 0 ? `  (${olculemeyen} geçişli zemin atlandı)` : '';
+      console.log(`  ${yol}  (data-theme=${gercekTema})  temiz${not}`);
       continue;
     }
     console.log(`  ${yol}  (data-theme=${gercekTema})  ${bulgular.length} sorun:`);
