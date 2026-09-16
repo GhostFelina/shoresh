@@ -44,9 +44,30 @@ function versionModule(): Plugin {
   };
 }
 
+/**
+ * Seslendirme vekilini geliştirme sunucusunda da çalıştırır.
+ *
+ * `api/tts.js` yayında Vercel işlevi olarak koşuyor. Geliştirme sunucusunda
+ * böyle bir çalışma ortamı yok; bu eklenti aynı işlevi Vite'ın ara katmanına
+ * bağlıyor. Olmasaydı ses yalnızca yayında çalışır, yerelde sessiz kalırdı —
+ * ve fark tam da hata ararken ortaya çıkardı.
+ */
+function ttsDevEndpoint(): Plugin {
+  return {
+    name: 'shoresh-tts-dev',
+    configureServer(server) {
+      server.middlewares.use('/api/tts', async (req, res) => {
+        const mod = await server.ssrLoadModule('/api/tts.js');
+        await (mod.default as (q: unknown, r: unknown) => Promise<void>)(req, res);
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     versionModule(),
+    ttsDevEndpoint(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -85,7 +106,7 @@ export default defineConfig({
          */
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/translate\.google\.com\/translate_tts/,
+            urlPattern: /\/api\/tts\?/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'shoresh-ses',

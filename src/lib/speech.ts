@@ -11,24 +11,27 @@
  *   2. Çevrimiçi seslendirme akışı — ses paketi olmayan cihazlarda devreye girer
  *   3. Hiçbiri yoksa sessiz kalmaz, durumu ve çözümünü bildirir
  *
- * ── Katman 2'nin çalışması için bilinmesi gereken üç şey ──
+ * ── Katman 2 neden KENDİ SUNUCUMUZ üzerinden geçiyor ──
  *
- * 1. `crossOrigin` AYARLANMAZ. Seslendirme uç noktası
- *    `Access-Control-Allow-Origin` göndermiyor; `crossOrigin` ayarlamak
- *    tarayıcıyı CORS denetimine zorlar, denetim başarısız olur ve ses HİÇ
- *    yüklenmez. Ayarlanmazsa kaynak sıradan bir medya olarak çalınır —
- *    uç nokta `Cross-Origin-Resource-Policy: cross-origin` ile buna
- *    açıkça izin veriyor. Bu tek satır, sesin çalışıp çalışmamasını
- *    belirliyor.
+ * Ölçüldü: seslendirme uç noktası SUNUCUDAN çağrıldığında 200 ve geçerli
+ * MP3 dönüyor, ama TARAYICIDAN çağrıldığında 404 veriyor — Referer ve
+ * Origin başlığı taşıyan istekleri reddediyor. Bu yüzden istemciden
+ * doğrudan çağıran her sürüm sessizce başarısız oldu: `<audio>` öğesi
+ * 404 gövdesini ses sanıp "MEDIA_ELEMENT_ERROR: Format error" verdi ve
+ * kullanıcı hiçbir şey duymadı.
  *
- * 2. KALICI KİLİT YOK. Tek bir ağ hatası katmanı sonsuza kadar kapatmamalı;
- *    art arda birkaç hatadan sonra kısa bir süre dinlendirilir, sonra
- *    yeniden denenir.
+ * İstek artık `api/tts.js` üzerinden yapılıyor. Sonuçlar:
+ *  - Referer/Origin yok → uç nokta 200 dönüyor
+ *  - Yanıt kendi alan adımızdan geliyor → CORS ve opak yanıt sorunu bitti
+ *  - Hata gerçekten görülebiliyor; önceki sürümde opak yanıt yüzünden
+ *    404 bile "başarı" sayılıyordu
  *
- * 3. TARAYICI OTOMATİK OYNATMAYI ENGELLER. Kullanıcı sayfayla henüz
- *    etkileşmediyse ses çalmaz. Bu bir hata değil, tarayıcı kuralıdır;
- *    `hasUserGesture()` ile ayırt edilir ki arayüz "bozuk" demek yerine
- *    "dinlemek için dokun" desin.
+ * Diğer iki kural yerinde duruyor:
+ *  - KALICI KİLİT YOK: tek bir ağ hatası katmanı sonsuza kadar kapatmaz;
+ *    art arda üç hatadan sonra kısa bir dinlenme, sonra yeniden deneme.
+ *  - TARAYICI OTOMATİK OYNATMAYI ENGELLER: kullanıcı sayfayla etkileşmediyse
+ *    ses çalmaz. Bu hata değil, tarayıcı kuralıdır; `hasUserGesture()` ile
+ *    ayırt edilir ki arayüz "bozuk" demek yerine "dinlemek için dokun" desin.
  */
 
 export type SpeechLayer = 'device-voice' | 'online' | 'none';
@@ -132,17 +135,18 @@ function noteOnlineSuccess(): void {
 }
 
 /**
- * Seslendirme adresi.
- * `tl=iw` — servis İbranice için hâlâ eski ISO kodunu bekliyor.
- * Metin uzunluğu sınırlı; uygulamada seslendirilen en uzun şey kısa bir
- * cümle olduğu için bu sınıra takılmıyoruz.
+ * Seslendirme adresi — KENDİ sunucumuz.
+ *
+ * NEDEN DOĞRUDAN DIŞ SERVİS DEĞİL: Ölçüldü. Seslendirme uç noktası
+ * sunucudan çağrıldığında 200 ve geçerli MP3 dönüyor, ama tarayıcıdan
+ * çağrıldığında 404 veriyor — Referer/Origin taşıyan istekleri
+ * reddediyor. Bu yüzden istemciden doğrudan çağıran her deneme sessizce
+ * başarısız oldu ve `<audio>` 404 gövdesini ses sanıp "Format error"
+ * verdi. İstek artık `api/tts.js` üzerinden sunucudan yapılıyor.
  */
 function ttsUrl(text: string, slow: boolean): string {
   const q = encodeURIComponent(text.slice(0, 180));
-  return (
-    'https://translate.google.com/translate_tts' +
-    `?ie=UTF-8&client=tw-ob&tl=iw&ttsspeed=${slow ? '0.4' : '1'}&q=${q}`
-  );
+  return `/api/tts?q=${q}${slow ? '&slow=1' : ''}`;
 }
 
 /* ------------------------------------------------------------------ *
@@ -282,10 +286,7 @@ function speakOnline(text: string, opts: SpeakOptions): Promise<OnlineResult> {
     const src = cacheGet(key) ?? ttsUrl(text, Boolean(opts.slow));
 
     const audio = new Audio();
-    /*
-     * crossOrigin AYARLANMIYOR — açıklaması dosyanın başında.
-     * Ayarlanırsa CORS denetimi devreye girer ve ses hiç yüklenmez.
-     */
+    // Aynı alan adı olduğu için crossOrigin ayarına gerek yok.
     audio.preload = 'auto';
     audio.src = src;
     currentAudio = audio;
@@ -427,7 +428,7 @@ export async function diagnose(): Promise<DiagnosticResult[]> {
     const reachable = await new Promise<boolean>((resolve) => {
       const probe = new Audio();
       probe.preload = 'auto';
-      probe.src = ttsUrl('שלום', false);
+      probe.src = ttsUrl('\u05e9\u05dc\u05d5\u05dd', false);
       const done = (v: boolean) => resolve(v);
       probe.addEventListener('loadedmetadata', () => done(true), { once: true });
       probe.addEventListener('canplaythrough', () => done(true), { once: true });

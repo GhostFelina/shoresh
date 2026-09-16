@@ -14,17 +14,15 @@
  * çekilip tarayıcının kalıcı önbelleğine konursa uygulama çevrimdışı
  * konuşur ve her klip anında başlar.
  *
- * NASIL ÇALIŞIR — opak yanıt meselesi:
- * Seslendirme uç noktası CORS başlığı göndermiyor. Bu yüzden sayfa onu
- * `fetch` ile okuyup kendisi saklayamaz; gelen yanıt "opak"tır, gövdesi
- * JavaScript'e kapalıdır. Ama SERVICE WORKER opak yanıtı önbelleğe
- * koyabilir ve sonra `<audio>` isteğine yanıt olarak verebilir —
- * tarayıcının medya hattı onu sorunsuz çalar.
+ * NASIL ÇALIŞIR:
+ * Klipler kendi `/api/tts` ucumuzdan indirilir ve service worker onları
+ * kalıcı önbelleğe yazar. Sonradan aynı adres `<audio src>` ile istendiğinde
+ * service worker önbellekten verir; ağ hiç kullanılmaz.
  *
- * Yani indirme şöyle işler: sayfa `fetch(url, { mode: 'no-cors' })` der,
- * service worker araya girip yanıtı önbelleğe yazar, gövdeyi kimse
- * okumaz. Sonradan aynı adres `<audio src>` ile istendiğinde service
- * worker önbellekten verir.
+ * Önceki sürüm dış servise doğrudan `no-cors` ile gidiyordu. O yanıt opaktı:
+ * gövdesi okunamadığı için 404 bile "indirildi" sayılıyor, paket dolu
+ * görünüyor ama hiçbir klip çalmıyordu. Kendi ucumuza geçince yanıt
+ * okunabilir oldu ve başarısız indirmeler gerçekten sayılıyor.
  *
  * SINIR: Service worker yalnızca ÜRETİM derlemesinde çalışır. Geliştirme
  * sunucusunda paket indirme kapalıdır ve arayüz bunu söyler — sessizce
@@ -39,14 +37,21 @@ import { WRITTEN_SENTENCES } from '@/data/sentences';
 /** Service worker'ın önbelleğe aldığı isim — vite.config.ts ile aynı olmalı. */
 const CACHE_NAME = 'shoresh-ses';
 
-/** Seslendirme adresi — `speech.ts` ile birebir aynı biçimde kurulmalı. */
+/**
+ * Seslendirme adresi — `speech.ts` ile BİREBİR aynı olmalı.
+ *
+ * İki yerde ayrı kurulsaydı paket bir adresi indirir, oynatıcı başka bir
+ * adresi isterdi; önbellek hiç tutmaz ve "indirdim ama yine ağdan çalıyor"
+ * durumu ortaya çıkardı.
+ */
 function ttsUrl(text: string, slow: boolean): string {
   const q = encodeURIComponent(text.slice(0, 180));
-  return (
-    'https://translate.google.com/translate_tts' +
-    `?ie=UTF-8&client=tw-ob&tl=iw&ttsspeed=${slow ? '0.4' : '1'}&q=${q}`
-  );
+  return `/api/tts?q=${q}${slow ? '&slow=1' : ''}`;
 }
+
+/** Tam adres — service worker önbelleği mutlak adresle eşleşir. */
+const absolute = (path: string): string =>
+  typeof location === 'undefined' ? path : new URL(path, location.origin).toString();
 
 export interface PackSection {
   id: string;
@@ -100,7 +105,7 @@ export function packUrls(sections = packSections()): string[] {
     }
   }
   // Yavaş okuma ayrı bir adrestir; uygulama öğretirken yavaşı kullanıyor.
-  return [...texts].map((t) => ttsUrl(t, true));
+  return [...texts].map((t) => absolute(ttsUrl(t, true)));
 }
 
 export interface PackStatus {
@@ -175,11 +180,11 @@ export async function downloadPack(
       const url = urls[cursor++]!;
       try {
         /*
-         * `no-cors` zorunlu: uç nokta CORS başlığı göndermiyor. Yanıt opak
-         * gelir ve okunamaz — ama service worker onu önbelleğe yazar,
-         * bizim de istediğimiz tam olarak bu.
+         * Kendi alan adımıza istek atıyoruz, bu yüzden yanıt okunabilir
+         * ve başarısızlık gerçekten sayılabiliyor.
          */
-        await fetch(url, { mode: 'no-cors', signal });
+        const res = await fetch(url, { signal });
+        if (!res.ok) failed++;
       } catch {
         failed++;
       }
