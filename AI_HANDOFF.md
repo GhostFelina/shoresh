@@ -270,13 +270,11 @@ Ses konusunda tahmin yürütme, bunu çalıştır.
 Kullanıcının verdiği, sırası belirlenmiş liste. Biteni buradan sil.
 
 1. ~~Yedek/checkpoint + devir belgesi~~ — **v1.16.0'da yapıldı**
+   ~~Geri bildirim formu~~ — **v1.19.0/v1.19.1'de yapıldı, canlıda doğrulandı**
 2. ~~Test motoru~~ — **v1.17.0'da yapıldı.** 39 E2E testi, iki proje
    (masaüstü + telefon). `npm run verify` artık dördünü birden koşuyor.
-3. **VERB sayfası çalışma alanına çevrilecek.** Teşhis edildi:
-   `Shell.tsx` içerik alanını `max-w-5xl` (1024px) ile sınırlıyor; VERB sayfası
-   bunun içinde ikiye bölününce tabloya ~700px kalıyor. Sayfalar kendi
-   genişliğini belirleyebilmeli — okuma sayfaları dar kalmalı, çalışma alanı
-   geniş olmalı.
+3. ~~VERB sayfası çalışma alanı~~ — **v1.18.0'da yapıldı.** Genişlik artık
+   sayfanın kendi kararı (`usePageWidth`).
 4. **Çok dilli mimari.** İbranice bitince Korece gelecek. İki DİK eksen var ve
    karıştırılmamalı: *arayüz dili* (TR/EN) ve *öğrenilen dil* (he/ko).
    Hedeflenen yapı: `src/languages/hebrew/{engine,data,games,teacher,pages}` +
@@ -292,14 +290,36 @@ Kullanıcının verdiği, sırası belirlenmiş liste. Biteni buradan sil.
    anlamı, 478 kalıp. Bu arayüz çevirisi değil içerik yerelleştirmesi; ayrı
    sürüm olmalı.
 
-### Bilinen, kullanıcının onayını bekleyen
+### Supabase — kurulu ve çalışıyor
 
-- **Geri bildirim formu** (sağ üstte, tema yanında) kurulacak. Kanal Supabase
-  olarak seçildi. **Engel:** CLI oturumu kullanıcının verdiği org'u
-  (`iqhirlxhenqzvgrjmcic`) görmüyor; görünenler Azul Flow, Brandapp, NexoClave,
-  Ghost Samurai. Tarayıcı oturumu ile CLI token'ı farklı hesaplar. Kullanıcı
-  `supabase.com/dashboard/account/tokens` adresinden anahtar verecek, sonra
-  `npx supabase login --token <anahtar>`.
+| | |
+|---|---|
+| Proje | **Shoresh** — `cfcoosvtwutnsvagckdo`, eu-central-1, ÜCRETSİZ plan |
+| Org | Ghost Samurai (`qkilnwrfkntefcmqdlie`) |
+| Tablo | `public.feedback` — RLS AÇIK, politika YOK |
+| Göç | `supabase/migrations/20260916210000_feedback.sql` |
+| Gizli anahtar | Vercel `SUPABASE_SECRET_KEY` + yerel `.env.local` (ikisi de depoda değil) |
+| Gelen kutusu | `/gelen-kutusu`, parola Vercel `FEEDBACK_ADMIN_KEY` |
+
+**Neden bu proje:** Kullanıcının verdiği proje referansı
+(`nsevrzbipqxdvwequrui`) BAŞKA bir Supabase hesabına ait — `supabase login`
+kullanıcının tarayıcı oturumuyla yetkilendirdi ve Management API o projeye
+`403 "Your account does not have the necessary privileges"` döndü. Erişilebilen
+hesapta yeni proje açıldı.
+
+**Neden mevcut aktif proje kullanılmadı:** Göç çalıştırmak veritabanı parolası
+istiyor ve "Cortexia Language" projesinin parolası elde yok. Yeni projede parola
+oluşturma anında belirlendiği için kurulum tamamen otomatik yapılabildi.
+
+**Güvenlik modeli — ölçüldü:**
+```
+anon okuma     → []     (RLS sızdırmıyor)
+anon yazma     → 401    new row violates row-level security policy
+gizli anahtar  → çalışıyor, yalnızca sunucuda
+parolasız kutu → 401
+```
+Politika VERİLMEDİ; bu bilinçli. Politika verilseydi adresi bilen herkes
+yazabilir, okuma izni de verilseydi bütün bildirimler herkese açık olurdu.
 
 ---
 
