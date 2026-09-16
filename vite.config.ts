@@ -125,6 +125,16 @@ function ttsDevEndpoint(): Plugin {
         const mod = await server.ssrLoadModule('/api/feedback.js');
         await (mod.default as (q: unknown, r: unknown) => Promise<void>)(req, res);
       });
+      /*
+       * Yapay zekâ ucu da yerelde çalışsın. Olmasaydı öğretmenin konuşan
+       * tarafı yalnızca yayında denenebilir, yereldeki her deneme
+       * "kurulum eksik" derdi — ve gerçekten eksik mi, yoksa uç mu yok,
+       * ayırt edilemezdi.
+       */
+      server.middlewares.use('/api/ai', async (req, res) => {
+        const mod = await server.ssrLoadModule('/api/ai.js');
+        await (mod.default as (q: unknown, r: unknown) => Promise<void>)(req, res);
+      });
     },
   };
 }

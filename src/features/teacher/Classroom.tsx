@@ -10,8 +10,9 @@
  * Ekranın sırası bilinçli:
  *   1) Öğretmenin seni karşılaması  (kim olduğunu hatırlıyor)
  *   2) Bugünün programı             (ne yapacağız, neden)
- *   3) Seviye kartı                 (nerede olduğun, ölçümle)
- *   4) Bütün dersler                (kendi başına gezmek isteyene)
+ *   3) Öğretmene sor                (takıldığın yeri sorabildiğin köşe)
+ *   4) Seviye kartı                 (nerede olduğun, ölçümle)
+ *   5) Bütün dersler                (kendi başına gezmek isteyene)
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +37,7 @@ import {
 import { buildDailyPlan, planMinutes, type PlanEntry } from '@/features/teacher/plan';
 import { classroomMood } from '@/features/teacher/persona';
 import { SKILL_LABEL, readPlacement, type PlacementResult, type SkillId } from '@/features/teacher/placement';
+import { TeacherChat } from '@/features/teacher/TeacherChat';
 import { MixedText } from '@/components/MixedText';
 import { overallStats, type OverallStats } from '@/lib/progress';
 import { today } from '@/lib/db';
@@ -287,7 +289,10 @@ export function Classroom({
         </ol>
       </section>
 
-      {/* ---------------- 3) Seviye kartı ---------------- */}
+      {/* ---------------- 3) Öğretmene sor ---------------- */}
+      <TeacherChat level={level} lessonsDone={totalDone} streak={stats?.streak ?? 0} />
+
+      {/* ---------------- 4) Seviye kartı ---------------- */}
       <section className="card space-y-3 p-5">
         <div className="flex flex-wrap items-baseline gap-2">
           <h2 className="text-sm font-semibold">Seviyen</h2>
@@ -342,7 +347,7 @@ export function Classroom({
         </div>
       </section>
 
-      {/* ---------------- 4) Bütün dersler ---------------- */}
+      {/* ---------------- 5) Bütün dersler ---------------- */}
       <section className="space-y-5">
         <div className="flex items-baseline gap-2">
           <h2 className="text-sm font-semibold">Bütün dersler</h2>
