@@ -28,6 +28,8 @@ const PAGES = [
   ['binyanim', '/binyanim'],
   ['kaliplar', '/kaliplar'],
   ['kelimeler', '/kelimeler'],
+  ['ogretmen', '/ogretmen'],
+  ['ders-ici', '/ogretmen/binyan-present-paal'],
   ['oyunlar', '/oyunlar'],
   ['oyun-ici', '/oyunlar/kok-avcisi'],
   ['ses', '/ses'],

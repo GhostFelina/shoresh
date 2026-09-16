@@ -16,6 +16,7 @@ const BinyanimPage = lazy(() => import('@/pages/BinyanimPage'));
 const PhrasesPage = lazy(() => import('@/pages/PhrasesPage'));
 const WordsPage = lazy(() => import('@/pages/WordsPage'));
 const GamesPage = lazy(() => import('@/pages/GamesPage'));
+const TeacherPage = lazy(() => import('@/pages/TeacherPage'));
 const SoundPage = lazy(() => import('@/pages/SoundPage'));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage'));
 
@@ -44,6 +45,9 @@ export default function App() {
           <Route path="/binyanim" element={<BinyanimPage />} />
           <Route path="/kaliplar" element={<PhrasesPage />} />
           <Route path="/kelimeler" element={<WordsPage />} />
+
+          <Route path="/ogretmen" element={<TeacherPage />} />
+          <Route path="/ogretmen/:lessonId" element={<TeacherPage />} />
 
           <Route path="/oyunlar" element={<GamesPage />} />
           <Route path="/oyunlar/:gameId" element={<GamesPage />} />

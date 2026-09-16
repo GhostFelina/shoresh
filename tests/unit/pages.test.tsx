@@ -6,6 +6,8 @@
  * ve kimse fark etmez — bir kez oldu. Bu testler menüdeki her adresin
  * gerçekten bir sayfa açtığını ve sayfanın VERİ bastığını doğrular.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -116,26 +118,32 @@ describe('Alef-Bet sayfası', () => {
 });
 
 describe('gezinme bütünlüğü', () => {
+  /*
+   * Rota listesi App.tsx KAYNAĞINDAN okunuyor, elle yazılmıyor.
+   *
+   * Önceki sürümde burada elle tutulan bir dizi vardı ve testin
+   * koruması gereken şeyin kendisi — iki listenin ayrı düşmesi —
+   * testin içinde tekrar ediyordu: menüye yeni bir giriş eklendiğinde
+   * rota da diziye eklenmezse test kırılıyor ama sebebi rotanın
+   * eksikliği değil, dizinin güncellenmemiş olması oluyordu. Kaynaktan
+   * okuyunca test yalnızca gerçek eksikliği bildiriyor.
+   */
+  const routePaths = (): string[] => {
+    // jsdom ortamında import.meta.url bir file: adresi değil; kök dizin
+    // vitest'in çalışma dizini — proje kökü.
+    const src = readFileSync(resolve(process.cwd(), 'src/app/App.tsx'), 'utf-8');
+    return [...src.matchAll(/path="([^"]+)"/g)].map((m) => m[1]!);
+  };
+
   it('menüdeki her adres uygulamada tanımlı bir rotaya karşılık gelir', () => {
-    const known = [
-      '/',
-      '/seviye/:level',
-      '/alefbet',
-      '/okuma',
-      '/verb',
-      '/binyanim',
-      '/kaliplar',
-      '/kelimeler',
-      '/oyunlar',
-      '/ses',
-      '/ilerleme',
-    '/ilerleme',
-    ];
+    const known = routePaths();
+    expect(known.length).toBeGreaterThan(5);
+
     for (const item of NAV_ITEMS) {
       const matches = known.some((pattern) => {
         if (pattern.includes(':')) {
           const base = pattern.split('/:')[0]!;
-          return item.to.startsWith(base + '/');
+          return item.to.startsWith(base + '/') || item.to === base;
         }
         return item.to === pattern;
       });

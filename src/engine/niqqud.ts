@@ -323,6 +323,13 @@ export function transliterate(vocalized: string): string {
   const chars = [...vocalized];
   let out = '';
   let letterIndex = 0;
+  /*
+   * Bir önceki harfin ünlüsü — hirik male kuralı için gerekli.
+   * Hirik’ten sonra gelen ÇIPLAK י ses vermez; yalnızca o “i” sesinin
+   * yazıdaki taşıyıcısıdır. ו için aynı kural zaten vardı (וֹ → o),
+   * י için unutulmuştu ve הוֹלְכִים “holhiym” diye okunuyordu.
+   */
+  let prevVowel: string | undefined;
 
   for (let i = 0; i < chars.length; i++) {
     const ch = chars[i]!;
@@ -360,6 +367,25 @@ export function transliterate(vocalized: string): string {
     else if (hasDagesh && DAGESH_SOUND[base]) sound = DAGESH_SOUND[base]!;
     else sound = CONSONANT_TR[base] ?? base;
 
+    /*
+     * Hirik male — ִי. İşaretsiz י, kendinden önceki harf hirik
+     * taşıyorsa sessizdir: הוֹלְכִים “holhim”, הָלַכְתִּי “halahti”.
+     *
+     * İşareti olan י ise gerçek ünsüzdür ve yazılır: טִיּוּל “tiyul”,
+     * עַגְבָנִיָּה “agvaniya”. הָיִיתִי ikisini birden taşır: ilk י
+     * hirik taşıdığı için ünsüz, ikincisi çıplak olduğu için sessiz —
+     * “hayiti”.
+     *
+     * Tzere+י (בֵּית) BİLEREK kapsam dışı: modern konuşmada orada
+     * gerçek bir “ey” sesi var ve “beyt” doğru okunuştur.
+     */
+    if (base === 'י' && marks.length === 0 && prevVowel === HIRIK) {
+      i = j - 1;
+      letterIndex++;
+      prevVowel = undefined;
+      continue;
+    }
+
     // ו ve י ünlü görevindeyse ünsüz olarak yazılmaz.
     const isHolamVav = base === 'ו' && marks.includes(HOLAM);
     const isShurukVav = base === 'ו' && hasDagesh && marks.length === 1 && letterIndex > 0;
@@ -367,12 +393,14 @@ export function transliterate(vocalized: string): string {
       out += 'o';
       i = j - 1;
       letterIndex++;
+      prevVowel = HOLAM;
       continue;
     }
     if (isShurukVav) {
       out += 'u';
       i = j - 1;
       letterIndex++;
+      prevVowel = KUBUTZ;
       continue;
     }
 
@@ -381,6 +409,7 @@ export function transliterate(vocalized: string): string {
     // Ünlü sesi
     const vowel = marks.find((m) => m in VOWEL_TR);
     if (vowel) out += VOWEL_TR[vowel]!;
+    prevVowel = vowel;
 
     i = j - 1;
     letterIndex++;

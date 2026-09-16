@@ -1,6 +1,7 @@
 import {
   BookOpen,
   Gamepad2,
+  Presentation,
   GraduationCap,
   Home,
   Languages,
@@ -82,6 +83,12 @@ export const NAV_GROUPS: NavGroup[] = [
     id: 'pratik',
     title: 'Pratik',
     items: [
+      {
+        to: '/ogretmen',
+        label: 'Öğretmen Modu',
+        hint: 'Kural, örnek, alıştırma',
+        icon: Presentation,
+      },
       { to: '/oyunlar', label: 'Oyunlar', hint: 'Alıştırma oyunları', icon: Gamepad2 },
       { to: '/ses', label: 'Ses', hint: 'Seslendirme ve tanılama', icon: Volume2 },
       { to: '/ilerleme', label: 'İlerleme', hint: 'Ne biliyorsun, ne tekrar', icon: TrendingUp },

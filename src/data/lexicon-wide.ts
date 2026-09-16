@@ -378,7 +378,7 @@ export const LEX_BUSINESS = `
 כַּלְכָּלָה|כלכלה|kalkala|ekonomi|noun|f|iş|B1|
 תַּעֲשִׂיָּה|תעשייה|taasiya|sanayi|noun|f|iş|B1|תעשיות
 חַקְלָאוּת|חקלאות|haklaut|tarım|noun|f|iş|B1|
-מִסְחָר|מסחר|mishar|ticaret|noun|m|iş|B1|
+מִסְחָר|מסחר|mis-har|ticaret|noun|m|iş|B1|
 יְצוּא|יצוא|yetsu|ihracat|noun|m|iş|B2|
 יְבוּא|יבוא|yevu|ithalat|noun|m|iş|B2|
 אַבְטָלָה|אבטלה|avtala|işsizlik|noun|f|iş|B2|
@@ -577,7 +577,7 @@ export const LEX_SPORT_DEEP = `
 סְפוֹרְט|ספורט|sport|spor|noun|m|spor|A1|
 כַּדּוּרְסַל|כדורסל|kadursal|basketbol|noun|m|spor|A2|
 כַּדּוּרְעָף|כדורעף|kaduraf|voleybol|noun|m|spor|B1|
-שְׂחִיָּה|שחייה|shiya|yüzme|noun|f|spor|A2|
+שְׂחִיָּה|שחייה|s-hiya|yüzme|noun|f|spor|A2|
 רִיצָה|ריצה|ritsa|koşu|noun|f|spor|A2|
 טֶנִיס|טניס|tenis|tenis|noun|m|spor|A2|
 אִמּוּן|אימון|imun|antrenman|noun|m|spor|B1|אימונים

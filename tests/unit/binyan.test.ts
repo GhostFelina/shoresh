@@ -8,7 +8,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { conjugate } from '@/engine/binyan';
-import { stripNiqqud } from '@/engine/niqqud';
+import { stripNiqqud, transliterate } from '@/engine/niqqud';
 
 /** Harekeli karşılaştırmada görünmez fark olmasın diye normalize eder. */
 const norm = (s: string) => s.normalize('NFC');
@@ -266,5 +266,34 @@ describe('motor sözleşmesi', () => {
       expect(Object.keys(t.past)).toHaveLength(8);
       expect(Object.keys(t.future)).toHaveLength(8);
     }
+  });
+});
+
+describe('okunuş — hirik male', () => {
+  /*
+   * NEDEN AYRI TEST: İşaretsiz י, kendinden önceki harf hirik taşıyorsa
+   * ses vermez; yalnızca o "i" sesinin yazıdaki taşıyıcısıdır. Kural
+   * eksikken ÜRETİLEN 9.786 biçimin 2.522'si "holhiym", "halahtiy" diye
+   * okunuyordu — yani çoğul ve geçmiş zamanın tamamı. Kuralı buraya
+   * kilitliyoruz ki bir daha sessizce kaybolmasın.
+   */
+  it('hirik ardındaki çıplak yod okunmaz', () => {
+    expect(transliterate('הוֹלְכִים')).toBe('holhim');
+    expect(transliterate('הָלַכְתִּי')).toBe('halahti');
+    expect(transliterate('כּוֹתְבִים')).toBe('kotvim');
+  });
+
+  it('işaret taşıyan yod gerçek ünsüzdür', () => {
+    expect(transliterate('טִיּוּל')).toBe('tiyul');
+    expect(transliterate('עַגְבָנִיָּה')).toBe('agvaniya');
+  });
+
+  it('aynı kelimede ikisi birden olabilir', () => {
+    // İlk yod hirik taşır (ünsüz), ikincisi çıplaktır (sessiz).
+    expect(transliterate('הָיִיתִי')).toBe('hayiti');
+  });
+
+  it('tzere + yod kapsam dışı — orada gerçek bir "ey" sesi var', () => {
+    expect(transliterate('בֵּית')).toBe('beyt');
   });
 });
