@@ -25,6 +25,7 @@ import { MixedText } from '@/components/MixedText';
 import { HebrewKeyboardToggle } from '@/components/HebrewKeyboard';
 import { recordAnswer } from '@/lib/progress';
 import { itemKey } from '@/engine/srs';
+import { useRewards } from '@/app/Rewards';
 import type { CEFR } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -326,6 +327,7 @@ function LessonRunner({
   const [answers, setAnswers] = useState<Record<number, AnswerState>>({});
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const spokenFor = useRef<number>(-1);
+  const { award } = useRewards();
 
   const step = lesson.steps[index]!;
   const answer = answers[index] ?? EMPTY;
@@ -364,6 +366,10 @@ function LessonRunner({
        * Yalnızca sorunun dayandığı gerçek öğe biliniyorsa yazılır;
        * uydurma bir anahtar üretmek SRS'i kirletirdi.
        */
+      // Ödül, SRS kaydından bağımsız: kaynağı bilinmeyen soru da
+      // emek ister ve XP kazandırır.
+      void award({ correct, elapsedMs, hintsUsed: hinted ? 1 : 0, cefr: level });
+
       const src = step.question?.source;
       if (!src) return;
       void recordAnswer(itemKey(src.kind, src.id, src.axis), 'ogretmen', {
@@ -373,7 +379,7 @@ function LessonRunner({
         mode: step.question?.choices ? 'choice' : 'type',
       });
     },
-    [step.question],
+    [step.question, award, level],
   );
 
   const go = (d: number) => {

@@ -5,6 +5,7 @@ import { NAV_GROUPS } from './nav';
 import { APP_VERSION } from '@/lib/version';
 import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
 import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
+import { RewardHud } from './Rewards';
 import { BUILD_TIME, formatBuildTime } from '@/lib/version';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
@@ -204,6 +205,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           >
             שֹׁרֶשׁ
           </span>
+          <RewardHud />
           <PalettePicker theme={theme} palette={palette} onChange={changePalette} />
           <ThemeToggle theme={theme} onChange={changeTheme} />
         </header>

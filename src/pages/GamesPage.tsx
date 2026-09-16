@@ -15,6 +15,7 @@ import { hasUserGesture, speak, speechStatus } from '@/lib/speech';
 import { MixedText } from '@/components/MixedText';
 import { HebrewKeyboardToggle } from '@/components/HebrewKeyboard';
 import { recordAnswer } from '@/lib/progress';
+import { useRewards } from '@/app/Rewards';
 import type { CEFR } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -104,6 +105,7 @@ const FRESH: RunState = {
 };
 
 function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: () => void }) {
+  const { award } = useRewards();
   const [seed, setSeed] = useState(0);
   const [s, setS] = useState<RunState>(FRESH);
 
@@ -145,16 +147,23 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
 
   const commit = (right: boolean) => {
     if (q) {
+      const elapsedMs = Date.now() - shownAtRef.current;
       /*
        * Kayıt beklenmiyor: oyun akışı veritabanına bağlı olmamalı.
        * Yazma başarısız olursa `recordAnswer` sessizce null döner.
        */
       void recordAnswer(q.itemKey, game.id, {
         correct: right,
-        elapsedMs: Date.now() - shownAtRef.current,
+        elapsedMs,
         hintsUsed: s.hintsUsed,
         mode: q.kind,
       });
+      /*
+       * Ödül AYRI çağrılıyor: tekrar programı (SRS) ile motivasyon
+       * katmanı birbirine bağlı olmamalı. Biri yazılamazsa öteki yine
+       * de çalışsın.
+       */
+      void award({ correct: right, elapsedMs, hintsUsed: s.hintsUsed, cefr: level });
     }
     setS((prev) => {
       const streak = right ? prev.streak + 1 : 0;

@@ -51,12 +51,32 @@ export interface DayRecord {
   learned: number;
   /** Toplam çalışma süresi (ms). */
   studyMs: number;
+  /**
+   * O gün kazanılan XP.
+   *
+   * NEDEN GÜNLÜK TUTULUYOR: Günlük hedef bunu okuyor ve toplam XP de
+   * bunların toplamı. Ayrı bir "toplam" sayacı tutulsaydı iki değer
+   * birbirinden kayabilir ve hangisinin doğru olduğu bilinemezdi.
+   *
+   * Eski kayıtlarda bu alan YOK; okuyan her yer `?? 0` uygulamalı.
+   */
+  xp?: number;
+}
+
+/** Kazanılmış rozet — yalnızca kazanılanlar yazılır. */
+export interface BadgeRecord {
+  id: string;
+  /** Kazanıldığı an — epoch ms. */
+  unlockedAt: number;
+  /** Kullanıcıya kutlama gösterildi mi? */
+  celebrated: boolean;
 }
 
 class ShoreshDb extends Dexie {
   attempts!: Table<AttemptRecord, number>;
   progress!: Table<ProgressRecord, string>;
   days!: Table<DayRecord, string>;
+  badges!: Table<BadgeRecord, string>;
 
   constructor() {
     super('shoresh');
@@ -70,6 +90,19 @@ class ShoreshDb extends Dexie {
       attempts: '++id, key, day, at',
       progress: 'key, dueAt, updatedAt',
       days: 'day',
+    });
+
+    /*
+     * Sürüm 2 — rozet tablosu.
+     *
+     * Dexie yalnızca DEĞİŞEN tabloları yeniden bildirmeyi ister; eskiler
+     * olduğu gibi taşınır. `DayRecord.xp` alanı indekssiz olduğu için
+     * şema bildirimi gerektirmiyor, ama sürüm yine de yükseltiliyor:
+     * yeni tablo eklendi ve iki değişikliği aynı sürümde tutmak,
+     * ileride "hangi sürümde ne oldu" sorusunu cevaplanabilir kılıyor.
+     */
+    this.version(2).stores({
+      badges: 'id, unlockedAt',
     });
   }
 }
@@ -107,9 +140,10 @@ export async function dbAvailable(): Promise<boolean> {
 /** Bütün ilerlemeyi siler. Geri alınamaz. */
 export async function wipeProgress(): Promise<void> {
   if (!(await dbAvailable())) return;
-  await db.transaction('rw', db.attempts, db.progress, db.days, async () => {
+  await db.transaction('rw', db.attempts, db.progress, db.days, db.badges, async () => {
     await db.attempts.clear();
     await db.progress.clear();
     await db.days.clear();
+    await db.badges.clear();
   });
 }

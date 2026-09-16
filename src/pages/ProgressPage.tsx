@@ -10,6 +10,7 @@ import { PHRASES } from '@/data/phrases';
 import { LETTER_BY_ID, NIQQUD_BY_ID } from '@/data/alefbet';
 import { FORM_LABEL, type HebrewForm } from '@/types/hebrew';
 import { MixedText } from '@/components/MixedText';
+import { RewardPanels } from '@/features/rewards/RewardPanels';
 
 /**
  * Öğe anahtarını okunabilir bir satıra çevirir.
@@ -47,6 +48,18 @@ function describe(key: string): { he: string; tr: string; axis?: string } | null
     return n ? { he: n.mark, tr: n.nameTr } : null;
   }
   return null;
+}
+
+/**
+ * YYYY-MM-DD'yi gün adına çevirir.
+ *
+ * Elle parçalanıyor: `new Date('2026-09-16')` tarihi UTC gece yarısı
+ * sayar ve UTC'nin gerisindeki saat dilimlerinde bir ÖNCEKİ günü
+ * gösterir. Gün etiketinin yanlış olması grafiği sessizce yalan yapar.
+ */
+function weekdayLabel(day: string): string {
+  const [y, m, d] = day.split('-').map(Number) as [number, number, number];
+  return new Date(y, m - 1, d).toLocaleDateString('tr-TR', { weekday: 'short' });
 }
 
 function Stat({ value, label, tone }: { value: number | string; label: string; tone?: string }) {
@@ -124,6 +137,14 @@ export default function ProgressPage() {
         </p>
       </header>
 
+      {/*
+        Ödül bölümleri SRS bölümlerinden ÖNCE geliyor. Sebebi sıralama
+        değil öncelik: sayfayı açan kişi önce "ne kadar yol aldım"
+        sorusunun cevabını arıyor; "neyi tekrar etmeliyim" ondan sonra
+        gelen bir soru.
+      */}
+      <RewardPanels />
+
       {empty ? (
         <section className="card space-y-3 p-6 text-center">
           <h2 className="text-lg font-bold">Henüz kayıt yok</h2>
@@ -170,23 +191,36 @@ export default function ProgressPage() {
             {/* Son yedi gün */}
             <section className="card space-y-3 p-5">
               <h2 className="text-sm font-semibold">Son yedi gün</h2>
-              <div className="flex items-end gap-2" style={{ height: '5rem' }}>
+              {/*
+                Çubuklar MUTLAK konumla çiziliyor.
+                Önceki yazımda yüzde yükseklikli bir çubuk, yüksekliği
+                `auto` olan bir sütunun içindeydi; CSS'te yüzde yükseklik
+                böyle bir kapsayıcıda çözülmez ve çubukların hepsi sıfır
+                yükseklikte kalıyordu — grafik boş görünüyordu. Şimdi
+                yüzde, yüksekliği flex ile KESİNLEŞMİŞ bir raya göre
+                hesaplanıyor.
+              */}
+              <div className="flex items-stretch gap-2" style={{ height: '6rem' }}>
                 {stats.lastWeek.map((d) => {
                   const h = Math.round((d.attempts / maxDay) * 100);
-                  const label = new Date(d.day).toLocaleDateString('tr-TR', { weekday: 'short' });
                   return (
-                    <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-                      <div
-                        className="w-full rounded-t transition-all"
-                        style={{
-                          height: `${Math.max(3, h)}%`,
-                          background:
-                            d.attempts > 0 ? 'var(--color-brand-400)' : 'var(--surface-2)',
-                        }}
-                        title={`${d.attempts} cevap, ${d.correct} doğru`}
-                      />
-                      <span className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
-                        {label}
+                    <div key={d.day} className="flex flex-1 flex-col gap-1">
+                      <div className="relative flex-1">
+                        <div
+                          className="absolute inset-x-0 bottom-0 rounded-t transition-all"
+                          style={{
+                            height: `${Math.max(4, h)}%`,
+                            background:
+                              d.attempts > 0 ? 'var(--color-brand-400)' : 'var(--surface-2)',
+                          }}
+                          title={`${d.attempts} cevap, ${d.correct} doğru`}
+                        />
+                      </div>
+                      <span
+                        className="shrink-0 text-center text-[10px]"
+                        style={{ color: 'var(--text-dim)' }}
+                      >
+                        {weekdayLabel(d.day)}
                       </span>
                     </div>
                   );

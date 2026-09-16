@@ -476,3 +476,43 @@ body::before {
     opacity: 0.85;
   }
 }
+
+/* ---------------------------------------------------------------- *
+ * Ödül hareketleri
+ *
+ * Kutlama şeridi gelir, bir süre durur, gider — hepsi tek bir
+ * animasyonun içinde. İki ayrı animasyon (giriş + çıkış) yazmak
+ * zamanlayıcıyla eşlemeyi gerektirir ve ikisi kayarsa şerit ekranda
+ * asılı kalır.
+ * ---------------------------------------------------------------- */
+@keyframes shoresh-celebrate {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.94);
+  }
+  8%,
+  86% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+}
+
+/** Kazanılan XP yukarı süzülerek kaybolur. */
+@keyframes shoresh-float {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}

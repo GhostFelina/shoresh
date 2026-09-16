@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Shell from './Shell';
+import { RewardProvider } from './Rewards';
 
 /**
  * Rotalar lazy: VERB Hebrew sayfası bütün çekim tablosunu kurar, Alef-Bet
@@ -30,7 +31,8 @@ function Loading() {
 
 export default function App() {
   return (
-    <Shell>
+    <RewardProvider>
+      <Shell>
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -60,6 +62,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-    </Shell>
+      </Shell>
+    </RewardProvider>
   );
 }

@@ -56,6 +56,33 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.13.0',
+    date: '2026-09-16',
+    title: 'İlerleme ve ödül sistemi',
+    summary:
+      'Artık her cevabın bir karşılığı var: XP kazanıyorsun, rütbe atlıyorsun, günlük hedefin ve serin birikiyor. On iki rozetin ölçütü baştan görünüyor.',
+    changes: [
+      { kind: 'yeni', text: 'XP ve dokuz rütbe — Tohum (זֶרַע) ile başlayıp Orman (יַעַר) ile bitiyor. Her rütbe aynı zamanda öğreneceğin bir kelime.' },
+      { kind: 'yeni', text: 'Günlük hedef: Hafif, Düzenli, Ciddi, Yoğun. İstediğin zaman değiştirebilirsin.' },
+      { kind: 'yeni', text: 'Seri (streak) — arka arkaya çalıştığın her gün kazandığın XP’yi artırıyor, en fazla %50.' },
+      { kind: 'yeni', text: 'On iki rozet. Ölçütleri ve ilerleme çubukları BAŞTAN görünüyor; gizli rozet yok.' },
+      { kind: 'yeni', text: 'Üst bantta seri, günlük hedef halkası ve rütbe; kazanılan XP cevap verince yanıp sönüyor.' },
+      { kind: 'gelisme', text: 'Yanlış cevap da XP kazandırıyor (doğrunun beşte biri). İpucu puanı düşürüyor ama sıfırlamıyor.' },
+      { kind: 'duzeltme', text: 'Cevap kaydı ile ödül kaydı aynı satıra yazarken birbirini eziyordu; seri hep 0 kalıyordu.' },
+      { kind: 'duzeltme', text: 'Son yedi gün grafiğinin çubukları hiç çizilmiyordu — yüzde yükseklik çözülemiyordu.' },
+    ],
+    benefits: [
+      {
+        title: 'Bugün neden çalışacağını biliyorsun',
+        text: 'Dil öğrenmenin en zor yanı ilerlemenin görünmez olması; haftalarca çalışırsın ve hiçbir şey değişmemiş gibi gelir. Günlük hedef ve seri, o görünmez ilerlemeyi her gün somut bir sayıya çeviriyor.',
+      },
+      {
+        title: 'Sayılar şişirilmiyor',
+        text: 'Her tıklamaya bol puan veren bir sistem önce heyecan verir, sonra sayılar anlamını yitirir. Buradaki ölçüler bilerek dar: elli doğru cevap bile bir rütbe atlatmıyor, yani rütbe atladığında gerçekten bir şey olmuş demektir.',
+      },
+    ],
+  },
+  {
     version: '1.12.0',
     date: '2026-09-16',
     title: 'Sürüm notları ve zaman damgası',
