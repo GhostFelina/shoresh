@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Menu, Moon, Sun, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { NAV_GROUPS } from './nav';
 import { APP_VERSION } from '@/lib/version';
+import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
 function Logo({ className = 'size-8' }: { className?: string }) {
@@ -35,39 +36,6 @@ function Logo({ className = 'size-8' }: { className?: string }) {
   );
 }
 
-/** Tema anahtarı — seçim cihazda kalır, sunucuya gitmez. */
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    try {
-      return (localStorage.getItem('shoresh.theme') as 'dark' | 'light') ?? 'dark';
-    } catch {
-      // Gizli sekmede ya da site verisi kapalıyken localStorage patlar;
-      // tema bir kolaylıktır, uygulamayı düşürmemeli.
-      return 'dark';
-    }
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try {
-      localStorage.setItem('shoresh.theme', theme);
-    } catch {
-      /* yazamadıysak sorun değil — bu oturumda yine de doğru görünür */
-    }
-  }, [theme]);
-
-  return (
-    <button
-      type="button"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="card-2 grid size-9 place-items-center card-interactive"
-      aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}
-    >
-      {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
-  );
-}
-
 /** Kenar çubuğunun içeriği — masaüstünde sabit, telefonda çekmecede. */
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -92,8 +60,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   className="group flex items-center gap-2.5 rounded-lg px-3 py-1.5 transition"
                   style={({ isActive }) => ({
                     background: isActive ? 'var(--surface-2)' : 'transparent',
-                    color: isActive ? 'var(--accent-text)' : 'var(--text-dim)',
-                    boxShadow: isActive ? 'inset 2px 0 0 var(--color-brand-400)' : 'none',
+                    // Etkin girişin rengi kendi tonu; yoksa marka rengi.
+                    color: isActive ? (item.tint ?? 'var(--accent-text)') : 'var(--text-dim)',
+                    boxShadow: isActive
+                      ? `inset 2px 0 0 ${item.tint ?? 'var(--color-brand-400)'}`
+                      : 'none',
                   })}
                 >
                   {item.icon ? (
@@ -101,7 +72,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   ) : (
                     <span
                       className="grid size-5 shrink-0 place-items-center rounded text-[10px] numeric font-bold"
-                      style={{ background: 'var(--surface-2)' }}
+                      style={{
+                        background: item.tint
+                          ? `color-mix(in srgb, ${item.tint} 18%, var(--surface-2))`
+                          : 'var(--surface-2)',
+                        color: item.tint ?? 'inherit',
+                      }}
                     >
                       {item.badge}
                     </span>
@@ -122,6 +98,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export default function Shell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { theme, palette, changeTheme, changePalette } = useAppearance();
 
   // Çekmece açıkken arkadaki sayfa kaymasın.
   useEffect(() => {
@@ -224,7 +201,8 @@ export default function Shell({ children }: { children: ReactNode }) {
           >
             שֹׁרֶשׁ
           </span>
-          <ThemeToggle />
+          <PalettePicker theme={theme} palette={palette} onChange={changePalette} />
+          <ThemeToggle theme={theme} onChange={changeTheme} />
         </header>
 
         <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>

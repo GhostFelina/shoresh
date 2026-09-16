@@ -248,6 +248,88 @@ body::before {
 }
 
 /* ---------------------------------------------------------------- *
+ * Kaydırma çubuğu
+ *
+ * Tarayıcının varsayılan çubuğu koyu arayüzde açık gri bir şerit
+ * bırakıyor ve kenar çubuğunun yanında yamalı duruyordu. Burada
+ * çubuğu yüzey renklerine bağlıyoruz: zemin saydam, tutamak kenarlık
+ * renginin biraz üstünde, üzerine gelince marka rengine dönüyor.
+ *
+ * İki ayrı yazım gerekiyor: `scrollbar-*` Firefox ve yeni Chromium'un
+ * standart yolu, `::-webkit-scrollbar` ise Safari ve eski Chromium.
+ * Biri ötekini dışlamıyor, yalnızca farklı tarayıcılar farklı olanı
+ * görüyor.
+ * ---------------------------------------------------------------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-brand-400) 32%, var(--border)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-400) 28%, var(--border));
+  /* Saydam kenarlık + arka planın yalnızca içe boyanması: tutamak
+     inceliyor ama tıklama alanı tam genişlikte kalıyor. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-brand-400) 62%, var(--border));
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ---------------------------------------------------------------- *
+ * Canlılık
+ *
+ * Arka plandaki iki renk lekesi çok yavaş yer değiştiriyor. Amaç
+ * dikkat çekmek değil — tam tersine, fark edilmeden sayfanın "ölü"
+ * durmasını engellemek. 40 saniyelik bir döngü, bakarken hareket
+ * görülmeyecek kadar yavaş.
+ *
+ * `transform` ile yapılıyor; düzen hesabı gerektirmediği için
+ * kaydırma başarımına etkisi yok. Hareket azaltma tercihi varsa
+ * aşağıdaki blok bunu tamamen durduruyor.
+ * ---------------------------------------------------------------- */
+@keyframes shoresh-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-2%, 1.5%, 0) scale(1.06);
+  }
+}
+
+body::before {
+  animation: shoresh-drift 40s ease-in-out infinite;
+}
+
+/** Palet değişiminde renkler zıplamasın, aksın. */
+.palette-shift,
+.palette-shift * {
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease,
+    color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+/* ---------------------------------------------------------------- *
  * Erişilebilirlik
  * ---------------------------------------------------------------- */
 
@@ -292,5 +374,30 @@ body::before {
 
   .card-interactive:hover {
     transform: none;
+  }
+
+  /* Arka plan hareketi süresi kısaltılırsa hızlı bir titremeye dönerdi;
+     tamamen kapatmak gerekiyor. */
+  body::before {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Açılış hareketleri
+ *
+ * Panel ve kutular belirirken hafifçe büyüyüp yukarı gelir. Süre kısa
+ * (180–260ms) ve yay eğrisi hafif: amaç gösteri yapmak değil, öğenin
+ * NEREDEN geldiğini göstermek. Ani beliren bir panel, kullanıcının
+ * gözünü sayfada kaybettirir.
+ * ---------------------------------------------------------------- */
+@keyframes shoresh-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
