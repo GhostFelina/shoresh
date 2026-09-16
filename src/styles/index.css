@@ -170,7 +170,13 @@ body::before {
     transform 140ms ease,
     box-shadow 140ms ease,
     border-color 140ms ease;
-  will-change: transform;
+  /*
+   * `will-change: transform` KALDIRILDI. Tarayıcıya "bu öğe değişecek"
+   * demek, ona kendi katmanını ayırtmak demektir. Tek bir kartta ucuz;
+   * ama öğretmen kataloğunda 70, kelime sayfasında yüzlerce kart var ve
+   * her biri ayrı katman istiyordu. Kazanç sıfır (transform geçişi zaten
+   * ucuz), maliyet bellek ve birleştirme (compositing) yüküydü.
+   */
 }
 
 .card-interactive:hover {
@@ -319,14 +325,32 @@ body::before {
   animation: shoresh-drift 40s ease-in-out infinite;
 }
 
-/** Palet değişiminde renkler zıplamasın, aksın. */
+/*
+ * Palet/tema değişiminde zemin aksın.
+ *
+ * NEDEN `*` KALDIRILDI — ÖLÇÜLDÜ: Geçiş sınıfı her öğeye
+ * (`.palette-shift *`) uygulanıyordu. Tarayıcı bu durumda sayfadaki HER
+ * düğüm için geçiş nesnesi kuruyor ve 260 ms boyunca hepsini yeniden
+ * boyuyor. Maliyet düğüm sayısıyla doğru orantılı çıktı
+ * (`node scripts/perf-theme.mjs`):
+ *
+ *     sayfa        düğüm   boyama   ana iş parçacığı kilidi
+ *     öğretmen       498     75ms     0ms
+ *     kelimeler     1329    164ms   393ms
+ *     VERB          2750    349ms   646ms   ← yarım saniyelik donma
+ *
+ * Kullanıcının bildirdiği "tema geçişleri kasıyor ve donuyor" tam olarak
+ * buydu. Artık yalnızca büyük zeminler yumuşak geçiyor; metin ve kenarlık
+ * renkleri ANINDA değişiyor — ki bu daha hızlı hissettiriyor, çünkü
+ * bekleyen bir animasyon yok.
+ */
 .palette-shift,
-.palette-shift * {
+.palette-shift body,
+.palette-shift .card,
+.palette-shift .card-2 {
   transition:
-    background-color 260ms ease,
-    border-color 260ms ease,
-    color 260ms ease,
-    box-shadow 260ms ease;
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 
 /* ---------------------------------------------------------------- *

@@ -14,10 +14,21 @@ test('geniş ekranda çalışma alanı 1024pxin ötesine açılıyor', async ({ 
   await page.setViewportSize({ width: 1920, height: 1080 });
   await ac(page, '/he/verb');
 
-  const genislik = await page.evaluate(
-    () => Math.round(document.querySelector('main')?.getBoundingClientRect().width ?? 0),
-  );
-  expect(genislik, `ana bölge ${genislik}px — hâlâ dar`).toBeGreaterThan(1300);
+  /*
+   * ÖLÇÜM YERLEŞENE KADAR BEKLİYOR. Genişlik `max-width` geçişiyle
+   * açılıyor (300 ms). Tek seferlik ölçüm geçişin ortasına denk gelip
+   * 1089px okuyabiliyor — test bir kez tam olarak böyle düştü ve
+   * ölçtüğü şey tasarım değil, animasyonun o anki karesiydi.
+   */
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() =>
+          Math.round(document.querySelector('main')?.getBoundingClientRect().width ?? 0),
+        ),
+      { message: 'ana bölge açılmadı — hâlâ dar', timeout: 5_000 },
+    )
+    .toBeGreaterThan(1300);
 });
 
 test('okuma sayfaları dar kalıyor — geniş düzen oraya sızmıyor', async ({ page }) => {

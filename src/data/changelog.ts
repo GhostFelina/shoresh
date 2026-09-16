@@ -67,6 +67,66 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.21.0',
+    date: '2026-09-17',
+    releasedAt: '2026-09-17T02:13:19+03:00',
+    title: 'Öğretmen modu gerçek bir sınıfa dönüştü',
+    summary:
+      'Öğretmen modu artık ders kataloğu değil: seni karşılıyor, seviyeni ölçüyor, bugün ne çalışacağını gerekçesiyle söylüyor ve ödev veriyor.',
+    changes: [
+      {
+        kind: 'yeni',
+        text: 'Seviye tespit sınavı: 18 soruluk uyarlamalı ölçüm. Her cevaptan sonra tahmin güncelleniyor ve sonraki sorunun zorluğu ona göre kuruluyor. Sonunda seviye, beceri haritası ve nereden başlanacağı yazılı bir karne çıkıyor.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Sınıf ekranı: karşılama, bugünün programı (en fazla dört madde, her birinin NEDEN o olduğu yazılı), seviye kartı ve ardından katalog.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Ödev, not ve karne. Her ödev maddesi ÖLÇÜLEBİLİR — "yaptım" düğmesi yok; ders tamamlandı mı, oyunda kaç doğru verildi, kaç öğe tekrar edildi verisine bakılıyor. Not teslim anında donuyor.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Yapay zekâ öğretmen köşesi. Model İbranice UYDURAMIYOR: her soruya senin seviyendeki gerçek fiil, kelime ve kalıplar katalogdan süzülüp "bu listenin dışına çıkma" yönergesiyle veriliyor. Anahtar bağlanana kadar panel dürüstçe "bağlı değil" diyor.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Tema geçişindeki donma çözüldü — ÖLÇÜLDÜ. Geçiş sayfadaki her öğeye kuruluyordu; VERB sayfasında yarım saniyelik (646 ms) kilit oluyordu. Şimdi 0 ms, boyama 349 ms yerine 76 ms.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Yüzlerce kartın her biri tarayıcıdan ayrı bir çizim katmanı istiyordu; kazancı olmayan bu istek kaldırıldı.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Yeni ekranlar dil önekli adres yapısına bağlandı; sınıf ekranından derse, ödevden oyuna geçişler doğru yere gidiyor.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Test sayısı 506 birim + 62 uçtan uca. Genişlik testi animasyonun ortasını ölçüyordu — artık yerleşmeyi bekliyor.',
+      },
+    ],
+    benefits: [
+      {
+        title: '"Bugün ne çalışsam" sorusu bitti',
+        text: 'Öğretmen modunu açtığında karşına program çıkıyor: en fazla dört madde ve her birinin neden seçildiği. Yetmiş dersin arasından seçim yapmak zorunda değilsin.',
+      },
+      {
+        title: 'Nereden başlayacağını tahmin etmiyorsun',
+        text: 'Seviye tespit sınavı seviyeni ölçüyor ve ders listesi ölçülen seviyeye göre açılıyor. Sınav sırasında doğru-yanlış gösterilmiyor; bu bir ölçüm, ders değil.',
+      },
+      {
+        title: 'Ödevin gerçek karşılığı var',
+        text: 'Ödevi "yaptım" diyerek kapatamıyorsun — sistem gerçekten çalışıp çalışmadığına bakıyor. Not da bu yüzden anlamlı.',
+      },
+      {
+        title: 'Tema değiştirmek artık takılmıyor',
+        text: 'Renk paletini değiştirdiğinde yarım saniyelik donma vardı; ölçülüp kaldırıldı. Geçiş hem daha hızlı hem daha yumuşak.',
+      },
+    ],
+  },
+  {
     version: '1.20.0',
     date: '2026-09-17',
     releasedAt: '2026-09-17T01:51:26+03:00',

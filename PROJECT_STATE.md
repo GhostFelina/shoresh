@@ -9,8 +9,8 @@
 
 # Shoresh — ölçülen durum
 
-**Üretim anı:** 17.09.2026 01:56:26
-**Sürüm:** v1.20.0 · **Dal:** main · **Commit:** 783c4d8
+**Üretim anı:** 17.09.2026 02:14:51
+**Sürüm:** v1.21.0 · **Dal:** main · **Commit:** 205ea7e
 **Çalışma ağacı:** ⚠ TEMİZ DEĞİL (commit edilmemiş değişiklik var)
 
 ## Testler
@@ -18,10 +18,10 @@
 | | |
 |---|---|
 | Durum | hepsi geçiyor |
-| Birim testi | 433 |
-| Test dosyası | 19 |
-| Kaynak satırı | 22.476 |
-| Test satırı | 4.486 |
+| Birim testi | 506 |
+| Test dosyası | 24 |
+| Kaynak satırı | 25.225 |
+| Test satırı | 5.389 |
 
 ## İçerik
 
@@ -47,11 +47,12 @@
 | Renk paleti | 5 |
 | Rozet | 12 |
 | Rütbe | 9 |
-| Kayda geçmiş sürüm | 24 |
+| Kayda geçmiş sürüm | 25 |
 
 ## Son commit'ler
 
 ```
+17.09 01:58 · v1.20.0 — çok dilli mimari + ürün kimliği
 16.09 22:04 · Devir belgesi: Supabase kurulumu ve neden farkli projede olduğu yazıldı
 16.09 22:01 · v1.19.1 — Geri bildirim arka ucu kuruldu ve doğrulandı
 16.09 21:48 · v1.19.0 — Geri bildirim formu ve gelen kutusu
@@ -59,11 +60,11 @@
 16.09 21:15 · v1.17.0 — Test motoru: 39 uçtan uca test
 16.09 20:58 · v1.16.0 — Yedekleme, checkpoint ve devir belgesi
 16.09 20:25 · v1.15.0 — Sürüm geçmişi paneli
-16.09 17:18 · v1.14.0 — Öğretmen Modu 30 dersten 71 derse
 ```
 
 ## Checkpoint etiketleri
 
+- `v1.20.0`
 - `v1.19.1`
 - `v1.19.0`
 - `v1.18.0`
