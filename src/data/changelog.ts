@@ -67,6 +67,31 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.17.0',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T21:13:00+03:00',
+    title: 'Test motoru',
+    summary:
+      'Uygulama artık her sürümde gerçek bir tarayıcıda baştan sona sınanıyor: 39 uçtan uca test, masaüstü ve telefon olmak üzere iki ayrı ekran boyutunda.',
+    changes: [
+      { kind: 'yeni', text: 'Uçtan uca test paketi — gezinme, öğrenme akışı, arayüz, seslendirme ve telefon görünümü.' },
+      { kind: 'yeni', text: 'Tek komut: kod denetimi, biçim denetimi, birim testleri ve tarayıcı testleri birlikte koşuyor.' },
+      { kind: 'yeni', text: 'Testler yaşanmış hataların üstüne yazıldı: seri neden 0 kalıyordu, grafik çubukları neden çizilmiyordu, ses neden duyulmuyordu.' },
+      { kind: 'gelisme', text: 'Telefon görünümü ayrı sınanıyor: çekmece açılıyor mu, arkadaki sayfa kayıyor mu, içerik ekrandan taşıyor mu.' },
+      { kind: 'duzeltme', text: 'Seslendirme ucunun İbranice olmayan metni reddettiği ve boş isteğe çökmediği artık testle güvence altında.' },
+    ],
+    benefits: [
+      {
+        title: 'Bir şeyi düzeltirken başka bir şey bozulmuyor',
+        text: 'Bu uygulamada en az bir kez oldu: iki yönlü metin düzeltmesi, kendi getirdiği bir hatayla kelimeleri birbirine yapıştırdı. Artık her değişiklikten sonra kırk civarında gerçek kullanıcı yolculuğu otomatik deneniyor — sayfalar açılıyor mu, oyun oynanıyor mu, ses geliyor mu.',
+      },
+      {
+        title: 'Hatalar sana ulaşmadan bulunuyor',
+        text: 'Şimdiye kadar hatalar ekran görüntüsüne bakılarak ya da sen bildirdiğin için bulunuyordu. Test paketi aynı kontrolleri her seferinde, unutmadan ve saniyeler içinde yapıyor.',
+      },
+    ],
+  },
+  {
     version: '1.16.0',
     date: '2026-09-16',
     releasedAt: '2026-09-16T20:57:00+03:00',

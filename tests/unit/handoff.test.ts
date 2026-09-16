@@ -60,7 +60,13 @@ describe('belgedeki komutlar gerçekten var', () => {
    * olmalı. Olmayan bir komut, devralanın ilk denemesinde duvara
    * toslaması demek.
    */
-  const komutlar = [...HANDOFF.matchAll(/npm run ([a-z:]+)/g)].map((m) => m[1]!);
+  /*
+   * Rakam da kabul ediliyor: ilk yazımda desen yalnızca harf ve iki
+   * nokta arıyordu ve `test:e2e` komutunu `test:e` diye kesip "böyle bir
+   * komut yok" dedi. Test, doğruladığı şeyi değil kendi desenini
+   * yanlışlamıştı.
+   */
+  const komutlar = [...HANDOFF.matchAll(/npm run ([a-z0-9:]+)/g)].map((m) => m[1]!);
 
   it('belgede komut geçiyor', () => {
     expect(komutlar.length).toBeGreaterThan(4);

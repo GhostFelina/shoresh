@@ -9,8 +9,8 @@
 
 # Shoresh — ölçülen durum
 
-**Üretim anı:** 16.09.2026 20:57:19
-**Sürüm:** v1.16.0 · **Dal:** main · **Commit:** e0feb80
+**Üretim anı:** 16.09.2026 21:13:18
+**Sürüm:** v1.17.0 · **Dal:** main · **Commit:** 87f995b
 **Çalışma ağacı:** ⚠ TEMİZ DEĞİL (commit edilmemiş değişiklik var)
 
 ## Testler
@@ -20,8 +20,8 @@
 | Durum | hepsi geçiyor |
 | Birim testi | ? |
 | Test dosyası | ? |
-| Kaynak satırı | 20.386 |
-| Test satırı | 3.093 |
+| Kaynak satırı | 20.411 |
+| Test satırı | 3.822 |
 
 ## İçerik
 
@@ -47,11 +47,12 @@
 | Renk paleti | 5 |
 | Rozet | 12 |
 | Rütbe | 9 |
-| Kayda geçmiş sürüm | 19 |
+| Kayda geçmiş sürüm | 20 |
 
 ## Son commit'ler
 
 ```
+16.09 20:58 · v1.16.0 — Yedekleme, checkpoint ve devir belgesi
 16.09 20:25 · v1.15.0 — Sürüm geçmişi paneli
 16.09 17:18 · v1.14.0 — Öğretmen Modu 30 dersten 71 derse
 16.09 17:02 · v1.13.0 — İlerleme ve ödül sistemi
@@ -59,12 +60,11 @@
 16.09 16:31 · v1.11.0 — Beş renk paleti, ölçülen kontrast, düzgün kaydırma çubuğu
 16.09 16:18 · v1.10.0 — Öğretmen Modu ve okunuşta hirik male düzeltmesi
 16.09 15:58 · v1.9.0 — 1.572 öğe: sözlük iki katına, motora 8 eksik şablon
-16.09 12:47 · v1.8.0 — ses gerçekten çalışıyor: kök neden ölçüldü, sunucu vekili eklendi
 ```
 
 ## Checkpoint etiketleri
 
-_henüz etiket yok_
+- `v1.16.0`
 
 ---
 

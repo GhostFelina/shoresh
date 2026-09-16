@@ -16,7 +16,8 @@ Konum   C:\Users\User\Desktop\Shoresh
 Depo    github.com/GhostFelina/shoresh   (private)
 Canlı   https://shoresh-ivrit.vercel.app
 Dev     npm run dev            → http://localhost:5400
-Doğrula npm run verify         → typecheck + lint + birim testi
+Doğrula npm run verify         → typecheck + lint + birim + E2E
+E2E     npm run test:e2e       → yalnızca tarayıcı testleri
 Durum   npm run state          → PROJECT_STATE.md yeniler
 Yedek   npm run checkpoint     → zip + git etiketi
 ```
@@ -126,7 +127,15 @@ Her biri gerçekten oldu ve ölçümle bulundu. Yenisini eklersen buraya yaz.
 13. **Playwright her açılışta TEMİZ profil kullanır.** Bir betikte oyun oynayıp
     başka betikte ilerlemeye bakarsan boş görürsün. Aynı betikte yap.
 
-14. **Sürüm kutusu testleri engeller.** Otomasyon betiğinin başında
+14. **Gizli masaüstü menüsü telefon testini yanıltır.** Kenar çubuğu
+    telefonda gizlense de DOM'da duruyor ve aynı bağlantıları taşıyor.
+    `nav a` seçicisi DOM sırasına göre GİZLİ olanı seçer. → `nav:visible a`.
+
+15. **Playwright projeleri birbirinin dosyasını alır.** Telefon projesine
+    `testMatch` koymak yetmiyor; masaüstü projesine de `testIgnore`
+    gerekiyor, yoksa mobil testleri masaüstünde de koşar ve kırılır.
+
+16. **Sürüm kutusu testleri engeller.** Otomasyon betiğinin başında
     `localStorage.setItem('shoresh.seenVersion', '<güncel sürüm>')` yaz; bilinmeyen
     bir sürüm yazarsan kutu yine açılır ve tıklamaları yutar.
 
@@ -136,6 +145,7 @@ Her biri gerçekten oldu ve ölçümle bulundu. Yenisini eklersen buraya yaz.
 
 ```
 api/tts.js                 Seslendirme vekili (§6)
+playwright.config.ts       E2E yapılandırması (webServer kendini başlatır)
 scripts/
   checkpoint.mjs           Yedek: zip + git etiketi
   state.mjs                PROJECT_STATE.md üretir
@@ -191,7 +201,7 @@ tests/unit/                16 dosya, 398 test
 
 ```bash
 # 1. Doğrula
-npm run verify                      # typecheck + lint + birim testi
+npm run verify                      # typecheck + lint + birim + E2E
 
 # 2. Sürümü yükselt (işin ağırlığına göre)
 npm version 1.X.0 --no-git-tag-version
@@ -260,8 +270,8 @@ Ses konusunda tahmin yürütme, bunu çalıştır.
 Kullanıcının verdiği, sırası belirlenmiş liste. Biteni buradan sil.
 
 1. ~~Yedek/checkpoint + devir belgesi~~ — **v1.16.0'da yapıldı**
-2. **Test motoru** — Playwright E2E paketi + tek `verify` hattı. Amaç: her
-   görev sonunda projeyi otomatik sınamak.
+2. ~~Test motoru~~ — **v1.17.0'da yapıldı.** 39 E2E testi, iki proje
+   (masaüstü + telefon). `npm run verify` artık dördünü birden koşuyor.
 3. **VERB sayfası çalışma alanına çevrilecek.** Teşhis edildi:
    `Shell.tsx` içerik alanını `max-w-5xl` (1024px) ile sınırlıyor; VERB sayfası
    bunun içinde ikiye bölününce tabloya ~700px kalıyor. Sayfalar kendi
