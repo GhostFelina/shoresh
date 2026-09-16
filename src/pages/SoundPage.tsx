@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Check, Loader2, Volume2, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check, Download, Loader2, Trash2, Volume2, X } from 'lucide-react';
 import {
   diagnose,
   hebrewVoice,
@@ -10,6 +10,15 @@ import {
   type DiagnosticResult,
   type SpeechStatus,
 } from '@/lib/speech';
+import {
+  clearPack,
+  downloadPack,
+  estimatedMegabytes,
+  packSections,
+  packStatus,
+  type DownloadProgress,
+  type PackStatus,
+} from '@/lib/audio-pack';
 
 /** Sınama için kısa, tanıdık örnekler. */
 const SAMPLES = [
@@ -24,6 +33,159 @@ const LAYER_LABEL: Record<SpeechStatus['layer'], string> = {
   online: 'Çevrimiçi seslendirme',
   none: 'Ses yok',
 };
+
+
+/**
+ * Ses paketi bölümü.
+ *
+ * "Ses paketi indir" isteğinin gerçek karşılığı bu: uygulamanın
+ * seslendirdiği bütün metinler bir kez çekilip tarayıcının kalıcı
+ * önbelleğine konuyor. Sonrasında uygulama çevrimdışı konuşuyor ve her
+ * klip anında başlıyor.
+ */
+function AudioPack() {
+  const [status, setStatus] = useState<PackStatus | null>(null);
+  const [progress, setProgress] = useState<DownloadProgress | null>(null);
+  const [busy, setBusy] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const sections = useMemo(() => packSections(), []);
+  const refresh = useCallback(() => {
+    void packStatus().then(setStatus);
+  }, []);
+
+  useEffect(refresh, [refresh]);
+
+  const start = async () => {
+    setBusy(true);
+    setProgress({ done: 0, total: status?.total ?? 0, failed: 0 });
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    try {
+      await downloadPack(setProgress, ctrl.signal);
+    } finally {
+      abortRef.current = null;
+      setBusy(false);
+      refresh();
+    }
+  };
+
+  const stop = () => abortRef.current?.abort();
+
+  const wipe = async () => {
+    await clearPack();
+    setProgress(null);
+    refresh();
+  };
+
+  const total = status?.total ?? 0;
+  const cached = status?.cached ?? 0;
+  const pct = total > 0 ? Math.min(100, Math.round((cached / total) * 100)) : 0;
+  const mb = estimatedMegabytes(total);
+
+  return (
+    <section className="card space-y-3 p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="mr-auto text-sm font-semibold">Ses paketi — çevrimdışı dinleme</h2>
+        <span className="text-xs tabular-nums" style={{ color: 'var(--text-dim)' }}>
+          {cached.toLocaleString('tr-TR')} / {total.toLocaleString('tr-TR')} klip · ~{mb} MB
+        </span>
+      </div>
+
+      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+        Uygulamanın seslendirdiği her şey sonlu bir kümedir: harf adları, harekeler, kelimeler,
+        kalıplar, fiiller ve örnek cümleler. Hepsini bir kez indirirsen uygulama internetsiz de
+        konuşur ve her klip beklemeden başlar.
+      </p>
+
+      {/* İlerleme */}
+      <div className="h-1.5 overflow-hidden rounded" style={{ background: 'var(--surface-2)' }}>
+        <div
+          className="h-full origin-left transition-transform"
+          style={{
+            background: 'var(--color-brand-400)',
+            width: '100%',
+            transform: `scaleX(${
+              progress && progress.total > 0 ? progress.done / progress.total : pct / 100
+            })`,
+          }}
+        />
+      </div>
+
+      {progress && busy && (
+        <p className="text-xs tabular-nums" style={{ color: 'var(--text-dim)' }}>
+          {progress.done.toLocaleString('tr-TR')} / {progress.total.toLocaleString('tr-TR')}
+          {progress.failed > 0 && ` · ${progress.failed} klip alınamadı, sonra yeniden denenebilir`}
+        </p>
+      )}
+
+      {status && !status.available ? (
+        <p className="text-xs leading-relaxed" style={{ color: '#fbbf24' }}>
+          {status.reason}
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {busy ? (
+            <button
+              type="button"
+              onClick={stop}
+              className="card-2 flex items-center gap-2 px-4 py-2 text-sm transition hover:brightness-125"
+            >
+              <Loader2 className="size-4 animate-spin" />
+              Durdur
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void start()}
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition hover:brightness-110"
+              style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            >
+              <Download className="size-4" />
+              {cached > 0 ? 'Eksikleri indir' : `Ses paketini indir (~${mb} MB)`}
+            </button>
+          )}
+          {cached > 0 && !busy && (
+            <button
+              type="button"
+              onClick={() => void wipe()}
+              className="card-2 flex items-center gap-2 px-3 py-2 text-xs transition hover:brightness-125"
+            >
+              <Trash2 className="size-3.5" />
+              Paketi sil
+            </button>
+          )}
+        </div>
+      )}
+
+      <details>
+        <summary
+          className="cursor-pointer text-[11px] select-none"
+          style={{ color: 'var(--text-dim)' }}
+        >
+          Pakette ne var?
+        </summary>
+        <ul className="space-y-0.5 pt-1.5">
+          {sections.map((sec) => (
+            <li
+              key={sec.id}
+              className="flex justify-between text-[11px]"
+              style={{ color: 'var(--text-dim)' }}
+            >
+              <span>{sec.label}</span>
+              <span className="tabular-nums">{sec.texts.length.toLocaleString('tr-TR')}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="pt-1.5 text-[11px]" style={{ color: 'var(--text-dim)' }}>
+          Fiillerin tam çekim tablosu pakete girmiyor: 367 fiil × 24 biçim yaklaşık 8.800 klip
+          eder ve paket 80 MB’ı aşardı. Sözlük biçimi, mastar ve şimdiki zamanın dört hâli
+          alınıyor; kalan biçimler çevrimiçi çalınmaya devam ediyor.
+        </p>
+      </details>
+    </section>
+  );
+}
 
 export default function SoundPage() {
   const [status, setStatus] = useState<SpeechStatus>(() => speechStatus());
@@ -139,6 +301,8 @@ export default function SoundPage() {
           </p>
         )}
       </section>
+
+      <AudioPack />
 
       {/* Tanılama */}
       <section className="card space-y-3 p-5">

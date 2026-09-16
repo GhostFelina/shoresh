@@ -1,24 +1,52 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 /**
- * Sürüm numarası tek yerden gelir: package.json.
- * Arayüzde ayrıca yazılsaydı biri güncellenip diğeri unutulur ve
- * kullanıcı hangi sürümü kullandığını yanlış bilirdi.
+ * Sürümü package.json'dan okuyup `src/generated/version.ts` dosyasına yazar
+ * ve package.json değişince dev sunucusunu yeniler.
+ *
+ * NEDEN DOSYA ÜRETİYORUZ: Sürüm önce `define` ile derleme anında metin
+ * değişimiyle gömülüyordu. Dev sunucusunda bu değişim uygulanmadı ve
+ * tarayıcıya tanımsız bir değişken gitti. Gerçek bir modül yazmak dev,
+ * derleme ve test yollarının üçünde de aynı biçimde çalışır.
  */
-const pkg = JSON.parse(
-  readFileSync(new URL('./package.json', import.meta.url), 'utf-8'),
-) as { version: string };
+function versionModule(): Plugin {
+  const pkgPath = fileURLToPath(new URL('./package.json', import.meta.url));
+  const outPath = fileURLToPath(new URL('./src/generated/version.ts', import.meta.url));
+
+  const write = () => {
+    const version = (JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version: string }).version;
+    const current = existsSync(outPath) ? readFileSync(outPath, 'utf-8') : '';
+    const next = current.replace(/APP_VERSION = '[^']*'/, `APP_VERSION = '${version}'`);
+    // Yalnızca gerçekten değiştiyse yaz — gereksiz yazma sonsuz yeniden
+    // başlatma döngüsü kurar.
+    if (next !== current && next.includes(version)) writeFileSync(outPath, next, 'utf-8');
+  };
+
+  return {
+    name: 'shoresh-version-module',
+    buildStart() {
+      write();
+    },
+    configureServer(server) {
+      write();
+      server.watcher.add(pkgPath);
+      server.watcher.on('change', (file) => {
+        if (file !== pkgPath) return;
+        write();
+        server.config.logger.info('package.json degisti - surum modulu yenilendi');
+      });
+    },
+  };
+}
 
 export default defineConfig({
-  define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
-  },
   plugins: [
+    versionModule(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -42,6 +70,37 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
         cleanupOutdatedCaches: true,
+        /**
+         * Seslendirme klipleri için kalıcı önbellek.
+         *
+         * NEDEN SERVICE WORKER ÜZERİNDEN: Seslendirme uç noktası CORS
+         * başlığı göndermiyor, bu yüzden sayfa onu `fetch` ile okuyup
+         * saklayamaz — gelen yanıt "opak"tır, içeriği JavaScript'e kapalıdır.
+         * Ama service worker opak yanıtı önbelleğe KOYABİLİR ve sonra
+         * `<audio>` isteğine yanıt olarak verebilir; tarayıcının medya
+         * hattı onu sorunsuz çalar.
+         *
+         * Sonuç: bir kez indirilen klip çevrimdışı da çalışır. "Ses paketini
+         * indir" düğmesi bunu topluca yapar.
+         */
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/translate\.google\.com\/translate_tts/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'shoresh-ses',
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: {
+                // Opak yanıtın durum kodu 0'dır; listeye alınmazsa
+                // hiçbir klip önbelleğe girmez.
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
       },
     }),
   ],

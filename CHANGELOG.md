@@ -1,3 +1,34 @@
+## 1.4.0
+
+**Sürüm yerelde neden güncellenmiyordu — bulundu ve kökten çözüldü.**
+Sürüm `define` ile derleme anında metin değişimiyle gömülüyordu. Vite dev
+sunucusunda bu değişim UYGULANMIYORDU: tarayıcıya tanımsız bir değişken
+gidiyordu. Üstelik `package.json` değişse bile çalışan sunucu eski değeri
+sürdürüyordu, çünkü Vite yalnızca `vite.config.ts`yi izler.
+
+Sihirli değişken tamamen kaldırıldı. Sürüm artık `src/generated/version.ts`
+adlı GERÇEK bir modüle yazılıyor; dosyayı bir Vite eklentisi package.json
+değiştikçe yeniden üretiyor. Dev, derleme ve test aynı yoldan okuyor. Bir
+test de üretilen dosyanın package.json ile aynı olduğunu doğruluyor, sessiz
+kayma imkânsız.
+
+**Ses paketi — çevrimdışı dinleme.** Uygulamanın seslendirdiği her şey sonlu
+bir kümedir: harf adları, harekeler, 353 kelime, 150 kalıp, fiillerin sözlük
+ve şimdiki biçimleri, örnek cümleler. `/ses` sayfasındaki tek düğmeyle hepsi
+indirilip tarayıcının kalıcı önbelleğine konuyor. Sonrasında uygulama
+internetsiz konuşuyor ve her klip beklemeden başlıyor.
+
+Teknik engel ve çözümü: seslendirme uç noktası CORS başlığı göndermiyor,
+bu yüzden sayfa yanıtı okuyup kendisi saklayamıyor. Ama service worker opak
+yanıtı önbelleğe koyabiliyor ve sonra `<audio>` isteğine verebiliyor. İndirme
+`fetch(url, { mode: "no-cors" })` ile yapılıyor; gövdeyi kimse okumuyor,
+service worker araya girip yazıyor.
+
+Bu arada gömülü sinir ağı sesi de araştırıldı ve GEREKÇESİYLE elendi:
+Piper’ın İbranice sesi (he_IL-saspeech) var ama modeli 63 MB ve tarayıcıda
+çalıştıran kütüphane 155 MB dosya istiyor; hafif olan kütüphanenin ise
+İbranice sesi yok. Bir dil uygulaması için orantısız.
+
 ## 1.3.0
 
 **Sözlük katmanı eklendi — 353 kelime.** Şimdiye kadar 367 fiil vardı ama

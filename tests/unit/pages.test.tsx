@@ -141,3 +141,16 @@ describe('gezinme bütünlüğü', () => {
     }
   });
 });
+
+describe('sürüm', () => {
+  it('üretilen sürüm modülü package.json ile aynı', async () => {
+    /*
+     * Sürüm modülü vite.config.ts tarafından package.json'dan üretilir.
+     * Eklenti bir sebeple çalışmazsa dosya eskide kalır ve kullanıcı
+     * yanlış sürüm görür — bu test o sessiz kaymayı yakalar.
+     */
+    const pkg = (await import('../../package.json')) as unknown as { version: string };
+    const { APP_VERSION } = await import('@/lib/version');
+    expect(APP_VERSION).toBe(pkg.version);
+  });
+});

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { NAV_GROUPS } from './nav';
+import { APP_VERSION } from '@/lib/version';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
 function Logo({ className = 'size-8' }: { className?: string }) {
@@ -141,7 +142,7 @@ export default function Shell({ children }: { children: ReactNode }) {
                 className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
                 style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
               >
-                v{__APP_VERSION__}
+                v{APP_VERSION}
               </span>
             </div>
             <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -174,7 +175,7 @@ export default function Shell({ children }: { children: ReactNode }) {
                   className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
                   style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
                 >
-                  v{__APP_VERSION__}
+                  v{APP_VERSION}
                 </span>
               </div>
               <button
@@ -209,7 +210,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           <span className="mr-auto flex items-baseline gap-1.5 lg:hidden">
             <span className="text-sm font-bold">Shoresh</span>
             <span className="text-[9px] tabular-nums" style={{ color: 'var(--text-dim)' }}>
-              v{__APP_VERSION__}
+              v{APP_VERSION}
             </span>
           </span>
           <span
@@ -227,7 +228,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           className="mx-auto max-w-5xl px-4 pb-10 pt-4 text-xs"
           style={{ color: 'var(--text-dim)' }}
         >
-          Shoresh v{__APP_VERSION__} — kökten öğrenilen İbranice. Çekimler kural motoruyla
+          Shoresh v{APP_VERSION} — kökten öğrenilen İbranice. Çekimler kural motoruyla
           üretilir, ezberle değil.
         </footer>
       </div>
