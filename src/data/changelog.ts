@@ -67,6 +67,24 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.19.1',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T22:01:12+03:00',
+    title: 'Geri bildirim artık gerçekten ulaşıyor',
+    summary:
+      'Bir önceki sürümde form hazırdı ama arkasındaki veritabanı kurulu değildi. Kurulum tamamlandı; gönderdiğin bildirim artık saklanıyor.',
+    changes: [
+      { kind: 'duzeltme', text: 'Bildirim veritabanı kuruldu ve bağlandı; form çalışır durumda.' },
+      { kind: 'gelisme', text: 'Güvenlik uçtan uca sınandı: tarayıcıya ait anahtarla ne okunabiliyor ne yazılabiliyor, yalnızca sunucu erişiyor.' },
+    ],
+    benefits: [
+      {
+        title: 'Yazdığın gerçekten kaydediliyor',
+        text: 'Bir önceki sürümde form seni dürüstçe uyarıyordu ama gönderim yapılamıyordu. Artık bildirimin sayfası, sürümü ve saatiyle birlikte saklanıyor ve gelen kutusundan okunabiliyor.',
+      },
+    ],
+  },
+  {
     version: '1.19.0',
     date: '2026-09-16',
     releasedAt: '2026-09-16T21:47:36+03:00',

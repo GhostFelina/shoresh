@@ -12,7 +12,7 @@
  * Gerçek bir modül olarak yazılınca dev, derleme ve testte aynı yoldan
  * okunur — sihir yok, kırılacak bir şey yok.
  */
-export const APP_VERSION = '1.19.0';
+export const APP_VERSION = '1.19.1';
 
 /** Derlemenin yapıldığı an — ISO 8601, UTC. */
-export const BUILD_TIME = '2026-09-16T18:47:39.025Z';
+export const BUILD_TIME = '2026-09-16T19:01:15.507Z';

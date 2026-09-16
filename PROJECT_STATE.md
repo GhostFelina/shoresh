@@ -9,8 +9,8 @@
 
 # Shoresh — ölçülen durum
 
-**Üretim anı:** 16.09.2026 21:47:52
-**Sürüm:** v1.19.0 · **Dal:** main · **Commit:** 2091ce4
+**Üretim anı:** 16.09.2026 22:01:29
+**Sürüm:** v1.19.1 · **Dal:** main · **Commit:** 66c65db
 **Çalışma ağacı:** ⚠ TEMİZ DEĞİL (commit edilmemiş değişiklik var)
 
 ## Testler
@@ -20,7 +20,7 @@
 | Durum | hepsi geçiyor |
 | Birim testi | ? |
 | Test dosyası | ? |
-| Kaynak satırı | 21.462 |
+| Kaynak satırı | 21.480 |
 | Test satırı | 4.184 |
 
 ## İçerik
@@ -47,11 +47,12 @@
 | Renk paleti | 5 |
 | Rozet | 12 |
 | Rütbe | 9 |
-| Kayda geçmiş sürüm | 22 |
+| Kayda geçmiş sürüm | 23 |
 
 ## Son commit'ler
 
 ```
+16.09 21:48 · v1.19.0 — Geri bildirim formu ve gelen kutusu
 16.09 21:36 · v1.18.0 — VERB çalışma alanı ve iki çekim hatası
 16.09 21:15 · v1.17.0 — Test motoru: 39 uçtan uca test
 16.09 20:58 · v1.16.0 — Yedekleme, checkpoint ve devir belgesi
@@ -59,11 +60,11 @@
 16.09 17:18 · v1.14.0 — Öğretmen Modu 30 dersten 71 derse
 16.09 17:02 · v1.13.0 — İlerleme ve ödül sistemi
 16.09 16:40 · v1.12.0 — Sürüm notu kutusu ve derleme zaman damgası
-16.09 16:31 · v1.11.0 — Beş renk paleti, ölçülen kontrast, düzgün kaydırma çubuğu
 ```
 
 ## Checkpoint etiketleri
 
+- `v1.19.0`
 - `v1.18.0`
 - `v1.17.0`
 - `v1.16.0`
