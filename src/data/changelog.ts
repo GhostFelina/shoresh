@@ -67,6 +67,31 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.16.0',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T20:57:00+03:00',
+    title: 'Yedekleme, checkpoint ve devir belgesi',
+    summary:
+      'Her sürüm artık iki ayrı yerde yedekleniyor ve projeyi devralacak kişi için kodu baştan sona okumadan devam etmeyi sağlayan bir belge eklendi.',
+    changes: [
+      { kind: 'yeni', text: 'Checkpoint sistemi: her sürümde masaüstünde bağımsız bir arşiv ve GitHub tarafında bir etiket oluşuyor.' },
+      { kind: 'yeni', text: 'Her yedeğin yanında künye dosyası — hangi commit, kaç test geçiyordu, nasıl geri dönülür.' },
+      { kind: 'yeni', text: 'Devir belgesi (AI_HANDOFF.md): kararlar, gerekçeler ve yaşanmış on dört tuzak.' },
+      { kind: 'yeni', text: 'Durum belgesi (PROJECT_STATE.md) projeden ölçülerek üretiliyor; elle yazılmıyor, dolayısıyla eskiyemiyor.' },
+      { kind: 'yeni', text: 'Belgenin iddialarını doğrulayan testler: yazan her komut ve her dosya yolu gerçekten var mı.' },
+    ],
+    benefits: [
+      {
+        title: 'Bir şey bozulursa geri dönebiliyorsun',
+        text: 'Git tek başına yeterli değil: depo bozulursa ya da yanlışlıkla geri alınamaz bir işlem yapılırsa elde bir şey kalmıyordu. Artık masaüstünde, depodan bağımsız, açılıp doğrudan çalıştırılabilen bir kopya duruyor ve yanındaki künye o kopyanın hangi commit olduğunu ve o an kaç testin geçtiğini söylüyor.',
+      },
+      {
+        title: 'Proje devredilebilir hâle geldi',
+        text: 'Yirmi bin satırlık bir projeyi devralan kişi neyin neden öyle yapıldığını bilmeden ilerleyemez; bilmeye çalışırsa da çok zaman harcar. Belge kararları ve yaşanmış hataları topluyor, ölçülebilir kısmı ise otomatik üretiliyor — yani belge kendiliğinden eskimiyor.',
+      },
+    ],
+  },
+  {
     version: '1.15.0',
     date: '2026-09-16',
     releasedAt: '2026-09-16T20:24:26+03:00',
