@@ -146,7 +146,7 @@ export default function WordsPage() {
 
       {/* Cinsiyet uyarısı — İbranicenin en çok ihmal edilen yanı */}
       <section className="card-2 space-y-1 p-4">
-        <h2 className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#fbbf24' }}>
+        <h2 className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--warn)' }}>
           <AlertTriangle className="size-3.5" />
           Cinsiyeti kelimeyle birlikte öğren
         </h2>

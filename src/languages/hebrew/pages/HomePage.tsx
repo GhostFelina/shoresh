@@ -80,7 +80,7 @@ function TodayCard() {
         {stats.streak > 0 && (
           <span
             className="flex items-center gap-1 text-xs font-semibold"
-            style={{ color: '#fb923c' }}
+            style={{ color: 'var(--warn)' }}
           >
             <Flame className="size-3.5" />
             {stats.streak} günlük seri
@@ -90,7 +90,7 @@ function TodayCard() {
 
       <div className="grid grid-cols-3 gap-2">
         <div className="card-2 px-3 py-2">
-          <div className="text-xl numeric font-bold" style={{ color: '#fbbf24' }}>
+          <div className="text-xl numeric font-bold" style={{ color: 'var(--warn)' }}>
             {stats.due}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -98,7 +98,7 @@ function TodayCard() {
           </div>
         </div>
         <div className="card-2 px-3 py-2">
-          <div className="text-xl numeric font-bold" style={{ color: '#f87171' }}>
+          <div className="text-xl numeric font-bold" style={{ color: 'var(--danger)' }}>
             {stats.weak}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -122,7 +122,7 @@ function TodayCard() {
         <Link
           to={yol('oyunlar')}
           className="rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
-          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+          style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
         >
           {stats.due > 0 ? `${stats.due} tekrarı çöz` : 'Çalışmaya devam et'}
         </Link>
@@ -242,7 +242,7 @@ export default function HomePage() {
       <section className="card-2 space-y-1 p-4">
         <h2
           className="text-xs font-semibold"
-          style={{ color: speechReady ? 'var(--accent-text)' : '#fbbf24' }}
+          style={{ color: speechReady ? 'var(--accent-text)' : 'var(--warn)' }}
         >
           Seslendirme: {speechStatus().layer === 'device-voice'
             ? 'cihaz sesi'
@@ -261,7 +261,7 @@ export default function HomePage() {
 
       {CATALOG_ISSUES.length > 0 && (
         <section className="card-2 space-y-1 p-4">
-          <h2 className="text-xs font-semibold" style={{ color: '#f87171' }}>
+          <h2 className="text-xs font-semibold" style={{ color: 'var(--danger)' }}>
             Veri doğrulama uyarısı — {CATALOG_ISSUES.length} satır reddedildi
           </h2>
           <ul className="space-y-0.5 text-[11px]" style={{ color: 'var(--text-dim)' }}>

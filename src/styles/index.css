@@ -59,6 +59,22 @@
   /* Dişil rozeti — eril rozetinden ayrışsın ama okunur kalsın. */
   --accent-fem: #f0abfc;
 
+  /*
+   * Anlamsal renkler ve dolu düğme metni.
+   *
+   * ASIL KAYNAK `src/lib/palette.ts`; oradaki değerler birim testiyle
+   * kendi temasının zeminine karşı ölçülüyor. Buradakiler yalnızca İLK
+   * BOYAMA için: JavaScript paleti yazana kadar geçen bir karede
+   * tanımsız renk kalmasın diye duruyorlar. İki yer ayrı düşerse
+   * kullanıcı bunu göremez ama biz görelim diye birim testi ikisini
+   * karşılaştırıyor.
+   */
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --ok: #34d399;
+  --info: #7dd3fc;
+  --on-accent: #04120f;
+
   color-scheme: dark;
 }
 
@@ -77,6 +93,14 @@
   --accent-text: #0f766e;
   --accent-text-alt: #4338ca;
   --accent-fem: #a21caf;
+
+  /* Açık temada anlamsal renkler KOYULAŞIR; parlak tonlar beyaz
+     üzerinde okunmuyordu (amber 1.55:1 ölçüldü). */
+  --warn: #92400e;
+  --danger: #b91c1c;
+  --ok: #166534;
+  --info: #0369a1;
+  --on-accent: #ffffff;
 
   color-scheme: light;
 }

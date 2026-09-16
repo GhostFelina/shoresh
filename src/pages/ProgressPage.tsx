@@ -80,7 +80,7 @@ export default function ProgressPage() {
       <div className="space-y-4">
         <h1 className="title-gradient text-2xl font-bold tracking-tight">İlerleme</h1>
         <section className="card-2 space-y-1 p-4">
-          <h2 className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#fbbf24' }}>
+          <h2 className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--warn)' }}>
             <AlertTriangle className="size-3.5" />
             İlerleme kaydedilemiyor
           </h2>
@@ -128,7 +128,7 @@ export default function ProgressPage() {
           <Link
             to={yol('oyunlar')}
             className="inline-block rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
-            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
           >
             Oyunlara git
           </Link>
@@ -139,8 +139,8 @@ export default function ProgressPage() {
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <Stat value={stats.touched} label="çalışılan öğe" />
               <Stat value={stats.strong} label="oturmuş" />
-              <Stat value={stats.due} label="tekrar bekliyor" tone="#fbbf24" />
-              <Stat value={stats.weak} label="zayıf" tone="#f87171" />
+              <Stat value={stats.due} label="tekrar bekliyor" tone="var(--warn)" />
+              <Stat value={stats.weak} label="zayıf" tone="var(--danger)" />
             </div>
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -150,7 +150,7 @@ export default function ProgressPage() {
               <div className="card-2 px-4 py-3">
                 <div
                   className="flex items-center gap-1.5 text-2xl numeric font-bold"
-                  style={{ color: stats.streak > 0 ? '#fb923c' : 'var(--text-dim)' }}
+                  style={{ color: stats.streak > 0 ? 'var(--warn)' : 'var(--text-dim)' }}
                 >
                   <Flame className="size-5" />
                   {stats.streak}
@@ -232,7 +232,7 @@ export default function ProgressPage() {
                         )}
                         <span
                           className="w-10 shrink-0 text-right numeric text-xs"
-                          style={{ color: '#f87171' }}
+                          style={{ color: 'var(--danger)' }}
                         >
                           %{p.mastery}
                         </span>
@@ -259,7 +259,7 @@ export default function ProgressPage() {
                 type="button"
                 onClick={() => void reset()}
                 className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold"
-                style={{ background: '#f87171', color: '#1a0505' }}
+                style={{ background: 'var(--danger)', color: 'var(--bg)' }}
               >
                 <Trash2 className="size-3.5" />
                 Evet, hepsini sil

@@ -52,9 +52,9 @@ function SpeakButton({ text, big = false }: { text: string; big?: boolean }) {
     state === 'playing'
       ? 'var(--color-brand-400)'
       : state === 'failed'
-        ? '#f87171'
+        ? 'var(--danger)'
         : state === 'blocked'
-          ? '#fbbf24'
+          ? 'var(--warn)'
           : 'var(--border)';
 
   return (
@@ -380,7 +380,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
             className="space-y-2 rounded-lg p-3"
             style={{
               background: 'var(--surface-2)',
-              boxShadow: `inset 3px 0 0 ${s.wasRight ? 'var(--color-brand-400)' : '#f87171'}`,
+              boxShadow: `inset 3px 0 0 ${s.wasRight ? 'var(--color-brand-400)' : 'var(--danger)'}`,
             }}
           >
             <div className="flex items-center gap-2 text-sm font-semibold">
@@ -391,7 +391,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
                 </>
               ) : (
                 <>
-                  <X className="size-4" style={{ color: '#f87171' }} />
+                  <X className="size-4" style={{ color: 'var(--danger)' }} />
                   {q.kind === 'order' ? (
                     <span>
                       Doğrusu:{' '}
@@ -421,7 +421,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
               type="button"
               onClick={next}
               className="w-full rounded-lg py-2 text-sm font-semibold card-interactive"
-              style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+              style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
             >
               {s.index + 1 >= queue.length ? 'Sonucu gör' : 'Sonraki'}
             </button>
@@ -527,7 +527,7 @@ function OrderBody({
           onClick={check}
           disabled={!complete}
           className="w-full rounded-lg py-2 text-sm font-semibold card-interactive disabled:opacity-40"
-          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+          style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
         >
           {complete ? 'Kontrol et' : `${q.tokens.length - placed.length} sözcük kaldı`}
         </button>
@@ -552,7 +552,7 @@ function ChoiceBody({
         const isChosen = i === state.chosen;
         let border = 'var(--border)';
         if (state.answered && isAnswer) border = 'var(--color-brand-400)';
-        else if (state.answered && isChosen) border = '#f87171';
+        else if (state.answered && isChosen) border = 'var(--danger)';
 
         return (
           <button
@@ -653,7 +653,7 @@ function TypeBody({
             type="button"
             onClick={onSubmit}
             className="w-full rounded-lg py-2 text-sm font-semibold card-interactive"
-            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
           >
             Kontrol et
           </button>
@@ -722,7 +722,7 @@ export default function GamesPage() {
 
       {audio.layer === 'none' && (
         <div className="card-2 space-y-1 p-3">
-          <h2 className="text-xs font-semibold" style={{ color: '#fbbf24' }}>
+          <h2 className="text-xs font-semibold" style={{ color: 'var(--warn)' }}>
             Kulak Testi şu an oynanamaz
           </h2>
           <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-dim)' }}>
@@ -758,7 +758,7 @@ export default function GamesPage() {
                 <MixedText>{g.why}</MixedText>
               </p>
               {blocked && (
-                <p className="text-[11px]" style={{ color: '#fbbf24' }}>
+                <p className="text-[11px]" style={{ color: 'var(--warn)' }}>
                   Ses gerekiyor — şu an kullanılamıyor.
                 </p>
               )}

@@ -147,7 +147,7 @@ function OrderBody({ q, onAnswer }: { q: OrderQuestion; onAnswer: (correct: bool
           onAnswer(placed.length === q.order.length && placed.every((v, i) => v === q.order[i]))
         }
         className="card-interactive w-full rounded-lg py-2 text-sm font-semibold disabled:opacity-40"
-        style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+        style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
       >
         {complete ? 'Cevabı ver' : `${q.tokens.length - placed.length} sözcük kaldı`}
       </button>
@@ -434,7 +434,7 @@ export function PlacementReport({
           type="button"
           onClick={onApply}
           className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold"
-          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+          style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
         >
           <Check className="size-4" /> {result.level} sınıfına geç
         </button>

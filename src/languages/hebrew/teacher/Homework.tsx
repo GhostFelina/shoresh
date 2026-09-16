@@ -164,7 +164,7 @@ export function Homework({ level, lessons }: { level: CEFR; lessons: LessonMeta[
                       className="grid size-6 shrink-0 place-items-center rounded-full text-[10px] font-bold"
                       style={
                         p.complete
-                          ? { background: 'var(--color-brand-500)', color: '#04120f' }
+                          ? { background: 'var(--color-brand-500)', color: 'var(--on-accent)' }
                           : { border: '1px solid var(--border)', color: 'var(--text-dim)' }
                       }
                     >

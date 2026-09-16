@@ -66,17 +66,26 @@ export const HEBREW_LEVELS: Array<{
   blurb: string;
   tint: string;
 }> = [
+  /*
+   * SEVİYE RENKLERİ METİN TONLARINDAN SEÇİLİR.
+   *
+   * Önce dolgu tonları (`--color-brand-400`, `--color-accent-400`)
+   * kullanılıyordu. Koyu temada sorun yoktu; açık temada aynı tonlar
+   * beyaz rozetin üstünde 3.74:1 ve 4.47:1 kontrastla kalıyordu —
+   * ölçüldü. Dolgu tonu yüzeyle, metin tonu METİNLE ölçülür; ikisi
+   * ayrı şeyler ve karıştırıldığında yalnızca açık temada bozulur.
+   */
   {
     level: 'A1',
     title: 'A1 — Başlangıç',
     blurb: 'İlk cümleler, temel fiiller',
-    tint: 'var(--color-brand-400)',
+    tint: 'var(--accent-text)',
   },
   {
     level: 'A2',
     title: 'A2 — Temel',
     blurb: 'Günlük hayatı anlatma',
-    tint: 'var(--color-accent-400)',
+    tint: 'var(--info)',
   },
   {
     level: 'B1',

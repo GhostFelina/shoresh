@@ -150,7 +150,7 @@ export default function InboxPage() {
             type="submit"
             disabled={durum === 'yukleniyor' || key.length === 0}
             className="w-full rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
-            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
           >
             {durum === 'yukleniyor' ? 'Açılıyor…' : 'Aç'}
           </button>
@@ -159,9 +159,9 @@ export default function InboxPage() {
         {durum === 'hata' && (
           <p
             className="card-2 flex items-start gap-2 p-2.5 text-xs"
-            style={{ borderColor: '#f87171' }}
+            style={{ borderColor: 'var(--danger)' }}
           >
-            <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: '#f87171' }} />
+            <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: 'var(--danger)' }} />
             <span>{hata}</span>
           </p>
         )}

@@ -225,7 +225,7 @@ export function WhatsNewDialog({
             type="button"
             onClick={onClose}
             className="rounded-lg px-4 py-2 text-sm font-semibold transition"
-            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
           >
             Kapat
           </button>

@@ -247,7 +247,7 @@ export function FeedbackDialog({ onClose }: { onClose: () => void }) {
               type="button"
               onClick={onClose}
               className="rounded-lg px-4 py-2 text-sm font-semibold"
-              style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+              style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
             >
               Kapat
             </button>
@@ -304,9 +304,9 @@ export function FeedbackDialog({ onClose }: { onClose: () => void }) {
             {kurulumHazir === false && (
               <p
                 className="card-2 flex items-start gap-2 p-2.5 text-xs leading-relaxed"
-                style={{ borderColor: '#fbbf24' }}
+                style={{ borderColor: 'var(--warn)' }}
               >
-                <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: '#fbbf24' }} />
+                <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: 'var(--warn)' }} />
                 <span>
                   Bildirim sunucusu henüz kurulmadı, bu yüzden gönderim şu an çalışmıyor.
                   Yazdığın metin taslak olarak saklanıyor; kurulum tamamlanınca buradan
@@ -318,9 +318,9 @@ export function FeedbackDialog({ onClose }: { onClose: () => void }) {
             {durum === 'hata' && (
               <p
                 className="card-2 flex items-start gap-2 p-2.5 text-xs"
-                style={{ borderColor: '#f87171', color: 'var(--text)' }}
+                style={{ borderColor: 'var(--danger)', color: 'var(--text)' }}
               >
-                <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: '#f87171' }} />
+                <AlertCircle className="mt-0.5 size-3.5 shrink-0" style={{ color: 'var(--danger)' }} />
                 <span>{hataMetni}</span>
               </p>
             )}
@@ -344,7 +344,7 @@ export function FeedbackDialog({ onClose }: { onClose: () => void }) {
                 kurulumHazir === false
               }
               className="ms-auto flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+              style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
             >
               <Send className="size-3.5" />
               {durum === 'gonderiliyor' ? 'Gönderiliyor…' : 'Gönder'}

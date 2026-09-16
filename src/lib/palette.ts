@@ -30,6 +30,16 @@ export interface PaletteTones {
   accentTextAlt: string;
   /** Dişil rozetleri — erilden ayrışsın ama okunur kalsın. */
   accentFem: string;
+  /**
+   * MARKA RENGİYLE DOLU bir düğmenin ÜSTÜNDEKİ metin rengi.
+   *
+   * NEDEN PALETİN PARÇASI: Bu renk otuz küsur yerde `#04120f` diye
+   * sabit yazılıydı ve koyu temaya göre seçilmişti. Açık temada marka
+   * tonu koyulaşıyor, üstündeki koyu metin de 3.49:1'e düşüyordu —
+   * ölçüldü. Paletin parçası olunca birim testi her palet ve her tema
+   * için eşiği zorluyor.
+   */
+  onAccent: string;
 }
 
 export interface Palette {
@@ -54,6 +64,7 @@ export const PALETTES: Palette[] = [
       accentText: '#5eead4',
       accentTextAlt: '#a5b4fc',
       accentFem: '#f0abfc',
+      onAccent: '#04120f',
     },
     light: {
       brand300: '#5eead4',
@@ -64,6 +75,7 @@ export const PALETTES: Palette[] = [
       accentText: '#0f766e',
       accentTextAlt: '#4338ca',
       accentFem: '#a21caf',
+      onAccent: '#ffffff',
     },
   },
   {
@@ -79,6 +91,7 @@ export const PALETTES: Palette[] = [
       accentText: '#fcd34d',
       accentTextAlt: '#5eead4',
       accentFem: '#f9a8d4',
+      onAccent: '#1a1204',
     },
     light: {
       brand300: '#fcd34d',
@@ -89,6 +102,7 @@ export const PALETTES: Palette[] = [
       accentText: '#b45309',
       accentTextAlt: '#0f766e',
       accentFem: '#be185d',
+      onAccent: '#ffffff',
     },
   },
   {
@@ -104,6 +118,7 @@ export const PALETTES: Palette[] = [
       accentText: '#bef264',
       accentTextAlt: '#fcd34d',
       accentFem: '#fda4af',
+      onAccent: '#0d1404',
     },
     light: {
       brand300: '#bef264',
@@ -114,6 +129,7 @@ export const PALETTES: Palette[] = [
       accentText: '#4d7c0f',
       accentTextAlt: '#b45309',
       accentFem: '#be123c',
+      onAccent: '#ffffff',
     },
   },
   {
@@ -129,6 +145,7 @@ export const PALETTES: Palette[] = [
       accentText: '#7dd3fc',
       accentTextAlt: '#fcd34d',
       accentFem: '#f5d0fe',
+      onAccent: '#031018',
     },
     light: {
       brand300: '#7dd3fc',
@@ -139,6 +156,7 @@ export const PALETTES: Palette[] = [
       accentText: '#0369a1',
       accentTextAlt: '#a16207',
       accentFem: '#86198f',
+      onAccent: '#ffffff',
     },
   },
   {
@@ -154,6 +172,7 @@ export const PALETTES: Palette[] = [
       accentText: '#fda4af',
       accentTextAlt: '#d8b4fe',
       accentFem: '#fbcfe8',
+      onAccent: '#ffffff',
     },
     light: {
       brand300: '#fda4af',
@@ -164,6 +183,7 @@ export const PALETTES: Palette[] = [
       accentText: '#be123c',
       accentTextAlt: '#7e22ce',
       accentFem: '#a21caf',
+      onAccent: '#ffffff',
     },
   },
 ];
@@ -246,6 +266,54 @@ export function colorDistance(a: string, b: string): number {
  * ------------------------------------------------------------------ */
 
 /** CSS değişken adları — `index.css` içindeki varsayılanlarla aynı. */
+/**
+ * Anlamsal renkler — palete DEĞİL temaya bağlı.
+ *
+ * NEDEN BURADA, CSS'TE DEĞİL: Uyarı ve hata renkleri bileşenlerin
+ * içine `#fbbf24`, `#f87171` diye elle yazılıydı ve hepsi koyu temaya
+ * göre seçilmişti. Açık temada amber bir başlık beyaz üzerinde 1.55:1
+ * kontrastla duruyordu — yani okunmuyordu, kullanıcı "açık tema bozuk"
+ * derken gördüğü şey buydu. Burada veri olunca birim testi ikisini de
+ * kendi temasının zeminine karşı ölçebiliyor.
+ *
+ * Palete bağlı DEĞİL çünkü anlamları sabit: uyarı her palette uyarı,
+ * hata her palette hatadır. Marka rengiyle birlikte kaymaları
+ * anlamlarını zayıflatırdı.
+ */
+export interface SemanticTones {
+  /** Dikkat çeker ama yanlış demez: ipucu, "ses yok", kural notu. */
+  warn: string;
+  /** Yanlış cevap, başarısız istek, yıkıcı eylem. */
+  danger: string;
+  /** Doğru cevap, tamamlandı. */
+  ok: string;
+  /** Yansız bilgi — nötr rozet ve açıklama. */
+  info: string;
+}
+
+export const SEMANTIC: Record<'dark' | 'light', SemanticTones> = {
+  dark: {
+    warn: '#fbbf24',
+    danger: '#f87171',
+    ok: '#34d399',
+    info: '#7dd3fc',
+  },
+  light: {
+    // Beyaz zeminde 4.5:1 üstü kalan koyu tonlar — ölçüldü.
+    warn: '#92400e',
+    danger: '#b91c1c',
+    ok: '#166534',
+    info: '#0369a1',
+  },
+};
+
+const SEMANTIC_VARS: Array<[keyof SemanticTones, string]> = [
+  ['warn', '--warn'],
+  ['danger', '--danger'],
+  ['ok', '--ok'],
+  ['info', '--info'],
+];
+
 const VARS: Array<[keyof PaletteTones, string]> = [
   ['brand300', '--color-brand-300'],
   ['brand400', '--color-brand-400'],
@@ -255,6 +323,7 @@ const VARS: Array<[keyof PaletteTones, string]> = [
   ['accentText', '--accent-text'],
   ['accentTextAlt', '--accent-text-alt'],
   ['accentFem', '--accent-fem'],
+  ['onAccent', '--on-accent'],
 ];
 
 /**
@@ -271,5 +340,13 @@ export function applyPalette(paletteId: string, theme: 'dark' | 'light'): void {
   const tones = theme === 'light' ? palette.light : palette.dark;
   const root = document.documentElement;
   for (const [key, cssVar] of VARS) root.style.setProperty(cssVar, tones[key]);
+
+  /*
+   * Anlamsal renkler de burada yazılıyor. Ayrı bir yerde yazılsaydı
+   * tema değişiminde biri güncellenir öteki kalırdı — tam olarak bu
+   * sınıf hatanın peşindeyiz.
+   */
+  const anlam = SEMANTIC[theme];
+  for (const [key, cssVar] of SEMANTIC_VARS) root.style.setProperty(cssVar, anlam[key]);
   root.dataset.palette = palette.id;
 }

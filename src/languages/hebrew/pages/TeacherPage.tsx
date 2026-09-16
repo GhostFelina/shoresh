@@ -74,9 +74,9 @@ function SpeakButton({ text, big = false }: { text: string; big?: boolean }) {
     state === 'playing'
       ? 'var(--color-brand-400)'
       : state === 'failed'
-        ? '#f87171'
+        ? 'var(--danger)'
         : state === 'blocked'
-          ? '#fbbf24'
+          ? 'var(--warn)'
           : 'var(--border)';
 
   return (
@@ -216,7 +216,7 @@ function StepBody({
                   borderColor: show
                     ? isRight
                       ? 'var(--color-brand-400)'
-                      : '#f87171'
+                      : 'var(--danger)'
                     : 'var(--border)',
                 }}
               >
@@ -285,7 +285,7 @@ function StepBody({
       {answer.checked && (
         <div
           className="card-2 space-y-2 p-4"
-          style={{ borderColor: answer.correct ? 'var(--color-brand-400)' : '#f87171' }}
+          style={{ borderColor: answer.correct ? 'var(--color-brand-400)' : 'var(--danger)' }}
         >
           <p className="text-sm font-medium">{answer.reaction}</p>
           <div className="flex items-center gap-3">
@@ -499,7 +499,7 @@ function LessonRunner({
             type="button"
             onClick={finish}
             className="rounded-lg px-4 py-2 text-sm font-semibold"
-            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+            style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
           >
             Dersi bitir
           </button>

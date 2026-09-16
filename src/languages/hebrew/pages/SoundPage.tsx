@@ -120,7 +120,7 @@ function AudioPack() {
       )}
 
       {status && !status.available ? (
-        <p className="text-xs leading-relaxed" style={{ color: '#fbbf24' }}>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--warn)' }}>
           {status.reason}
         </p>
       ) : (
@@ -139,7 +139,7 @@ function AudioPack() {
               type="button"
               onClick={() => void start()}
               className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
-              style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+              style={{ background: 'var(--color-brand-500)', color: 'var(--on-accent)' }}
             >
               <Download className="size-4" />
               {cached > 0 ? 'Eksikleri indir' : `Ses paketini indir (~${mb} MB)`}
@@ -233,8 +233,8 @@ export default function SoundPage() {
     status.layer === 'device-voice'
       ? 'var(--color-brand-400)'
       : status.layer === 'online'
-        ? '#fbbf24'
-        : '#f87171';
+        ? 'var(--warn)'
+        : 'var(--danger)';
 
   return (
     <div className="space-y-5">
@@ -296,7 +296,7 @@ export default function SoundPage() {
           ))}
         </div>
         {lastError && (
-          <p className="text-xs leading-relaxed" style={{ color: '#fbbf24' }}>
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--warn)' }}>
             {lastError}
           </p>
         )}
@@ -326,7 +326,7 @@ export default function SoundPage() {
                 {r.ok ? (
                   <Check className="mt-0.5 size-4 shrink-0" style={{ color: 'var(--color-brand-400)' }} />
                 ) : (
-                  <X className="mt-0.5 size-4 shrink-0" style={{ color: '#f87171' }} />
+                  <X className="mt-0.5 size-4 shrink-0" style={{ color: 'var(--danger)' }} />
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-medium">{r.step}</span>
