@@ -15,12 +15,12 @@
   --font-hebrew: 'Heebo', 'Frank Ruhl Libre', serif;
   --font-serif-he: 'Frank Ruhl Libre', 'Heebo', serif;
 
-  --color-ink-950: #05070d;
-  --color-ink-900: #0a0e18;
-  --color-ink-850: #0e1422;
-  --color-ink-800: #141b2d;
-  --color-ink-700: #1e2740;
-  --color-ink-600: #2c3757;
+  --color-ink-950: #04060c;
+  --color-ink-900: #080c16;
+  --color-ink-850: #0c1120;
+  --color-ink-800: #11182b;
+  --color-ink-700: #1b2440;
+  --color-ink-600: #2a3558;
   --color-ink-400: #64748b;
   --color-ink-200: #cbd5e1;
 
@@ -36,18 +36,29 @@
   --surface: var(--color-ink-900);
   --surface-2: var(--color-ink-850);
   --border: var(--color-ink-700);
-  --text: #e6edf7;
+  --text: #e8eef9;
   --text-dim: #8b9bb4;
+
+  /* Yükseltilmiş yüzeyler için ortak gölge ve parıltı.
+     Tek yerde tanımlı, çünkü kart/düğme/panel hepsi aynı dili konuşmalı. */
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --glow-brand: 0 0 0 1px color-mix(in srgb, var(--color-brand-400) 35%, transparent);
+
   color-scheme: dark;
 }
 
 :root[data-theme='light'] {
-  --bg: #f6f8fc;
+  --bg: #f4f7fb;
   --surface: #ffffff;
   --surface-2: #eef2f9;
-  --border: #d7dfeb;
-  --text: #0d1524;
-  --text-dim: #5a6b85;
+  --border: #dbe3ee;
+  --text: #0b1220;
+  --text-dim: #566579;
+
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.05), 0 8px 20px -14px rgb(15 23 42 / 0.25);
+  --shadow-lift: 0 2px 6px rgb(15 23 42 / 0.08), 0 18px 40px -20px rgb(15 23 42 / 0.35);
+
   color-scheme: light;
 }
 
@@ -67,6 +78,98 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------- *
+ * Arka plan dokusu
+ *
+ * İki büyük, çok yumuşak renk lekesi sayfanın üstünde duruyor. Amaç
+ * süs değil DERİNLİK: düz tek renk zeminde kartların kenarı kaybolur,
+ * hafif bir renk geçişi kartları zeminden ayırır.
+ *
+ * `fixed` ve `pointer-events: none` — kaydırmayla hareket etmez ve
+ * hiçbir tıklamayı engellemez. Tek bir boyalı katman olduğu için
+ * kaydırma başarımına etkisi ölçülemez düzeyde.
+ * ---------------------------------------------------------------- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      60rem 40rem at 15% -10%,
+      color-mix(in srgb, var(--color-brand-500) 12%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 35rem at 95% 5%,
+      color-mix(in srgb, var(--color-accent-500) 10%, transparent),
+      transparent 60%
+    );
+}
+
+:root[data-theme='light'] body::before {
+  opacity: 0.55;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------------------------------------------------------- *
+ * Yüzeyler
+ * ---------------------------------------------------------------- */
+
+.card {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+}
+
+.card-2 {
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+/**
+ * Tıklanabilir kart.
+ *
+ * Yükselme yalnızca `transform` ve `box-shadow` ile yapılıyor; ikisi de
+ * düzen (layout) hesabı gerektirmez, bu yüzden uzun listelerde bile
+ * takılma olmaz. `filter: brightness` kullanılmıyordu çünkü alt öğelerin
+ * rengini de bozuyor ve İbranice metni soluklaştırıyordu.
+ */
+.card-interactive {
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+  will-change: transform;
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  border-color: color-mix(in srgb, var(--color-brand-400) 45%, var(--border));
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+}
+
+/** Seçili durum — kenarda ince bir marka şeridi. */
+.is-selected {
+  border-color: color-mix(in srgb, var(--color-brand-400) 55%, var(--border));
+  box-shadow:
+    var(--shadow-soft),
+    inset 2px 0 0 var(--color-brand-400);
 }
 
 /* ---------------------------------------------------------------- *
@@ -95,30 +198,80 @@ body {
   letter-spacing: 0.01em;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
+/** Büyük İbranice gösterim — harf kartı ve oyun sorusu. */
+.he-display {
+  font-family: var(--font-serif-he);
+  line-height: 1.35;
+  letter-spacing: 0.005em;
 }
 
-.card-2 {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
+/* ---------------------------------------------------------------- *
+ * Vurgu ve tipografi
+ * ---------------------------------------------------------------- */
+
+/** Marka renginde geçişli başlık — yalnızca sayfa başlıklarında. */
+.title-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--text) 0%,
+    var(--text) 40%,
+    var(--color-brand-300) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-/* Odak halkası — klavyeyle gezinme görünür kalmalı. */
+/** Sayısal göstergeler — rakamların eni sabit kalsın ki zıplamasın. */
+.numeric {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------- *
+ * Erişilebilirlik
+ * ---------------------------------------------------------------- */
+
 :focus-visible {
   outline: 2px solid var(--color-brand-400);
   outline-offset: 2px;
   border-radius: 0.5rem;
 }
 
+/** Klavyeyle gezinenler için içeriğe atlama bağlantısı. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-brand-500);
+  color: #04120f;
+  font-weight: 600;
+}
+
+/**
+ * Hareket azaltma tercihi.
+ *
+ * Yalnızca süreyi kısaltmıyoruz; yükselme dönüşümünü de kapatıyoruz.
+ * Vestibüler duyarlılığı olan biri için asıl rahatsız edici olan
+ * sürenin uzunluğu değil, öğenin yer değiştirmesidir.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .card-interactive:hover {
+    transform: none;
   }
 }

@@ -1,3 +1,38 @@
+## 1.6.0
+
+**İbranice ekran klavyesi.** Rakip uygulamaları incelerken bizde olmayan
+en somut eksik buydu ve aslında bir engeldi: kullanıcının klavyesi Türkçe,
+İbranice harf yazamıyor. "Zaman Makinesi" gibi yazarak cevaplanan oyunlar
+bu yüzden yarı yarıya oynanamaz durumdaydı. Latin harfle okunuş yazmak
+kabul ediliyordu ama bu bir ödün — İbranice harfle yazabilmek ayrı bir
+beceridir ve asıl öğretilmesi gereken odur.
+
+Klavye İsrail standart düzeninde. Alfabetik dizmek daha kolay görünürdü
+ama öğrenci gerçek bir klavyede bu düzenle karşılaşacak; buradaki
+alışkanlık oraya taşınsın diye aynısı kullanıldı. Sofit harfler ayrı
+satırda değil, ait oldukları harfin yanında — ayrı satıra alınsaydı
+öğrenci onları ayrı harfler sanırdı.
+
+**Tasarım turu.** Üç kez istenmiş ve yapılmamıştı:
+- Arka planda iki yumuşak renk lekesi — süs değil DERİNLİK; düz zeminde
+  kartların kenarı kayboluyordu.
+- Kartlar cam etkili (backdrop-blur) ve gerçek gölge taşıyor.
+- Tıklanabilir kartlar artık `brightness` ile parlamıyor, YÜKSELİYOR.
+  Parlaklık hilesi alt öğelerin rengini de bozuyor ve İbranice metni
+  soluklaştırıyordu; yeni yöntem yalnızca `transform` ve gölge kullanıyor,
+  düzen hesabı gerektirmediği için uzun listelerde takılma yapmıyor.
+- Sayfa başlıklarında geçişli vurgu, sayaçlarda sabit genişlikli rakam.
+- Hareket azaltma tercihinde yükselme de kapanıyor — vestibüler duyarlılığı
+  olan biri için rahatsız edici olan sürenin uzunluğu değil, yer değiştirme.
+
+**Klavye kısayolları.** Aralıklı tekrarın işe yaraması için tur sayısının
+yüksek olması gerekir; her soruda fareyi seçeneğe götürmek turu iki katına
+çıkarıyor ve insanlar bırakıyor. Artık 1–4 ile cevap, Enter ile ilerleme.
+Yazarak cevaplanan sorularda rakam kısayolları devre dışı — orada 1-4
+gerçek bir girdi olabilir.
+
+280 birim testi.
+
 ## 1.5.0
 
 **Öğrenme belleği eklendi — uygulama artık ne bildiğini hatırlıyor.**

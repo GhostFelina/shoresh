@@ -30,7 +30,7 @@ export default function PhrasesPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Kalıplar</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Kalıplar</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           Bunlar kelime değil, parça. <span className="he">מַה נִּשְׁמָע</span> kelime kelime "ne
           duyuluyor" demektir ama anlamı "naber"dir. Çekim motorundan geçmezler, sözlükten de
@@ -54,7 +54,7 @@ export default function PhrasesPage() {
         <button
           type="button"
           onClick={() => setTopic('all')}
-          className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+          className="card-2 px-2.5 py-1 text-xs card-interactive"
           style={{
             borderColor: topic === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
             color: topic === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -67,7 +67,7 @@ export default function PhrasesPage() {
             key={t}
             type="button"
             onClick={() => setTopic(t)}
-            className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+            className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: topic === t ? 'var(--color-brand-400)' : 'var(--border)',
               color: topic === t ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -110,7 +110,7 @@ export default function PhrasesPage() {
               <button
                 type="button"
                 onClick={() => speak(p.plain)}
-                className="card grid size-9 shrink-0 place-items-center transition hover:brightness-125"
+                className="card grid size-9 shrink-0 place-items-center card-interactive"
                 aria-label={`${p.tr} kalıbını seslendir`}
               >
                 <Volume2 className="size-4" />

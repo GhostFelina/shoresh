@@ -28,7 +28,7 @@ function Cell({ label, c }: { label: string; c: Conjugation | undefined }) {
     <button
       type="button"
       onClick={() => speak(c.plain)}
-      className="card-2 group flex w-full items-center gap-3 px-3 py-2 text-right transition hover:brightness-125"
+      className="card-2 group flex w-full items-center gap-3 px-3 py-2 text-right card-interactive"
     >
       <span className="w-24 shrink-0 text-left text-[11px]" style={{ color: 'var(--text-dim)' }}>
         {label}
@@ -169,7 +169,7 @@ function Examples({ verb }: { verb: HebrewVerb }) {
                 <button
                   type="button"
                   onClick={() => speak(s.plain)}
-                  className="card-2 group/g flex w-full items-center gap-3 px-3 py-2 text-left transition hover:brightness-125"
+                  className="card-2 group/g flex w-full items-center gap-3 px-3 py-2 text-left card-interactive"
                 >
                   <span
                     className="w-16 shrink-0 text-[10px] uppercase tracking-wide"
@@ -230,7 +230,7 @@ export default function VerbsPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">VERB Hebrew</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">VERB Hebrew</h1>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
           {CATALOG_STATS.total} kök+binyan çifti, kural motoruyla üretilmiş{' '}
           {CATALOG_STATS.totalForms.toLocaleString('tr-TR')} çekim biçimi. Her biçim tıklanınca seslendirilir.
@@ -258,7 +258,7 @@ export default function VerbsPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedId(v.id)}
-                    className="card-2 flex w-full items-center gap-2 px-3 py-2 transition hover:brightness-125"
+                    className="card-2 flex w-full items-center gap-2 px-3 py-2 card-interactive"
                     style={{
                       borderColor: active ? 'var(--color-brand-400)' : 'var(--border)',
                     }}
@@ -354,7 +354,7 @@ export default function VerbsPage() {
                         key={s.id}
                         type="button"
                         onClick={() => setSelectedId(s.id)}
-                        className="flex items-center gap-2 rounded px-2 py-1 text-sm transition hover:brightness-125"
+                        className="flex items-center gap-2 rounded px-2 py-1 text-sm card-interactive"
                         style={{ background: 'var(--surface)' }}
                       >
                         <span className="he he-vocalized">{s.lemma.vocalized}</span>
@@ -373,7 +373,7 @@ export default function VerbsPage() {
                   key={f}
                   type="button"
                   onClick={() => setForm(f)}
-                  className="card-2 px-3 py-1.5 text-xs transition hover:brightness-125"
+                  className="card-2 px-3 py-1.5 text-xs card-interactive"
                   style={{
                     borderColor: form === f ? 'var(--color-brand-400)' : 'var(--border)',
                     color: form === f ? 'var(--color-brand-300)' : 'var(--text-dim)',

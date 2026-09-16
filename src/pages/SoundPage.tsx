@@ -87,7 +87,7 @@ function AudioPack() {
     <section className="card space-y-3 p-5">
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="mr-auto text-sm font-semibold">Ses paketi — çevrimdışı dinleme</h2>
-        <span className="text-xs tabular-nums" style={{ color: 'var(--text-dim)' }}>
+        <span className="numeric text-xs" style={{ color: 'var(--text-dim)' }}>
           {cached.toLocaleString('tr-TR')} / {total.toLocaleString('tr-TR')} klip · ~{mb} MB
         </span>
       </div>
@@ -113,7 +113,7 @@ function AudioPack() {
       </div>
 
       {progress && busy && (
-        <p className="text-xs tabular-nums" style={{ color: 'var(--text-dim)' }}>
+        <p className="numeric text-xs" style={{ color: 'var(--text-dim)' }}>
           {progress.done.toLocaleString('tr-TR')} / {progress.total.toLocaleString('tr-TR')}
           {progress.failed > 0 && ` · ${progress.failed} klip alınamadı, sonra yeniden denenebilir`}
         </p>
@@ -129,7 +129,7 @@ function AudioPack() {
             <button
               type="button"
               onClick={stop}
-              className="card-2 flex items-center gap-2 px-4 py-2 text-sm transition hover:brightness-125"
+              className="card-2 flex items-center gap-2 px-4 py-2 text-sm card-interactive"
             >
               <Loader2 className="size-4 animate-spin" />
               Durdur
@@ -138,7 +138,7 @@ function AudioPack() {
             <button
               type="button"
               onClick={() => void start()}
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition hover:brightness-110"
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
               style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
             >
               <Download className="size-4" />
@@ -149,7 +149,7 @@ function AudioPack() {
             <button
               type="button"
               onClick={() => void wipe()}
-              className="card-2 flex items-center gap-2 px-3 py-2 text-xs transition hover:brightness-125"
+              className="card-2 flex items-center gap-2 px-3 py-2 text-xs card-interactive"
             >
               <Trash2 className="size-3.5" />
               Paketi sil
@@ -239,7 +239,7 @@ export default function SoundPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Ses</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Ses</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           İbranice seslendirme üç katman hâlinde çalışır. Önce cihazında kurulu İbranice ses
           denenir — en iyisi odur, çevrimdışı da çalışır. Yoksa çevrimiçi seslendirmeye düşülür.
@@ -275,7 +275,7 @@ export default function SoundPage() {
               key={s.plain}
               type="button"
               onClick={() => play(s)}
-              className="card-2 flex items-center gap-3 px-3 py-2.5 text-right transition hover:brightness-125"
+              className="card-2 flex items-center gap-3 px-3 py-2.5 text-right card-interactive"
               style={{
                 borderColor: playing === s.plain ? 'var(--color-brand-400)' : 'var(--border)',
               }}
@@ -312,7 +312,7 @@ export default function SoundPage() {
             type="button"
             onClick={() => void runDiagnostics()}
             disabled={running}
-            className="card-2 flex items-center gap-2 px-3 py-1.5 text-xs transition hover:brightness-125 disabled:opacity-50"
+            className="card-2 flex items-center gap-2 px-3 py-1.5 text-xs card-interactive disabled:opacity-50"
           >
             {running && <Loader2 className="size-3.5 animate-spin" />}
             {running ? 'Sınanıyor…' : 'Sınamayı çalıştır'}

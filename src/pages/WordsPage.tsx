@@ -111,7 +111,7 @@ export default function WordsPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Kelimeler</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Kelimeler</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           Fiiller kökten üretilir, isimler üretilmez. İbranicede isim de kökten doğar
           (<span className="he">כ־ת־ב</span> → <span className="he">מִכְתָּב</span> "mektup") ama
@@ -128,7 +128,7 @@ export default function WordsPage() {
         ].map(([v, l]) => (
           <div key={l as string} className="card-2 px-4 py-3">
             <div
-              className="text-2xl font-bold tabular-nums"
+              className="text-2xl numeric font-bold"
               style={{ color: 'var(--color-brand-300)' }}
             >
               {v as number}
@@ -177,7 +177,7 @@ export default function WordsPage() {
               key={l}
               type="button"
               onClick={() => setLevel(l)}
-              className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+              className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: level === l ? 'var(--color-brand-400)' : 'var(--border)',
                 color: level === l ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -191,7 +191,7 @@ export default function WordsPage() {
               key={c}
               type="button"
               onClick={() => setWordClass(c)}
-              className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+              className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: wordClass === c ? 'var(--color-accent-400)' : 'var(--border)',
                 color: wordClass === c ? 'var(--color-accent-400)' : 'var(--text-dim)',
@@ -206,7 +206,7 @@ export default function WordsPage() {
           <button
             type="button"
             onClick={() => setTopic('all')}
-            className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+            className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: topic === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
               color: topic === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -219,7 +219,7 @@ export default function WordsPage() {
               key={t}
               type="button"
               onClick={() => setTopic(t)}
-              className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+              className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: topic === t ? 'var(--color-brand-400)' : 'var(--border)',
                 color: topic === t ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -260,7 +260,7 @@ export default function WordsPage() {
                       key={w.id}
                       type="button"
                       onClick={() => speak(w.plain)}
-                      className="flex items-baseline gap-2 text-sm transition hover:brightness-125"
+                      className="flex items-baseline gap-2 text-sm card-interactive"
                     >
                       <span className="he he-vocalized text-lg">{w.vocalized}</span>
                       <span className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>

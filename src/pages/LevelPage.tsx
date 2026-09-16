@@ -74,7 +74,7 @@ function VerbRow({ verb }: { verb: HebrewVerb }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:brightness-125"
+        className="flex w-full items-center gap-3 px-3 py-2.5 text-left card-interactive"
       >
         <span className="he he-vocalized w-28 shrink-0 text-xl">{verb.lemma.vocalized}</span>
         <span
@@ -120,7 +120,7 @@ function VerbRow({ verb }: { verb: HebrewVerb }) {
               <button
                 type="button"
                 onClick={() => speak(example.plain)}
-                className="card-2 grid size-9 shrink-0 place-items-center transition hover:brightness-125"
+                className="card-2 grid size-9 shrink-0 place-items-center card-interactive"
                 aria-label="Cümleyi seslendir"
               >
                 <Volume2 className="size-4" />
@@ -189,7 +189,7 @@ export default function LevelPage() {
           >
             {level}
           </span>
-          <h1 className="text-2xl font-bold tracking-tight">{meta.title.split('—')[1]?.trim()}</h1>
+          <h1 className="title-gradient text-2xl font-bold tracking-tight">{meta.title.split('—')[1]?.trim()}</h1>
         </div>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           {guide.focus}
@@ -198,7 +198,7 @@ export default function LevelPage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
             {verbs.length}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -206,7 +206,7 @@ export default function LevelPage() {
           </div>
         </div>
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
             {totalForms.toLocaleString('tr-TR')}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -214,7 +214,7 @@ export default function LevelPage() {
           </div>
         </div>
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
             {phrases.length}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -258,7 +258,7 @@ export default function LevelPage() {
           <button
             type="button"
             onClick={() => setBinyanFilter('all')}
-            className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+            className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: binyanFilter === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
               color: binyanFilter === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -271,7 +271,7 @@ export default function LevelPage() {
               key={b}
               type="button"
               onClick={() => setBinyanFilter(b)}
-              className="card-2 px-2.5 py-1 text-xs transition hover:brightness-125"
+              className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: binyanFilter === b ? 'var(--color-brand-400)' : 'var(--border)',
                 color: binyanFilter === b ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -304,7 +304,7 @@ export default function LevelPage() {
                 key={p.id}
                 type="button"
                 onClick={() => speak(p.plain)}
-                className="card-2 flex items-center gap-3 px-3 py-2 text-right transition hover:brightness-125"
+                className="card-2 flex items-center gap-3 px-3 py-2 text-right card-interactive"
               >
                 <span className="he he-vocalized flex-1 text-lg">{p.he}</span>
                 <span className="flex-1 text-left">

@@ -53,7 +53,7 @@ function Stat({ value, label, tone }: { value: number | string; label: string; t
   return (
     <div className="card-2 px-4 py-3">
       <div
-        className="text-2xl font-bold tabular-nums"
+        className="text-2xl numeric font-bold"
         style={{ color: tone ?? 'var(--color-brand-300)' }}
       >
         {typeof value === 'number' ? value.toLocaleString('tr-TR') : value}
@@ -92,7 +92,7 @@ export default function ProgressPage() {
   if (available === false) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold tracking-tight">İlerleme</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">İlerleme</h1>
         <section className="card-2 space-y-1 p-4">
           <h2 className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#fbbf24' }}>
             <AlertTriangle className="size-3.5" />
@@ -116,7 +116,7 @@ export default function ProgressPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">İlerleme</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">İlerleme</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           Uygulama neyi ne zaman tekrar etmen gerektiğini kendisi hesaplar. Her cevabın
           doğruluğu, süresi ve kullandığın ipucu sayısı ölçülür — 2 saniyede hatırlanan kelime
@@ -133,7 +133,7 @@ export default function ProgressPage() {
           </p>
           <Link
             to="/oyunlar"
-            className="inline-block rounded-lg px-4 py-2 text-sm font-semibold transition hover:brightness-110"
+            className="inline-block rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
             style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
           >
             Oyunlara git
@@ -155,7 +155,7 @@ export default function ProgressPage() {
               <Stat value={stats.attempts} label="toplam cevap" />
               <div className="card-2 px-4 py-3">
                 <div
-                  className="flex items-center gap-1.5 text-2xl font-bold tabular-nums"
+                  className="flex items-center gap-1.5 text-2xl numeric font-bold"
                   style={{ color: stats.streak > 0 ? '#fb923c' : 'var(--text-dim)' }}
                 >
                   <Flame className="size-5" />
@@ -224,7 +224,7 @@ export default function ProgressPage() {
                           </span>
                         )}
                         <span
-                          className="w-10 shrink-0 text-right text-xs tabular-nums"
+                          className="w-10 shrink-0 text-right numeric text-xs"
                           style={{ color: '#f87171' }}
                         >
                           %{p.mastery}
@@ -260,7 +260,7 @@ export default function ProgressPage() {
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="card px-3 py-1.5 text-xs transition hover:brightness-125"
+                className="card px-3 py-1.5 text-xs card-interactive"
               >
                 Vazgeç
               </button>
@@ -269,7 +269,7 @@ export default function ProgressPage() {
             <button
               type="button"
               onClick={() => setConfirming(true)}
-              className="card flex items-center gap-2 px-3 py-1.5 text-xs transition hover:brightness-125"
+              className="card flex items-center gap-2 px-3 py-1.5 text-xs card-interactive"
             >
               <RotateCcw className="size-3.5" />
               Sıfırla

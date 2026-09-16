@@ -18,7 +18,7 @@ function LetterCard({
     <button
       type="button"
       onClick={() => onSelect(letter)}
-      className="card flex flex-col items-center gap-1 p-3 transition hover:brightness-125"
+      className="card flex flex-col items-center gap-1 p-3 card-interactive"
       style={{
         borderColor: active ? 'var(--color-brand-400)' : 'var(--border)',
         background: active ? 'var(--surface-2)' : 'var(--surface)',
@@ -42,7 +42,7 @@ export default function AlefBetPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Alef-Bet</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Alef-Bet</h1>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
           22 harf, 5 sofit biçim. İbranice sağdan sola yazılır ve yazıda ünlü harf yoktur —
           ünlüler harfin altındaki işaretlerle verilir.
@@ -60,7 +60,7 @@ export default function AlefBetPage() {
             key={key}
             type="button"
             onClick={() => setOrder(key)}
-            className="card-2 px-3 py-1.5 text-xs transition hover:brightness-125"
+            className="card-2 px-3 py-1.5 text-xs card-interactive"
             style={{
               borderColor: order === key ? 'var(--color-brand-400)' : 'var(--border)',
               color: order === key ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -132,7 +132,7 @@ export default function AlefBetPage() {
           <button
             type="button"
             onClick={() => speak(selected.nameHe)}
-            className="card-2 grid size-10 shrink-0 place-items-center transition hover:brightness-125"
+            className="card-2 grid size-10 shrink-0 place-items-center card-interactive"
             aria-label={`${selected.nameTr} harfini seslendir`}
           >
             <Volume2 className="size-4" />
@@ -159,7 +159,7 @@ export default function AlefBetPage() {
                     key={id}
                     type="button"
                     onClick={() => setSelected(other)}
-                    className="flex items-center gap-2 text-sm transition hover:brightness-125"
+                    className="flex items-center gap-2 text-sm card-interactive"
                   >
                     <span className="he he-serif text-3xl">{other.glyph}</span>
                     <span style={{ color: 'var(--text-dim)' }}>{other.nameTr}</span>

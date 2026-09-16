@@ -26,7 +26,7 @@ export default function BinyanimPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Yedi binyan</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Yedi binyan</h1>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
           İbranicede fiil ezberlenmez, kalıba oturur. Aynı üç harfli kök yedi ayrı kalıpta yedi
           ayrı anlam verir. Aşağıdaki tablonun tamamı <span className="he">כ־ת־ב</span> kökünden,

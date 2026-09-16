@@ -13,7 +13,7 @@ import { canSpeakHebrew, speechStatus } from '@/lib/speech';
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="card-2 px-4 py-3">
-      <div className="text-2xl font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+      <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
         {typeof value === 'number' ? value.toLocaleString('tr-TR') : value}
       </div>
       <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -82,7 +82,7 @@ function TodayCard() {
 
       <div className="grid grid-cols-3 gap-2">
         <div className="card-2 px-3 py-2">
-          <div className="text-xl font-bold tabular-nums" style={{ color: '#fbbf24' }}>
+          <div className="text-xl numeric font-bold" style={{ color: '#fbbf24' }}>
             {stats.due}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -90,7 +90,7 @@ function TodayCard() {
           </div>
         </div>
         <div className="card-2 px-3 py-2">
-          <div className="text-xl font-bold tabular-nums" style={{ color: '#f87171' }}>
+          <div className="text-xl numeric font-bold" style={{ color: '#f87171' }}>
             {stats.weak}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -99,7 +99,7 @@ function TodayCard() {
         </div>
         <div className="card-2 px-3 py-2">
           <div
-            className="text-xl font-bold tabular-nums"
+            className="text-xl numeric font-bold"
             style={{ color: 'var(--color-brand-300)' }}
           >
             {stats.strong}
@@ -113,12 +113,12 @@ function TodayCard() {
       <div className="flex flex-wrap gap-2">
         <Link
           to="/oyunlar"
-          className="rounded-lg px-4 py-2 text-sm font-semibold transition hover:brightness-110"
+          className="rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
           style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
         >
           {stats.due > 0 ? `${stats.due} tekrarı çöz` : 'Çalışmaya devam et'}
         </Link>
-        <Link to="/ilerleme" className="card-2 px-4 py-2 text-sm transition hover:brightness-125">
+        <Link to="/ilerleme" className="card-2 px-4 py-2 text-sm card-interactive">
           İlerlemeyi gör
         </Link>
       </div>
@@ -139,7 +139,7 @@ export default function HomePage() {
               שֹׁרֶשׁ
             </span>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Kökten İbranice</h1>
+              <h1 className="title-gradient text-2xl font-bold tracking-tight">Kökten İbranice</h1>
               <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
                 Sıfırdan Modern İvrit — A1'den B1'e
               </p>
@@ -180,7 +180,7 @@ export default function HomePage() {
             <Link
               key={s.to}
               to={s.to}
-              className="card group space-y-2 p-4 transition hover:brightness-125"
+              className="card group space-y-2 p-4 card-interactive"
             >
               <div className="flex items-center gap-2">
                 <span

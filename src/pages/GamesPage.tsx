@@ -13,6 +13,7 @@ import {
 } from '@/features/games/engine';
 import { hasUserGesture, speak, speechStatus } from '@/lib/speech';
 import { MixedText } from '@/components/MixedText';
+import { HebrewKeyboardToggle } from '@/components/HebrewKeyboard';
 import { recordAnswer } from '@/lib/progress';
 import type { CEFR } from '@/types/hebrew';
 
@@ -56,7 +57,7 @@ function SpeakButton({ text, big = false }: { text: string; big?: boolean }) {
     <button
       type="button"
       onClick={play}
-      className={`card-2 grid shrink-0 place-items-center transition hover:brightness-125 ${
+      className={`card-2 grid shrink-0 place-items-center card-interactive ${
         big ? 'size-20' : 'size-10'
       }`}
       style={{ borderColor: border }}
@@ -168,6 +169,48 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
     });
   };
 
+  /**
+   * Klavye kısayolları.
+   *
+   * NEDEN: Aralıklı tekrarın işe yaraması için tur sayısının yüksek
+   * olması gerekir. Her soruda fareyi seçeneğe götürmek turu iki katına
+   * çıkarıyor ve insanlar bırakıyor. 1-4 ile cevap, Enter ile ilerleme
+   * tüm turu klavyede tutuyor.
+   *
+   * Yazarak cevaplanan sorularda rakamlar DEVRE DIŞI: orada 1-4 gerçek
+   * bir girdi olabilir.
+   */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (finished || !q) return;
+
+      // Metin kutusunda yazarken kısayol çalışmamalı.
+      const el = document.activeElement;
+      const typing =
+        el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement;
+
+      if (s.answered) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          next();
+        }
+        return;
+      }
+
+      if (q.kind === 'choice' && !typing) {
+        const n = Number(e.key);
+        if (Number.isInteger(n) && n >= 1 && n <= q.options.length) {
+          e.preventDefault();
+          setS((prev) => ({ ...prev, chosen: n - 1 }));
+          commit(n - 1 === q.answer);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   const next = () =>
     setS((prev) => ({
       ...prev,
@@ -184,7 +227,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
     return (
       <div className="card space-y-4 p-6 text-center">
         <h2 className="text-xl font-bold">Tur bitti</h2>
-        <div className="text-5xl font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+        <div className="text-5xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
           {s.correct}/{queue.length}
         </div>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
@@ -201,7 +244,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           <button
             type="button"
             onClick={restart}
-            className="card-2 flex items-center gap-2 px-4 py-2 text-sm transition hover:brightness-125"
+            className="card-2 flex items-center gap-2 px-4 py-2 text-sm card-interactive"
           >
             <RotateCcw className="size-4" />
             Yeni tur
@@ -209,7 +252,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           <button
             type="button"
             onClick={onExit}
-            className="card-2 px-4 py-2 text-sm transition hover:brightness-125"
+            className="card-2 px-4 py-2 text-sm card-interactive"
           >
             Oyunlara dön
           </button>
@@ -227,7 +270,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
         <button
           type="button"
           onClick={onExit}
-          className="card-2 grid size-9 place-items-center transition hover:brightness-125"
+          className="card-2 grid size-9 place-items-center card-interactive"
           aria-label="Çık"
         >
           <ArrowLeft className="size-4" />
@@ -239,7 +282,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold tabular-nums" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-lg numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
             {s.correct}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -247,6 +290,10 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           </div>
         </div>
       </div>
+
+      <p className="hidden text-[10px] sm:block" style={{ color: 'var(--text-dim)' }}>
+        Klavye: <kbd>1</kbd>–<kbd>4</kbd> cevap · <kbd>Enter</kbd> sonraki
+      </p>
 
       {/* İlerleme çubuğu */}
       <div className="h-1 overflow-hidden rounded" style={{ background: 'var(--surface-2)' }}>
@@ -360,7 +407,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
             <button
               type="button"
               onClick={next}
-              className="w-full rounded-lg py-2 text-sm font-semibold transition hover:brightness-110"
+              className="w-full rounded-lg py-2 text-sm font-semibold card-interactive"
               style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
             >
               {s.index + 1 >= queue.length ? 'Sonucu gör' : 'Sonraki'}
@@ -431,7 +478,7 @@ function OrderBody({
                 type="button"
                 disabled={state.answered}
                 onClick={() => setPlaced((prev) => prev.filter((_, i) => i !== pos))}
-                className="rounded px-2 py-0.5 transition hover:brightness-125"
+                className="rounded px-2 py-0.5 card-interactive"
                 style={{ background: 'var(--surface)' }}
               >
                 {q.tokens[idx]}
@@ -449,7 +496,7 @@ function OrderBody({
             type="button"
             disabled={state.answered}
             onClick={() => setPlaced((prev) => [...prev, idx])}
-            className="card-2 he he-vocalized px-3 py-2 text-lg transition hover:brightness-125"
+            className="card-2 he he-vocalized px-3 py-2 text-lg card-interactive"
           >
             {q.tokens[idx]}
           </button>
@@ -466,7 +513,7 @@ function OrderBody({
           type="button"
           onClick={check}
           disabled={!complete}
-          className="w-full rounded-lg py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
+          className="w-full rounded-lg py-2 text-sm font-semibold card-interactive disabled:opacity-40"
           style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
         >
           {complete ? 'Kontrol et' : `${q.tokens.length - placed.length} sözcük kaldı`}
@@ -500,9 +547,17 @@ function ChoiceBody({
             type="button"
             disabled={state.answered}
             onClick={() => onPick(i)}
-            className="card-2 px-4 py-3 text-center transition hover:brightness-125 disabled:cursor-default"
+            className="card-2 relative px-4 py-3 text-center card-interactive disabled:cursor-default"
             style={{ borderColor: border }}
           >
+            {/* Kısayol numarası — klavyeyle oynayanlar için */}
+            <span
+              className="absolute left-2 top-2 hidden size-4 place-items-center rounded text-[10px] font-semibold sm:grid"
+              style={{ background: 'var(--surface)', color: 'var(--text-dim)' }}
+              aria-hidden="true"
+            >
+              {i + 1}
+            </span>
             <span
               className={
                 q.optionsAreHebrew
@@ -556,7 +611,7 @@ function TypeBody({
           type="button"
           onClick={onHint}
           disabled={state.answered || state.hintsUsed >= q.hints.length}
-          className="card-2 grid size-11 shrink-0 place-items-center transition hover:brightness-125 disabled:opacity-40"
+          className="card-2 grid size-11 shrink-0 place-items-center card-interactive disabled:opacity-40"
           aria-label="İpucu"
         >
           <Lightbulb className="size-4" />
@@ -574,14 +629,22 @@ function TypeBody({
       )}
 
       {!state.answered && (
-        <button
-          type="button"
-          onClick={onSubmit}
-          className="w-full rounded-lg py-2 text-sm font-semibold transition hover:brightness-110"
-          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
-        >
-          Kontrol et
-        </button>
+        <>
+          <HebrewKeyboardToggle
+            disabled={state.answered}
+            onInsert={(ch) => onChange(state.typed + ch)}
+            onBackspace={() => onChange(state.typed.slice(0, -1))}
+            onClear={() => onChange('')}
+          />
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="w-full rounded-lg py-2 text-sm font-semibold card-interactive"
+            style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+          >
+            Kontrol et
+          </button>
+        </>
       )}
     </div>
   );
@@ -612,7 +675,7 @@ export default function GamesPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Oyunlar</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Oyunlar</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           On bir oyun, on bir ayrı beceri. Hepsi aynı veriden beslenir — katalog düzeltilince
           oyunlar da düzelir. Sorular her turda yeniden üretilir, ezberlenecek sabit bir
@@ -629,7 +692,7 @@ export default function GamesPage() {
             key={l}
             type="button"
             onClick={() => setLevel(l)}
-            className="card-2 px-3 py-1 text-xs transition hover:brightness-125"
+            className="card-2 px-3 py-1 text-xs card-interactive"
             style={{
               borderColor: level === l ? 'var(--color-brand-400)' : 'var(--border)',
               color: level === l ? 'var(--color-brand-300)' : 'var(--text-dim)',
@@ -663,7 +726,7 @@ export default function GamesPage() {
               type="button"
               disabled={blocked}
               onClick={() => navigate(`/oyunlar/${g.id}`)}
-              className="card space-y-2 p-4 text-left transition hover:brightness-125 disabled:opacity-50"
+              className="card space-y-2 p-4 text-left card-interactive disabled:opacity-50"
             >
               <div className="flex items-baseline gap-2">
                 <h2 className="text-base font-bold">{g.title}</h2>

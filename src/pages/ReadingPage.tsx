@@ -26,7 +26,7 @@ export default function ReadingPage() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Harekeler ve okuma</h1>
+        <h1 className="title-gradient text-2xl font-bold tracking-tight">Harekeler ve okuma</h1>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
           İbrani alfabesinde ünlü harf yoktur. Ünlüler harfin altına ya da üstüne konan küçük
           işaretlerle verilir. Bu işaretlere <span className="he">נִקּוּד</span> (nikud) denir.
@@ -97,7 +97,7 @@ export default function ReadingPage() {
               <button
                 type="button"
                 onClick={() => speak(w.plain)}
-                className="grid size-8 place-items-center rounded-lg transition hover:brightness-150"
+                className="grid size-8 place-items-center rounded-lg card-interactive"
                 style={{ background: 'var(--surface)' }}
                 aria-label={`${w.tr} kelimesini seslendir`}
               >

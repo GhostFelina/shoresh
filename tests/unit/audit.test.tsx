@@ -176,3 +176,73 @@ describe('İbranice metin yönü', () => {
     });
   }
 });
+
+describe('ekran klavyesi', () => {
+  it('İsrail klavye düzenindeki 27 harf biçimini de sunar', async () => {
+    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const { container } = render(
+      <HebrewKeyboard onInsert={() => {}} onBackspace={() => {}} onClear={() => {}} />,
+    );
+    const letters = [...container.querySelectorAll('button')]
+      .map((b) => b.textContent ?? '')
+      .filter((t) => /^[\u05D0-\u05EA]$/.test(t));
+
+    // 22 temel harf + 5 sofit = 27 ayrı tuş
+    expect(new Set(letters).size).toBe(27);
+  });
+
+  it('harfe dokununca o harfi bildirir', async () => {
+    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const inserted: string[] = [];
+    render(
+      <HebrewKeyboard
+        onInsert={(c) => inserted.push(c)}
+        onBackspace={() => {}}
+        onClear={() => {}}
+      />,
+    );
+    screen.getByLabelText('א harfini ekle').click();
+    screen.getByLabelText('ב harfini ekle').click();
+    expect(inserted).toEqual(['א', 'ב']);
+  });
+
+  it('devre dışıyken hiçbir tuş çalışmaz', async () => {
+    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const inserted: string[] = [];
+    const { container } = render(
+      <HebrewKeyboard
+        disabled
+        onInsert={(c) => inserted.push(c)}
+        onBackspace={() => {}}
+        onClear={() => {}}
+      />,
+    );
+    for (const b of container.querySelectorAll('button')) {
+      expect((b as HTMLButtonElement).disabled).toBe(true);
+    }
+    expect(inserted).toEqual([]);
+  });
+});
+
+describe('karışık yönlü metin', () => {
+  it('İbranice parçayı bdi içine alır, Türkçeyi almaz', async () => {
+    const { MixedText } = await import('@/components/MixedText');
+    const { container } = render(
+      <MixedText>{'Ardından MASTAR gelir: אֲנִי צָרִיךְ לָלֶכֶת "gitmem gerek".'}</MixedText>,
+    );
+    const bdis = container.querySelectorAll('bdi');
+    expect(bdis.length).toBeGreaterThan(0);
+    for (const b of bdis) {
+      expect(b.getAttribute('dir')).toBe('rtl');
+      expect(/[\u05D0-\u05EA]/.test(b.textContent ?? '')).toBe(true);
+    }
+    // Türkçe kısım metinde korunmalı.
+    expect(container.textContent).toContain('Ardından MASTAR gelir');
+  });
+
+  it('hiç İbranice yoksa sarmalama yapmaz', async () => {
+    const { MixedText } = await import('@/components/MixedText');
+    const { container } = render(<MixedText>Bu tamamen Türkçe bir cümle.</MixedText>);
+    expect(container.querySelectorAll('bdi')).toHaveLength(0);
+  });
+});

@@ -55,7 +55,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="card-2 grid size-9 place-items-center transition hover:brightness-125"
+      className="card-2 grid size-9 place-items-center card-interactive"
       aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}
     >
       {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
@@ -95,7 +95,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     <item.icon className="size-4 shrink-0" />
                   ) : (
                     <span
-                      className="grid size-5 shrink-0 place-items-center rounded text-[10px] font-bold tabular-nums"
+                      className="grid size-5 shrink-0 place-items-center rounded text-[10px] numeric font-bold"
                       style={{ background: 'var(--surface-2)' }}
                     >
                       {item.badge}
