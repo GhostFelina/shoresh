@@ -9,8 +9,8 @@
 
 # Shoresh — ölçülen durum
 
-**Üretim anı:** 16.09.2026 21:13:18
-**Sürüm:** v1.17.0 · **Dal:** main · **Commit:** 87f995b
+**Üretim anı:** 16.09.2026 21:36:49
+**Sürüm:** v1.18.0 · **Dal:** main · **Commit:** d42b107
 **Çalışma ağacı:** ⚠ TEMİZ DEĞİL (commit edilmemiş değişiklik var)
 
 ## Testler
@@ -18,10 +18,10 @@
 | | |
 |---|---|
 | Durum | hepsi geçiyor |
-| Birim testi | ? |
-| Test dosyası | ? |
-| Kaynak satırı | 20.411 |
-| Test satırı | 3.822 |
+| Birim testi | 416 |
+| Test dosyası | 17 |
+| Kaynak satırı | 20.799 |
+| Test satırı | 4.044 |
 
 ## İçerik
 
@@ -47,11 +47,12 @@
 | Renk paleti | 5 |
 | Rozet | 12 |
 | Rütbe | 9 |
-| Kayda geçmiş sürüm | 20 |
+| Kayda geçmiş sürüm | 21 |
 
 ## Son commit'ler
 
 ```
+16.09 21:15 · v1.17.0 — Test motoru: 39 uçtan uca test
 16.09 20:58 · v1.16.0 — Yedekleme, checkpoint ve devir belgesi
 16.09 20:25 · v1.15.0 — Sürüm geçmişi paneli
 16.09 17:18 · v1.14.0 — Öğretmen Modu 30 dersten 71 derse
@@ -59,11 +60,11 @@
 16.09 16:40 · v1.12.0 — Sürüm notu kutusu ve derleme zaman damgası
 16.09 16:31 · v1.11.0 — Beş renk paleti, ölçülen kontrast, düzgün kaydırma çubuğu
 16.09 16:18 · v1.10.0 — Öğretmen Modu ve okunuşta hirik male düzeltmesi
-16.09 15:58 · v1.9.0 — 1.572 öğe: sözlük iki katına, motora 8 eksik şablon
 ```
 
 ## Checkpoint etiketleri
 
+- `v1.17.0`
 - `v1.16.0`
 
 ---

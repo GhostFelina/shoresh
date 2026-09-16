@@ -6,6 +6,7 @@ import { APP_VERSION } from '@/lib/version';
 import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
 import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
 import { RewardHud } from './Rewards';
+import { usePageWidthClass } from './Layout';
 import { VersionHistoryButton, VersionHistoryDialog } from './VersionHistory';
 import { BUILD_TIME, formatBuildTime } from '@/lib/version';
 
@@ -105,6 +106,8 @@ export default function Shell({ children }: { children: ReactNode }) {
   const { theme, palette, changeTheme, changePalette } = useAppearance();
   const whatsNew = useWhatsNew();
   const [historyOpen, setHistoryOpen] = useState(false);
+  // Sayfa kendi genişliğini bildiriyor; kabuk yalnızca uyguluyor.
+  const genislik = usePageWidthClass();
 
   // Çekmece açıkken arkadaki sayfa kaymasın.
   useEffect(() => {
@@ -213,10 +216,12 @@ export default function Shell({ children }: { children: ReactNode }) {
           <ThemeToggle theme={theme} onChange={changeTheme} />
         </header>
 
-        <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+        <main className={`mx-auto ${genislik} px-4 py-6 transition-[max-width] duration-300`}>
+          {children}
+        </main>
 
         <footer
-          className="mx-auto max-w-5xl space-y-1 px-4 pb-10 pt-4 text-xs"
+          className={`mx-auto ${genislik} space-y-1 px-4 pb-10 pt-4 text-xs`}
           style={{ color: 'var(--text-dim)' }}
         >
           <p>

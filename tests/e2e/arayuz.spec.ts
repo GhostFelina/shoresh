@@ -12,17 +12,25 @@ import { APP_VERSION, ac, konsolHatalari } from './yardim';
 test('tema değişiyor ve seçim kalıcı', async ({ page }) => {
   await ac(page, '/');
 
-  const temaOku = () => page.evaluate(() => document.documentElement.dataset.theme);
-  const ilk = await temaOku();
+  /*
+   * SABİT BEKLEME YOK. İlk yazımda `waitForTimeout(400)` kullanılıyordu ve
+   * test tek başına geçip dolu koşuda düşüyordu: iki işçi birlikte
+   * çalışırken geliştirme sunucusu modülleri derliyor ve 400 ms
+   * yetmiyordu. Kararsiz test kirik testi gizler; çözüm süreyi
+   * uzatmak değil, DURUMU beklemek.
+   */
+  const tema = page.locator('html');
+  const ilk = await tema.getAttribute('data-theme');
+  const hedef = ilk === 'dark' ? 'light' : 'dark';
 
   await page.getByRole('button', { name: /temaya geç/ }).click();
-  await page.waitForTimeout(400);
-  expect(await temaOku(), 'tema değişmedi').not.toBe(ilk);
+  await expect(tema, 'tema değişmedi').toHaveAttribute('data-theme', hedef);
 
-  const yeni = await temaOku();
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(400);
-  expect(await temaOku(), 'tema seçimi kalıcı değil').toBe(yeni);
+  await expect(page.locator('html'), 'tema seçimi kalıcı değil').toHaveAttribute(
+    'data-theme',
+    hedef,
+  );
 });
 
 test('palet değişince marka rengi gerçekten değişiyor', async ({ page }) => {
@@ -38,21 +46,23 @@ test('palet değişince marka rengi gerçekten değişiyor', async ({ page }) =>
   expect(once, 'marka rengi tanımlı değil').not.toBe('');
 
   await page.getByRole('button', { name: 'Renk paleti' }).click();
-  await page.waitForTimeout(300);
+  const secenekler = page.locator('[role="menuitemradio"]');
+  await expect(secenekler.first()).toBeVisible();
+  expect(await secenekler.count(), 'palet listesi boş').toBeGreaterThan(3);
 
   // Listedeki ikinci paleti seç (ilki zaten etkin olan).
-  const secenekler = page.locator('[role="menuitemradio"]');
-  expect(await secenekler.count(), 'palet listesi boş').toBeGreaterThan(3);
   await secenekler.nth(1).click();
-  await page.waitForTimeout(500);
 
+  // Sabit bekleme yerine durumu bekle — yük altında kararlı kalır.
+  await expect
+    .poll(rengiOku, { message: 'palet seçildi ama renk değişmedi' })
+    .not.toBe(once);
   const sonra = await rengiOku();
-  expect(sonra, 'palet seçildi ama renk değişmedi').not.toBe(once);
 
-  // Kalıcılık
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(500);
-  expect(await rengiOku(), 'palet seçimi kalıcı değil').toBe(sonra);
+  await expect
+    .poll(rengiOku, { message: 'palet seçimi kalıcı değil' })
+    .toBe(sonra);
 
   expect(hatalar).toEqual([]);
 });

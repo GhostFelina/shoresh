@@ -19,7 +19,6 @@
  */
 import { buildConjugation, normalizeFinals, type Segment } from './niqqud';
 import {
-  DAGESH,
   FUTURE_PREFIX_LETTER,
   FUTURE_SUFFIX,
   FUTURE_SUFFIXED,
@@ -34,11 +33,14 @@ import {
   PRESENT_ALL,
   SHURUK,
   SHVA,
+  ASSIMILATES,
   METATHESIS,
   TABLE_PERSONS,
   affix,
   dot,
+  light,
   presentTail,
+  strong,
   rt,
   v,
   vl,
@@ -382,21 +384,42 @@ const HUFAL: BinyanTemplate = {
  * ================================================================== */
 
 
-/** Hitpa'el ön ekini kök birinci harfine göre kurar. */
+/**
+ * Hitpa'el ön ekini kök birinci harfine göre kurar — ÜÇ ayrı durum.
+ *
+ * 1. NORMAL: הִתְ + kök. הִתְלַבֵּשׁ
+ * 2. METATEZ: ilk harf ıslıklıysa (ס ש צ ז) ת ile YER DEĞİŞTİRİR ve
+ *    bazıları ses değiştirir: צ→ט, ז→ד. הִסְתַּדֵּר, הִצְטָרֵף
+ * 3. KAYNAŞMA: ilk harf diş ünsüzüyse (ד ט ת) ת yer değiştirmez,
+ *    YUTULUR; ortada ayrı bir harf kalmaz. הִטַּפֵּל, הִדַּבֵּר
+ *
+ * Üçüncü durum başlangıçta metatez sayilmisti (ד→ד, ט→ט) ve harf İKİ
+ * KEZ yazılıyordu: הִטְטַּפֵּל.
+ *
+ * Dageş `light()` ile veriliyor, elle değil: yer değiştiren harf ת ise
+ * dageş kal alır (הִסְתַּדֵּר) ama ט begadkefat değildir ve almaz
+ * (הִצְטַלֵּם). Elle eklenince הִצְטַּלֵּם çıkıyordu.
+ */
 function hitpaelPrefix(first: string, headVowel: string): Segment[] {
+  if (ASSIMILATES.has(first)) {
+    // ת yutuldu: kök harfi ikizleşip gövdenin patah'ını üstlenir.
+    return [affix('ה' + headVowel), rt(strong(first) + PATAH)];
+  }
   const swapped = METATHESIS[first];
   if (!swapped) {
-    // Normal sıra: הִתְ + kök
     return [affix('ה' + headVowel + 'ת' + SHVA)];
   }
-  // Metatez: kök harfi öne geçer, ת (veya dönüşmüş hâli) arkasına düşer.
-  // Yer değiştiren ת gövdenin patah'ını üstlenir: הִסְתַּדֵּר.
-  return [affix('ה' + headVowel), rt(v(first, SHVA)), affix(swapped + DAGESH + PATAH)];
+  return [affix('ה' + headVowel), rt(v(first, SHVA)), affix(light(swapped) + PATAH)];
 }
 
-/** Metatezde kök ilk harfi ön eke taşındığı için gövdeden düşer. */
+/**
+ * Gövdede kalan kök harfleri.
+ *
+ * Hem metatezde hem kaynaşmada ilk harf başa taşındığı için gövdeden
+ * düşer; geriye iki harf kalır.
+ */
 const hitpaelBody = (r: Root3): [string, string, string] | [string, string] =>
-  METATHESIS[r[0]] ? [r[1], r[2]] : [r[0], r[1], r[2]];
+  METATHESIS[r[0]] || ASSIMILATES.has(r[0]) ? [r[1], r[2]] : [r[0], r[1], r[2]];
 
 const HITPAEL: BinyanTemplate = {
   infinitive: (r) => {
@@ -463,9 +486,11 @@ const HITPAEL: BinyanTemplate = {
  * tek yerde duruyor; ayrı ayrı yazılsa biri düzeltilip diğeri unutulur.
  */
 function hitpaelHead(r: Root3, head: string): Segment[] {
+  // Kural `hitpaelPrefix` ile AYNI; oradaki açıklamaya bak.
+  if (ASSIMILATES.has(r[0])) return [affix(head), rt(strong(r[0]) + PATAH)];
   const swapped = METATHESIS[r[0]];
   if (!swapped) return [affix(head + 'ת' + SHVA)];
-  return [affix(head), rt(v(r[0], SHVA)), affix(swapped + DAGESH + PATAH)];
+  return [affix(head), rt(v(r[0], SHVA)), affix(light(swapped) + PATAH)];
 }
 
 /**

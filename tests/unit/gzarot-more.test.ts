@@ -240,3 +240,60 @@ describe('hif’il + ע״גרונית tam kök şablonuyla çekilir', () => {
     expect(n(t.infinitive?.vocalized)).toBe(n('לְהַטְעִין'));
   });
 });
+
+describe('hitpa\u2019elde ilk kök harfi — üç ayrı davranış', () => {
+  /*
+   * NEDEN AYRI TEST: Bu üç durum tek bir haritada toplanmıştı ve ikisi
+   * yanlış çıkıyordu. Hata ekranda görüldü (VERB sayfasının uçtan uca
+   * testinde dökülen metinde), birim testi görmüyordu çünkü hiçbir test
+   * bu kökleri sınamıyordu.
+   */
+  const n = (x: string | undefined): string => (x ?? '').normalize('NFC');
+
+  it('normal kök: ön ek olduğu gibi durur', () => {
+    const t = conjugate(split('לבש'), 'hitpael');
+    expect(n(t.past.hu?.vocalized)).toBe(n('הִתְלַבֵּשׁ'));
+    expect(n(t.present.ms?.vocalized)).toBe(n('מִתְלַבֵּשׁ'));
+  });
+
+  it('ıslıklı kök: ת ile YER DEĞİŞTİRİR', () => {
+    expect(n(conjugate(split('סדר'), 'hitpael').past.hu?.vocalized)).toBe(n('הִסְתַּדֵּר'));
+    expect(n(conjugate(split('שמש'), 'hitpael').past.hu?.vocalized)).toBe(n('הִשְׁתַּמֵּשׁ'));
+  });
+
+  it('ıslıklı kökte ses de değişir: צ→ט, ז→ד', () => {
+    expect(n(conjugate(split('צלם'), 'hitpael').past.hu?.vocalized)).toBe(n('הִצְטַלֵּם'));
+    expect(n(conjugate(split('זקן'), 'hitpael').past.hu?.vocalized)).toBe(n('הִזְדַּקֵּן'));
+  });
+
+  it('yer değiştiren harfin dageşi begadkefat kuralına uyar', () => {
+    /*
+     * ת begadkefat: şva nahtan sonra dageş kal alır → הִסְתַּדֵּר
+     * ט begadkefat DEĞİL: dageş almaz → הִצְטַלֵּם
+     * Dageş elle eklenince ikincisi הִצְטַּלֵּם çıkıyordu.
+     */
+    expect(conjugate(split('סדר'), 'hitpael').past.hu?.vocalized).toContain('תּ');
+    expect(conjugate(split('צלם'), 'hitpael').past.hu?.vocalized).not.toContain('טּ');
+  });
+
+  it('diş ünsüzü kök: ת YUTULUR, ayrı harf kalmaz', () => {
+    const t = conjugate(split('טפל'), 'hitpael');
+    expect(n(t.past.hu?.vocalized)).toBe(n('הִטַּפֵּל'));
+    expect(n(t.infinitive?.vocalized)).toBe(n('לְהִטַּפֵּל'));
+    expect(n(t.present.ms?.vocalized)).toBe(n('מִטַּפֵּל'));
+    // Harf İKİ KEZ yazılmamalı — hatanın tam belirtisi buydu.
+    expect(t.past.hu?.plain, 'ט harfi yineleniyor').not.toContain('טט');
+  });
+
+  it('hiçbir hitpa\u2019el biçiminde ikizlenmiş harf kalmıyor', () => {
+    for (const kok of ['טפל', 'סדר', 'צלם', 'זקן', 'שמש', 'לבש']) {
+      const t = conjugate(split(kok), 'hitpael');
+      for (const c of [t.past.hu, t.present.ms, t.infinitive, t.future.hu]) {
+        if (!c) continue;
+        expect(/(.)\1/.test(c.plain.replace(/[^\u05d0-\u05ea]/g, '')), `${kok}: ${c.plain}`).toBe(
+          false,
+        );
+      }
+    }
+  });
+});

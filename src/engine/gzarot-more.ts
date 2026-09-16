@@ -23,6 +23,7 @@ import {
   HIRIK_MALE,
   HOLAM_MALE,
   KAMATZ,
+  ASSIMILATES,
   METATHESIS,
   PAST_SHAPE,
   PAST_SUFFIX,
@@ -35,6 +36,7 @@ import {
   light,
   presentTail,
   rt,
+  strong,
   v,
   vl,
   vs,
@@ -373,6 +375,13 @@ const HIFIL_LAMED_ALEF: BinyanTemplate = {
  * patah (הִתְלַבֵּשׁ), orta harf ר/א olduğunda kamatz (הִתְקָרֵב).
  */
 function hitpaelOpen(r: Root3, head: string, carrierVowel: string): Segment[] {
+  /*
+   * İlk harf diş ünsüzüyse (ד ט ת) ön ekteki ת yer değiştirmez, YUTULUR:
+   * kök harfi ikizleşip gövdenin harekesini üstlenir ve ortada ayrı bir
+   * harf kalmaz.
+   */
+  if (ASSIMILATES.has(r[0])) return [affix(head), rt(strong(r[0]) + carrierVowel)];
+
   const swapped = METATHESIS[r[0]];
   if (!swapped) return [affix(head + 'ת' + SHVA), rt(v(r[0], carrierVowel))];
   // Yer değiştiren harf gövdenin harekesini üstlenir; ilk kök harfi şva alır.

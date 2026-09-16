@@ -67,6 +67,33 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.18.0',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T21:28:24+03:00',
+    title: 'VERB çalışma alanı',
+    summary:
+      'Fiil sayfası artık ekranın tamamını kullanıyor ve bütün zamanları aynı anda gösteriyor. Ayrıca iki gerçek çekim hatası bulundu ve düzeltildi.',
+    changes: [
+      { kind: 'gelisme', text: 'Sayfa 1024 pikselle sınırlıydı; artık geniş ekranda 1.664 piksele kadar açılıyor. Okuma sayfaları dar kalmaya devam ediyor.' },
+      { kind: 'gelisme', text: 'Bütün zamanlar yan yana: şimdiki, geçmiş, gelecek, mastar ve emir aynı ekranda. Sekmeler arasında gidip gelmek gerekmiyor.' },
+      { kind: 'yeni', text: 'Binyan ve seviye süzgeçleri, kaç fiilin kaldığını gösteren sayaç.' },
+      { kind: 'yeni', text: 'Ok tuşlarıyla listede gezinme ve seçilen fiilin adrese yazılması — bağlantı paylaşılabiliyor.' },
+      { kind: 'yeni', text: 'Geniş ekranda sağ bölme: kök ailesi, düzensizlik notu ve örnek cümleler.' },
+      { kind: 'duzeltme', text: 'ט ile başlayan hitpa’el kökleri iki kez yazılıyordu: הִטְטַּפֵּל yerine doğrusu הִטַּפֵּל.' },
+      { kind: 'duzeltme', text: 'צ ile başlayan hitpa’el köklerinde ט fazladan dageş alıyordu: הִצְטַּלֵּם yerine doğrusu הִצְטַלֵּם.' },
+    ],
+    benefits: [
+      {
+        title: 'Zamanlar arasındaki ilişkiyi görüyorsun',
+        text: 'Bir fiili bilmek onun bir zamanını bilmek değil. Geçmişte kişinin sondaki ekten, gelecekte baştaki harften anlaşıldığını ancak ikisi yan yanayken fark edersin. Sekme arkasına saklanan bilgi karşılaştırılamaz.',
+      },
+      {
+        title: 'İki fiil artık doğru yazılıyor',
+        text: 'İbranicede ilk kök harfi ד ya da ט ise hitpa’el kalıbındaki ת yer değiştirmez, kaynaşır — ortada ayrı bir harf kalmaz. Motor bunu yer değiştirme sanıyor ve harfi iki kez yazıyordu. Hata yeni sayfanın uçtan uca testinde, ekrana dökülen metinde görüldü.',
+      },
+    ],
+  },
+  {
     version: '1.17.0',
     date: '2026-09-16',
     releasedAt: '2026-09-16T21:13:00+03:00',

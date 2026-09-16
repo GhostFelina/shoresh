@@ -208,9 +208,21 @@ export const METATHESIS: Record<string, string> = {
   ש: 'ת',
   צ: 'ט',
   ז: 'ד',
-  ד: 'ד',
-  ט: 'ט',
 };
+
+/**
+ * İlk kök harfi diş ünsüzüyse ön ekteki ת YER DEĞİŞTİRMEZ, KAYNAŞIR.
+ *
+ * ד, ט ve ת ağızda ת ile aynı noktada oluşuyor; iki komşu ses tek bir
+ * ikizleşmiş sese düşüyor ve ortada AYRI bir harf kalmıyor:
+ *   ט־פ־ל → הִטַּפֵּל   (הִטְטַּפֵּל DEĞİL)
+ *   ד־ב־ר → הִדַּבֵּר
+ *
+ * İlk yazılışta bu iki harf metatez haritasına kendine eşleyecek biçimde
+ * konmuştu (ד→ד, ט→ט) ve harf İKİ KEZ yazılıyordu. Hata VERB
+ * sayfasının uçtan uca testinde, ekrana dökülen metinde görüldü.
+ */
+export const ASSIMILATES = new Set(['ד', 'ט', 'ת']);
 
 /** Kökün ilk harfi metatez tetikliyor mu? */
 export const swapsWithTav = (letter: string): string | undefined =>
