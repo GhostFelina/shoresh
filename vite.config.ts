@@ -2,6 +2,8 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { aliases } from './aliases';
+import { BRAND } from './src/core/brand';
 import { fileURLToPath, URL } from 'node:url';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
@@ -18,6 +20,28 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
  * kaynağı derlemenin kendisidir. Elle yazılan bir tarih yayına çıkmayan
  * bir değişiklikte de güncellenir ve kullanıcıya yalan söyler.
  */
+/**
+ * Belge başlığını ve açıklamasını marka kaynağından yazar.
+ *
+ * NEDEN EKLENTİ: `index.html` düz metin; oradan TypeScript içe
+ * aktarılamıyor. Ad elle yazılı kalsaydı ürün adı değiştiğinde
+ * arayüzün her yeri yeni adı gösterirken sekme başlığı eskisinde
+ * kalırdı — tam olarak bu oldu.
+ */
+function brandHtml(): Plugin {
+  return {
+    name: 'shoresh-brand-html',
+    transformIndexHtml(html) {
+      return html
+        .replace(/<title>[^<]*<\/title>/, `<title>${BRAND.name}</title>`)
+        .replace(
+          /(<meta\s+name="description"\s+content=")[^"]*(")/,
+          `$1${BRAND.description}$2`,
+        );
+    },
+  };
+}
+
 function versionModule(): Plugin {
   const pkgPath = fileURLToPath(new URL('./package.json', import.meta.url));
   const outPath = fileURLToPath(new URL('./src/generated/version.ts', import.meta.url));
@@ -131,6 +155,7 @@ function ttsDevEndpoint(): Plugin {
 
 export default defineConfig({
   plugins: [
+    brandHtml(),
     versionModule(),
     ttsDevEndpoint(),
     react(),
@@ -139,9 +164,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Shoresh',
-        short_name: 'Shoresh · שורש',
-        description: 'Modern İbranice — Alef-Bet, okuma, binyan çekim motoru, SRS, çevrimdışı.',
+        name: BRAND.name,
+        short_name: BRAND.short,
+        description: BRAND.description,
         theme_color: '#05070d',
         background_color: '#05070d',
         display: 'standalone',
@@ -191,7 +216,8 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    // Takma adlar tek kaynaktan; vitest.config.ts ile ayrı düşemez.
+    alias: aliases,
   },
   build: {
     target: 'es2022',

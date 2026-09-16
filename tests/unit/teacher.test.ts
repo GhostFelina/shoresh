@@ -13,12 +13,12 @@ import {
   answerMatches,
   availableLessons,
   type Lesson,
-} from '@/features/teacher/lesson';
-import { VERB_BY_ID } from '@/data/catalog';
-import { WORD_BY_ID } from '@/data/lexicon';
-import { PHRASES } from '@/data/phrases';
-import { LETTER_BY_ID, NIQQUD_BY_ID } from '@/data/alefbet';
-import type { CEFR } from '@/types/hebrew';
+} from '@he/teacher/lesson';
+import { VERB_BY_ID } from '@he/data/catalog';
+import { WORD_BY_ID } from '@he/data/lexicon';
+import { PHRASES } from '@he/data/phrases';
+import { LETTER_BY_ID, NIQQUD_BY_ID } from '@he/data/alefbet';
+import type { CEFR } from '@he/types';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
 

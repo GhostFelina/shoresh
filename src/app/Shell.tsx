@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Menu, X } from 'lucide-react';
-import { NAV_GROUPS } from './nav';
+import { useLanguage } from './LanguageContext';
+import { LanguagePicker } from './LanguagePicker';
 import { APP_VERSION } from '@/lib/version';
 import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
 import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
@@ -10,43 +11,22 @@ import { usePageWidthClass } from './Layout';
 import { VersionHistoryButton, VersionHistoryDialog } from './VersionHistory';
 import { FeedbackButton, FeedbackDialog } from './Feedback';
 import { BUILD_TIME, formatBuildTime } from '@/lib/version';
-
-/** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
-function Logo({ className = 'size-8' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" className={`${className} shrink-0`} aria-hidden="true">
-      <defs>
-        <linearGradient id="shoresh-mark" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--accent-text)" />
-          <stop offset="1" stopColor="var(--color-accent-500)" />
-        </linearGradient>
-      </defs>
-      {/*
-        Üç kol tek noktada birleşip aşağı iniyor: hem ש harfinin üç çatalı
-        hem de toprağa inen kök. İlk sürümde kollar birleşmiyor, altta ayrı
-        bir çizgi duruyordu; kopuk üç çizgi gibi görünüyordu.
-      */}
-      <g
-        fill="none"
-        stroke="url(#shoresh-mark)"
-        strokeWidth="5.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M17 15v14c0 8 6 13 15 15" />
-        <path d="M32 13v31" />
-        <path d="M47 15v14c0 8-6 13-15 15" />
-        <path d="M32 44v7" />
-      </g>
-    </svg>
-  );
-}
+import { Logo } from './Logo';
+import { BRAND } from '@/core/brand';
 
 /** Kenar çubuğunun içeriği — masaüstünde sabit, telefonda çekmecede. */
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  /*
+   * Menü DİL MODÜLÜNDEN geliyor, burada yazılı değil. Burada yazılı
+   * olsaydı ikinci dil eklemek kabuğa "hangi dil?" koşulları serpmek
+   * olurdu ve her yeni dilde o koşullardan biri unutulurdu.
+   */
+  const dil = useLanguage();
+  const yol = (path: string) => (path ? `/${dil.id}/${path}` : `/${dil.id}`);
+
   return (
     <nav className="space-y-4 pb-6">
-      {NAV_GROUPS.map((group) => (
+      {dil.nav.map((group) => (
         <div key={group.id} className="space-y-1">
           {group.title && (
             <h2
@@ -58,9 +38,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           )}
           <ul className="space-y-0.5">
             {group.items.map((item) => (
-              <li key={item.to}>
+              <li key={item.path}>
                 <NavLink
-                  to={item.to}
+                  to={yol(item.path)}
                   end={item.end}
                   onClick={onNavigate}
                   className="group flex items-center gap-2.5 rounded-lg px-3 py-1.5 transition"
@@ -130,7 +110,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           <Logo />
           <div className="leading-tight">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-bold tracking-tight">Shoresh</span>
+              <span className="text-base font-bold tracking-tight">{BRAND.short}</span>
               <span
                 className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
                 style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
@@ -139,10 +119,14 @@ export default function Shell({ children }: { children: ReactNode }) {
               </span>
             </div>
             <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
-              Modern İbranice
+              {BRAND.motto}
             </div>
           </div>
         </div>
+        <div className="mb-3 px-1">
+          <LanguagePicker />
+        </div>
+
         <SidebarContent />
       </aside>
 
@@ -163,7 +147,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             <div className="mb-4 flex items-center gap-2.5 px-2">
               <Logo />
               <div className="mr-auto flex items-baseline gap-1.5">
-                <span className="text-base font-bold">Shoresh</span>
+                <span className="text-base font-bold">{BRAND.short}</span>
                 <span
                   className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
                   style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
@@ -180,6 +164,10 @@ export default function Shell({ children }: { children: ReactNode }) {
                 <X className="size-4" />
               </button>
             </div>
+            <div className="mb-3 px-1">
+              <LanguagePicker onNavigate={() => setDrawerOpen(false)} />
+            </div>
+
             <SidebarContent onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
@@ -201,16 +189,21 @@ export default function Shell({ children }: { children: ReactNode }) {
           </button>
           <Logo className="size-7 lg:hidden" />
           <span className="mr-auto flex items-baseline gap-1.5 lg:hidden">
-            <span className="text-sm font-bold">Shoresh</span>
+            <span className="text-sm font-bold">{BRAND.short}</span>
             <span className="text-[9px] tabular-nums" style={{ color: 'var(--text-dim)' }}>
               v{APP_VERSION}
             </span>
           </span>
+          {/*
+            Üst bantta DİLİN kendi yazısı duruyor, ürünün adı değil:
+            burada שֹׁרֶשׁ sabit yazılıydı ve Korece açıldığında ekranın
+            ortasında İbranice bir kelime kalacaktı.
+          */}
           <span
-            className="he he-serif mr-auto hidden text-2xl lg:block"
-            style={{ color: 'var(--color-brand-400)' }}
+            className="mr-auto hidden text-sm font-medium lg:block"
+            style={{ color: 'var(--text-dim)' }}
           >
-            שֹׁרֶשׁ
+            {BRAND.name}
           </span>
           <RewardHud />
           <FeedbackButton onOpen={() => setFeedbackOpen(true)} />
@@ -228,8 +221,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           style={{ color: 'var(--text-dim)' }}
         >
           <p>
-            Shoresh v{APP_VERSION} — kökten öğrenilen İbranice. Çekimler kural motoruyla
-            üretilir, ezberle değil.
+            {BRAND.name} v{APP_VERSION} — {BRAND.motto} {BRAND.promise}
           </p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {/* Damga derleme anında gömülüyor; elle yazılsaydı yayına

@@ -8,8 +8,14 @@
 
 ## 0. Otuz saniyede
 
-**Shoresh** — sıfırdan Modern İbranice öğreten uygulama. Arayüz Türkçe, hedef
-A1→B2. Kullanıcı **başkası için** yaptırıyor.
+**Cortexia Language 2** — kural motoruyla dil öğreten uygulama. Arayüz Türkçe,
+ilk dil Modern İbranice (A1→B2), sonraki dil Korece. Kullanıcı **başkası için**
+yaptırıyor.
+
+Ad v1.20.0'da **Shoresh**'ten değişti; kullanıcı "ben sonra değiştireceğim"
+dedi, yani geçici sayılmalı. Ad TEK kaynakta: `src/core/brand.ts`. Depo, klasör
+ve `localStorage`/IndexedDB önekleri hâlâ `shoresh` — **bilerek**: anahtar bir
+kimlik değil, bir adres; değiştirmek herkesin ilerlemesini silerdi.
 
 ```
 Konum   C:\Users\User\Desktop\Shoresh
@@ -35,12 +41,15 @@ edilirse iş geri alınır.
 
 | Kural | Neden |
 |---|---|
-| **"Cortexia" adı kullanılmaz** | Proje başkası için yapılıyor; marka bağımsız: Shoresh |
+| **Ürün adı `src/core/brand.ts`'ten okunur** | Ad altı yerde elle yazılıydı, değiştirilirken ikisi atlandı. Arayüzde bir daha elle marka adı yazma |
+| **Depolama öneki `shoresh.` kalır** | Ad değişse de anahtar değişmez; değişirse kullanıcıların ilerlemesi silinir |
 | **Chrome DevTools MCP yasak** | Kullanıcının açık talimatı. Playwright serbest ve kullanılıyor |
 | **GitHub private, Vercel herkese açık** | Kullanıcının açık talimatı |
 | **Her sürümde changelog girdisi zorunlu** | Test `LATEST.version === APP_VERSION` bekliyor; yazılmazsa kırılır |
 | **Deploy sonrası alias ŞART** | Vercel her deploy'a yeni URL verir; `shoresh-ivrit.vercel.app` elle bağlanır |
 | **Motor uydurma çekim üretmez** | Üretemediği birleşimi reddeder (`CATALOG_ISSUES`) ve test düşer |
+| **Kabuk hedef dili bilmez** | Menü, sayfa, sayaç, seslendirme `LanguageModule`'den gelir; kabuğa "hangi dil?" koşulu serpilmez |
+| **İkinci oturumla eşgüdüm** | İkinci bir Claude oturumu `ai/teacher-ui` dalında çalışıyor (§10). Sürüm numarasını ve changelog'u YALNIZCA ana oturum yazar |
 
 ---
 
@@ -143,59 +152,74 @@ Her biri gerçekten oldu ve ölçümle bulundu. Yenisini eklersen buraya yaz.
 
 ## 4. Nerede ne var
 
+**İKİ EKSEN AYRI:** *öğrenilen dil* (İbranice, ileride Korece) ve *arayüz dili*
+(Türkçe, ileride İngilizce). Bir şey yalnızca bir dilde anlamlıysa dil
+modülünde, birden çok dilde aynı anlama geliyorsa çekirdektedir.
+
 ```
-api/tts.js                 Seslendirme vekili (§6)
+aliases.ts                 Yol takma adları — TEK kaynak (vite + vitest)
+api/
+  tts.js                   Seslendirme vekili (§6)
+  feedback.js              Geri bildirim ucu — Supabase, sunucu tarafı
 playwright.config.ts       E2E yapılandırması (webServer kendini başlatır)
+supabase/migrations/       Veritabanı göçleri
 scripts/
   checkpoint.mjs           Yedek: zip + git etiketi
   state.mjs                PROJECT_STATE.md üretir
-  shots.mjs                Playwright ekran görüntüleri (14 sayfa × 2 boyut × 2 tema)
+  shots.mjs                Playwright ekran görüntüleri
   audio-check.mjs          Ses tanılaması — tarayıcı içinde ölçer
 src/
-  engine/                  DİLBİLGİSİ — saf, arayüzden bağımsız
-    binyan.ts              7 binyan tam kök şablonu + conjugate()
-    gzarot.ts              Zayıf kök şablonları (1. parti)
-    gzarot-more.ts         Zayıf kök şablonları (2. parti)
-    morphology.ts          Ortak yardımcılar (dot/strong/light, ekler, metatez)
-    niqqud.ts              Üç yazım: harekeli / harekesiz / okunuş
-    detect-gizra.ts        Kökün harflerinden zayıflık sınıfı
-    srs.ts                 FSRS sarmalayıcı
-    reward.ts              XP, rütbe, rozet — SAF, test edilebilir
-  data/                    İÇERİK — hepsi doğrulamadan geçer
-    roots-a1..b2.ts,       Kök tabloları (boru ile ayrılmış satırlar)
-    roots-extra.ts
-    catalog.ts             Satırları doğrular → HebrewVerb[]; hata = CATALOG_ISSUES
-    irregular.ts           14 düzensiz fiil, elle yazılmış
-    lexicon-*.ts           888 kelime
-    phrases*.ts            239 kalıp
-    sentences.ts           74 elle yazılmış örnek cümle
-    alefbet.ts             27 harf + 9 hareke
-    changelog*.ts          Sürüm notları (kutu + geçmiş paneli bunu okur)
-  features/
-    games/engine.ts        11 oyunun soru üreticileri
-    teacher/lesson.ts      Ders altyapısı + 1. parti dersler + kayıt
-    teacher/lessons-extra.ts  2. parti dersler (harf, hareke, gelecek, emir…)
-    rewards/RewardPanels.tsx  İlerleme sayfasının ödül bölümleri
+  core/                    DİLDEN BAĞIMSIZ çekirdek
+    types.ts               CEFR ve ortak tipler
+    language.ts            LanguageModule sözleşmesi + kayıt + anahtar öneki
+    languages.ts           Hangi diller kayıtlı (yeni dil buraya eklenir)
+  engine/
+    srs.ts                 FSRS sarmalayıcı — dilden bağımsız
+    reward.ts              XP, rütbe, rozet — SAF, dilden bağımsız
   lib/                     TARAYICI KATMANI
-    speech.ts              İbranice seslendirme (cihaz → /api/tts → dürüst hata)
-    coach.ts               TÜRKÇE öğretmen sesi (cihaz sesi, ağ gerekmez)
-    db.ts                  Dexie şeması (sürüm 2)
-    progress.ts            SRS ↔ veritabanı
+    speech.ts              Hedef dil seslendirmesi
+    coach.ts               ARAYÜZ dili sesi (Türkçe öğretmen)
+    db.ts                  Dexie şeması
+    progress.ts            SRS ↔ veritabanı + dil öneki göçü
     rewards.ts             Ödül ↔ veritabanı
     palette.ts             5 palet, kontrast ölçümü
+    audio-pack.ts          Çevrimdışı ses paketi (içerik dil modülünden)
     version.ts             APP_VERSION + BUILD_TIME
-  app/
-    Shell.tsx              Kabuk: kenar çubuğu, üst bant, altbilgi
-    nav.ts                 Menü tanımı (test rotalarla eşleşmesini zorluyor)
+  app/                     KABUK — hiçbir dili tanımaz
+    App.tsx                Yönlendirme; sayfalar dil modülünden gelir
+    Shell.tsx              Kenar çubuğu, üst bant, altbilgi
+    LanguageContext.tsx    Etkin dil + dil önekli yol kancası
+    LanguagePicker.tsx     Öğrenilen dil seçici
     Appearance.tsx         Tema + palet
-    Rewards.tsx            XP bağlamı, üst bant göstergesi, kutlama
+    Rewards.tsx            XP bağlamı, gösterge, kutlama
     WhatsNew.tsx           Sürüm duyuru kutusu
     VersionHistory.tsx     Sürüm geçmişi paneli
-  pages/                   12 sayfa
-tests/unit/                16 dosya, 398 test
+    Feedback.tsx           Geri bildirim formu
+    Layout.tsx             Sayfa genişliği (okuma / çalışma alanı)
+  languages/
+    hebrew/
+      index.ts             MODÜL: menü, sayfalar, sayaçlar, describeItem
+      types.ts             Binyan, Gizra, HebrewVerb… (CEFR çekirdekten)
+      engine/              binyan, gzarot, gzarot-more, morphology,
+                           niqqud, detect-gizra, meruba, sentence
+      data/                catalog, roots, irregular, lexicon, phrases,
+                           sentences, alefbet
+      games/engine.ts      11 oyunun soru üreticileri
+      teacher/             lesson.ts + lessons-extra.ts (71 ders)
+      pages/               Dile özgü 11 sayfa
+      HebrewKeyboard.tsx   Ekran klavyesi
+  components/              Dilden bağımsız: MixedText, ShowMore
+  features/rewards/        İlerleme sayfasının ödül bölümleri
+  data/changelog.ts        Sürüm notları (uygulamaya ait, dile değil)
+  pages/                   ProgressPage, InboxPage (dilden bağımsız)
+tests/
+  unit/                    Kurallar, motor, belgeler, takma adlar
+  e2e/                     Tarayıcı testleri (bkz. §7)
 ```
 
----
+**YENİ DİL EKLEMEK:** `src/languages/<dil>/index.ts` içinde `LanguageModule`
+sözleşmesini doldur, `src/core/languages.ts` içine iki satır ekle, `aliases.ts`
+içine kısa yol koy. Kabukta tek satır değişmez.
 
 ## 5. Sürüm yordamı — sırayla, atlamadan
 
@@ -275,14 +299,14 @@ Kullanıcının verdiği, sırası belirlenmiş liste. Biteni buradan sil.
    (masaüstü + telefon). `npm run verify` artık dördünü birden koşuyor.
 3. ~~VERB sayfası çalışma alanı~~ — **v1.18.0'da yapıldı.** Genişlik artık
    sayfanın kendi kararı (`usePageWidth`).
-4. **Çok dilli mimari.** İbranice bitince Korece gelecek. İki DİK eksen var ve
-   karıştırılmamalı: *arayüz dili* (TR/EN) ve *öğrenilen dil* (he/ko).
-   Hedeflenen yapı: `src/languages/hebrew/{engine,data,games,teacher,pages}` +
-   `LanguageModule` sözleşmesi + `/he/...` yolları. Dile bağımsız olanlar
-   (`srs`, `db`, `reward`, `palette`, kabuk) `core/` altında kalır.
-   **Dikkat:** SRS anahtarları dil öneki almalı (`he:verb:…`), yoksa Korece
-   ilerlemesi İbranice ile çakışır. Mevcut anahtarların hepsi İbranice, göç
-   gerekecek.
+4. ~~Çok dilli mimari~~ — **v1.20.0'da yapıldı.** `LanguageModule` sözleşmesi
+   (`src/core/language.ts`), `src/languages/hebrew/**`, `/he/...` yolları, dil
+   önekli SRS anahtarları ve tek seferlik göç. Ürün adı, logo ve motto da bu
+   sürümde platform seviyesine çekildi (`src/core/brand.ts`).
+   **Korece eklemek için yapılacak iş:** `src/languages/` altına `korean`
+   klasörü açıp sözleşmeyi dolduran bir `index.ts` yazmak, sonra
+   `src/core/languages.ts` içinde kaydetmek. Kabukta tek satır değişmeyecek —
+   değişiyorsa sözleşmede eksik var demektir.
 5. **Arayüz dili TR/EN.** Ölçüldü: ~400 arayüz metni + ~300 ders şablonu
    cümlesi. Ders metinleri şablondan üretildiği için şablonu çevirmek 2.753
    birimi otomatik kapatıyor.
@@ -360,3 +384,35 @@ düşülmemesi gerektiğini, §7 sırada ne olduğunu söylüyor.
 **Devralan da bu belgeyi güncel tutmalı:** yeni bir tuzağa düşüldüyse §3'e
 yazılır, bir iş bittiyse §7'den silinir, mimari karar değiştiyse §2 düzeltilir.
 Eski bir devir belgesi, belge olmamasından daha tehlikelidir.
+
+---
+
+## 10. İki oturumla çalışma — dal ve sürüm eşgüdümü
+
+Kullanıcı projeyi **iki Claude oturumuyla** birden yürütüyor. Çakışmayı
+önleyen kurallar burada; ikisi de aynı depoya yazıyor.
+
+| | Ana oturum | İkinci oturum |
+|---|---|---|
+| Çalışma kopyası | `C:\Users\User\Desktop\Shoresh` | `C:\Users\User\Desktop\shoresh-ai` (worktree) |
+| Dal | `main` | `ai/teacher-ui` |
+| Dev portu | 5400 | 5401 |
+| İş kolu | mimari, dil modülleri, içerik, motor, marka, sürüm | öğretmen modu, tasarım, giriş/profil, yapay zekâ, mobil |
+
+**Sürüm numarasını ve `src/data/changelog.ts`'i YALNIZCA ana oturum yazar.**
+İkisi de yazsaydı her birleştirmede aynı iki dosya çakışırdı. İkinci oturum
+yaptığı işin madde listesini gönderir, changelog'a ana oturum geçirir.
+
+**Birleştirme sırası — tersi yapılırsa çakışma katlanır:**
+
+1. Ana oturum işini `main`'e commit + push eder, **deploy etmez**.
+2. İkinci oturum `git merge main` yapar, kendi dosyalarını yeni yapıya uyarlar.
+3. Ana oturum `git merge ai/teacher-ui` yapar, tek sürüm numarasıyla yayınlar.
+
+**Yaşanmış tuzak:** `playwright.config.ts` portu 5400'de sabit ve
+`reuseExistingServer: true` idi; ikinci worktree'de E2E koşmak sessizce ÖTEKİ
+oturumun sunucusunu test ediyordu. Port artık `SHORESH_PORT` ile ayrılıyor.
+
+**İletişim:** oturumlar birbirine doğrudan mesaj gönderebiliyor. Karşı tarafın
+dokunduğu dosyaya girmeden önce haber ver — özellikle `src/app/**` ve
+`vite.config.ts`.

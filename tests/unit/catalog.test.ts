@@ -6,9 +6,9 @@
  * demektir; sebebi test çıktısında yazılı olur.
  */
 import { describe, expect, it } from 'vitest';
-import { CATALOG_ISSUES, CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
-import { conjugate } from '@/engine/binyan';
-import { WRITTEN_SENTENCES } from '@/data/sentences';
+import { CATALOG_ISSUES, CATALOG_STATS, VERBS, siblingsOf } from '@he/data/catalog';
+import { conjugate } from '@he/engine/binyan';
+import { WRITTEN_SENTENCES } from '@he/data/sentences';
 
 describe('katalog bütünlüğü', () => {
   it('hiçbir satır reddedilmez', () => {

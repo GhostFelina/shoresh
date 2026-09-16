@@ -30,7 +30,7 @@ test('menü düğmesi çekmeceyi açıyor ve gezinme çalışıyor', async ({ pa
   await baglanti.click();
 
   await beklenenIcerik(page);
-  expect(new URL(page.url()).pathname).toBe('/kelimeler');
+  expect(new URL(page.url()).pathname).toBe('/he/kelimeler');
 
   // Gezindikten sonra çekmece kapanmalı, yoksa içeriği örter.
   await expect(page.getByRole('button', { name: 'Menüyü aç' })).toBeVisible();
@@ -42,7 +42,7 @@ test('çekmece açıkken arkadaki sayfa kaymıyor', async ({ page }) => {
    * çekmeceyi kaydırmaya çalışırken arkadaki sayfa kayıyor ve geri
    * döndüğünde nerede olduğunu kaybediyor.
    */
-  await ac(page, '/kelimeler');
+  await ac(page, '/he/kelimeler');
   await page.getByRole('button', { name: 'Menüyü aç' }).click();
   await page.waitForTimeout(300);
 
@@ -61,7 +61,7 @@ test('sayfa yatay kaymıyor — içerik ekrana sığıyor', async ({ page }) => 
    * Telefonda yatay kaydırma, genişliği sabitlenmiş bir öğenin taştığını
    * gösterir. İbranice metin ve geniş tablolar bu riski taşıyor.
    */
-  for (const yol of ['/', '/verb', '/kelimeler', '/ogretmen', '/ilerleme']) {
+  for (const yol of ['/', '/he/verb', '/he/kelimeler', '/he/ogretmen', '/he/ilerleme']) {
     await ac(page, yol);
     const tasma = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

@@ -7,8 +7,8 @@
  * yanlış biçim demektir. Bu yüzden kilit burada.
  */
 import { describe, expect, it } from 'vitest';
-import { conjugate } from '@/engine/binyan';
-import { stripNiqqud, transliterate } from '@/engine/niqqud';
+import { conjugate } from '@he/engine/binyan';
+import { stripNiqqud, transliterate } from '@he/engine/niqqud';
 
 /** Harekeli karşılaştırmada görünmez fark olmasın diye normalize eder. */
 const norm = (s: string) => s.normalize('NFC');

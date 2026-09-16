@@ -67,6 +67,66 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.20.0',
+    date: '2026-09-17',
+    releasedAt: '2026-09-17T01:51:26+03:00',
+    title: 'Tek dilli uygulama, çok dilli platforma dönüştü',
+    summary:
+      'İbranice artık uygulamanın KENDİSİ değil, uygulamaya takılı ilk dil. Korece eklendiğinde kabukta tek satır değişmeyecek. Ürün de bu yüzden yeni adını aldı.',
+    changes: [
+      {
+        kind: 'yeni',
+        text: 'Dil modülü sözleşmesi kuruldu: menü, sayfalar, sayaçlar, seslendirme ve tekrar öğelerinin okunuşu artık dilin kendi modülünden geliyor; kabuk İbranice hakkında hiçbir şey bilmiyor.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Adresler dil önekli oldu: /he/verb, /he/oyunlar. Paylaşılan bağlantı hangi dilde olduğunu kendi söylüyor.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Kenar çubuğunda öğrenilen dil seçici — marka adının hemen altında, "Hebrew · İbranice".',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Ürün adı, logosu ve mottosu yenilendi: Cortexia Language 2 — "Her dil, kökünden." Ad tek kaynaktan besleniyor; sekme başlığı ve uygulama künyesi dâhil.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Telefona kurulan uygulamanın simgesi boş çıkıyordu: künyenin istediği iki simge dosyası hiç üretilmemişti. Artık işaretten otomatik üretiliyor.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Yeni adres yapısında sayfa bomboş açılıyordu — dil bulunamayınca yönlendirme kendi üstüne kapanıyordu. Konsolda tek hata vermeden oluyordu; 47 uçtan uca test bunu yakaladı.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Eski bağlantılar kırılmıyor: önekli olmayan /verb, /oyunlar gibi adresler aynı sayfanın yeni adresine gidiyor.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'İlerleme kayıtları dil önekiyle etiketlendi; ikinci dil geldiğinde iki dilin serisi ve tekrar takvimi birbirine karışmayacak. Mevcut kayıtlar tek seferde taşındı.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Test sayısı 425 birim + 60 uçtan uca; yeni testler menü-adres tutarlılığını, bırakılmış adresleri ve marka kaynağını denetliyor.',
+      },
+    ],
+    benefits: [
+      {
+        title: 'İlerlemen güvende',
+        text: 'Ad değişti ama kayıtların değişmedi. Serin, toplam XP ve tekrar takvimin olduğu gibi duruyor — depolama anahtarları bilerek eski hâlinde bırakıldı.',
+      },
+      {
+        title: 'Bağlantı paylaşabilirsin',
+        text: 'Bir fiile ya da derse bakarken adresi kopyalayıp gönderebilirsin; karşı taraf aynı yerde açılıyor. Eski yer imlerin de çalışmaya devam ediyor.',
+      },
+      {
+        title: 'Sıradaki dil seni bekletmeyecek',
+        text: 'Yeni bir dil eklemek artık uygulamayı yeniden yazmak değil, bir klasör eklemek. Öğrendiğin şey değişmiyor, yanına bir tane daha geliyor.',
+      },
+    ],
+  },
+  {
     version: '1.19.1',
     date: '2026-09-16',
     releasedAt: '2026-09-16T22:01:12+03:00',

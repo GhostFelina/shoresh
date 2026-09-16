@@ -28,11 +28,8 @@
  * sunucusunda paket indirme kapalıdır ve arayüz bunu söyler — sessizce
  * çalışmıyormuş gibi durmaz.
  */
-import { LETTERS, NIQQUDIM } from '@/data/alefbet';
-import { VERBS } from '@/data/catalog';
-import { WORDS } from '@/data/lexicon';
-import { PHRASES } from '@/data/phrases';
-import { WRITTEN_SENTENCES } from '@/data/sentences';
+
+import { defaultLanguage, type LanguageModule } from '@/core/language';
 
 /** Service worker'ın önbelleğe aldığı isim — vite.config.ts ile aynı olmalı. */
 const CACHE_NAME = 'shoresh-ses';
@@ -67,32 +64,15 @@ export interface PackSection {
  * biçimler alınıyor — sözlük biçimi, mastar ve şimdiki zamanın dört hâli.
  * Kalanı yine çevrimiçi çalınabilir.
  */
-export function packSections(): PackSection[] {
-  const letters = LETTERS.map((l) => l.nameHe);
-  const niqqud = NIQQUDIM.map((n) => n.nameHe);
-
-  const verbForms: string[] = [];
-  for (const v of VERBS) {
-    verbForms.push(v.lemma.plain);
-    verbForms.push(v.table.infinitive.plain);
-    for (const slot of ['ms', 'fs', 'mp', 'fp'] as const) {
-      const c = v.table.present[slot];
-      if (c) verbForms.push(c.plain);
-    }
-  }
-
-  const sentences = Object.values(WRITTEN_SENTENCES)
-    .flat()
-    .map((s) => s.plain);
-
-  return [
-    { id: 'letters', label: 'Harf adları', texts: letters },
-    { id: 'niqqud', label: 'Hareke adları', texts: niqqud },
-    { id: 'words', label: 'Kelimeler', texts: WORDS.map((w) => w.plain) },
-    { id: 'phrases', label: 'Kalıplar', texts: PHRASES.map((p) => p.plain) },
-    { id: 'verbs', label: 'Fiiller (sözlük, mastar, şimdiki)', texts: verbForms },
-    { id: 'sentences', label: 'Örnek cümleler', texts: sentences },
-  ];
+/**
+ * Uygulamanın seslendirebileceği bütün metinler, bölümlere ayrılmış.
+ *
+ * İÇERİK DİL MODÜLÜNDEN GELİYOR. Önce doğrudan İbranice kataloğu içeri
+ * alınıyordu; o hâliyle Korece eklendiğinde ses paketi İbranice metinleri
+ * indirmeye devam ederdi.
+ */
+export function packSections(mod: LanguageModule = defaultLanguage()!): PackSection[] {
+  return mod.audioTexts().map((s) => ({ id: s.id, label: s.label, texts: s.texts }));
 }
 
 /** Paketteki tekil adresler. Aynı metin iki kez indirilmez. */

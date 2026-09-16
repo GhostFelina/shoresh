@@ -1,10 +1,11 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import { fileURLToPath, URL } from 'node:url';
+import { aliases } from './aliases';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  // Takma adlar tek kaynaktan; vite.config.ts ile ayrı düşemez.
+  resolve: { alias: aliases },
   test: {
     globals: true,
     environment: 'jsdom',

@@ -1,27 +1,27 @@
+/**
+ * Yönlendirme.
+ *
+ * ADRESLER DİL ÖNEKLİ: `/he/verb`, `/he/oyunlar`. Önek olmasaydı ikinci
+ * dil eklendiğinde `/verb` adresi iki dile birden ait olur ve hangisini
+ * açacağı bir ayara bağlanırdı — yani bağlantı paylaşılamazdı. Önekle
+ * adres kendi kendini anlatıyor.
+ *
+ * SAYFA LİSTESİ BURADA DEĞİL: Her dil kendi sayfalarını modülünde
+ * bildiriyor (`LanguageModule.routes`). Buraya yazılsaydı yeni dil
+ * eklemek bu dosyayı da düzenlemek olurdu ve bir gün biri unutulurdu.
+ */
 import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Shell from './Shell';
 import { RewardProvider } from './Rewards';
 import { LayoutProvider } from './Layout';
+import { LanguageRoute, startLanguageId } from './LanguageContext';
+import { setupLanguages } from '@/core/languages';
+import { hasLanguage, languages } from '@/core/language';
 
-/**
- * Rotalar lazy: VERB Hebrew sayfası bütün çekim tablosunu kurar, Alef-Bet
- * 27 harf kartı çizer, oyunlar kendi motorunu getirir. İlk açılışta
- * hepsini birden indirmek telefonda gereksiz bir bekleme demek.
- */
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const LevelPage = lazy(() => import('@/pages/LevelPage'));
-const AlefBetPage = lazy(() => import('@/pages/AlefBetPage'));
-const ReadingPage = lazy(() => import('@/pages/ReadingPage'));
-const VerbsPage = lazy(() => import('@/pages/VerbsPage'));
-const BinyanimPage = lazy(() => import('@/pages/BinyanimPage'));
-const PhrasesPage = lazy(() => import('@/pages/PhrasesPage'));
-const WordsPage = lazy(() => import('@/pages/WordsPage'));
-const GamesPage = lazy(() => import('@/pages/GamesPage'));
-const TeacherPage = lazy(() => import('@/pages/TeacherPage'));
+setupLanguages();
+
 const InboxPage = lazy(() => import('@/pages/InboxPage'));
-const SoundPage = lazy(() => import('@/pages/SoundPage'));
-const ProgressPage = lazy(() => import('@/pages/ProgressPage'));
 
 function Loading() {
   return (
@@ -31,47 +31,65 @@ function Loading() {
   );
 }
 
+/**
+ * Dil öneki olmayan eski adresleri kurtarır.
+ *
+ * Uygulama bir süre `/verb`, `/oyunlar` gibi adreslerle yayındaydı ve o
+ * bağlantılar yer imlerinde, ekran görüntülerinde, sohbet geçmişinde
+ * duruyor olabilir. Doğrudan ana sayfaya atmak yerine aynı sayfanın dil
+ * önekli hâline götürüyoruz: `/verb` → `/he/verb`.
+ */
+function LegacyOrNotFound() {
+  const { pathname, search } = useLocation();
+  const dil = startLanguageId();
+  const ilkParca = pathname.split('/').filter(Boolean)[0];
+
+  // Zaten dil önekli ama sayfa bulunamadıysa o dilin ana sayfasına.
+  if (ilkParca && hasLanguage(ilkParca)) {
+    return <Navigate to={`/${ilkParca}`} replace />;
+  }
+  const hedef = pathname === '/' ? `/${dil}` : `/${dil}${pathname}`;
+  return <Navigate to={`${hedef}${search}`} replace />;
+}
+
 export default function App() {
   return (
     <RewardProvider>
       <LayoutProvider>
         <Shell>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              {/* Kök adres son kullanılan dile gider. */}
+              <Route path="/" element={<Navigate to={`/${startLanguageId()}`} replace />} />
 
-          {/* Seviye sekmeleri — sol menünün omurgası */}
-          <Route path="/seviye/:level" element={<LevelPage />} />
+              {/*
+                Gelen kutusu DİL DIŞI: bildirimler öğrenilen dile değil
+                projeyi yürütene ait. Menüde de yok.
+              */}
+              <Route path="/gelen-kutusu" element={<InboxPage />} />
 
-          <Route path="/alefbet" element={<AlefBetPage />} />
-          <Route path="/okuma" element={<ReadingPage />} />
+              {languages().map((dil) => (
+                <Route key={dil.id} path={`/${dil.id}`} element={<LanguageRoute module={dil} />}>
+                  {Object.entries(dil.aliases ?? {}).map(([eski, yeni]) => (
+                    <Route
+                      key={`alias-${eski}`}
+                      path={eski}
+                      element={<Navigate to={`/${dil.id}/${yeni}`} replace />}
+                    />
+                  ))}
+                  {dil.routes.map((r) =>
+                    r.path === '' ? (
+                      <Route key="index" index element={<r.element />} />
+                    ) : (
+                      <Route key={r.path} path={r.path} element={<r.element />} />
+                    ),
+                  )}
+                </Route>
+              ))}
 
-          <Route path="/verb" element={<VerbsPage />} />
-          <Route path="/binyanim" element={<BinyanimPage />} />
-          <Route path="/kaliplar" element={<PhrasesPage />} />
-          <Route path="/kelimeler" element={<WordsPage />} />
-
-          <Route path="/ogretmen" element={<TeacherPage />} />
-          <Route path="/ogretmen/:lessonId" element={<TeacherPage />} />
-
-          <Route path="/oyunlar" element={<GamesPage />} />
-          <Route path="/oyunlar/:gameId" element={<GamesPage />} />
-          <Route path="/ses" element={<SoundPage />} />
-          <Route path="/ilerleme" element={<ProgressPage />} />
-
-          {/*
-            Gelen kutusu MENÜDE YOK — bu sayfa öğrenciye değil, projeyi
-            yürütene ait. Menüde dursaydı her kullanıcı bir parola
-            kapısıyla karşılaşır ve uygulamanın parçası sanırdı.
-          */}
-          <Route path="/gelen-kutusu" element={<InboxPage />} />
-
-          {/* Eski bağlantılar kırılmasın */}
-          <Route path="/fiiller" element={<Navigate to="/verb" replace />} />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+              <Route path="*" element={<LegacyOrNotFound />} />
+            </Routes>
+          </Suspense>
         </Shell>
       </LayoutProvider>
     </RewardProvider>

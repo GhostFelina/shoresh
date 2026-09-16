@@ -6,18 +6,16 @@
  * ve kimse fark etmez — bir kez oldu. Bu testler menüdeki her adresin
  * gerçekten bir sayfa açtığını ve sayfanın VERİ bastığını doğrular.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import VerbsPage from '@/pages/VerbsPage';
-import LevelPage from '@/pages/LevelPage';
-import PhrasesPage from '@/pages/PhrasesPage';
-import GamesPage from '@/pages/GamesPage';
-import AlefBetPage from '@/pages/AlefBetPage';
-import { NAV_ITEMS } from '@/app/nav';
-import { VERBS } from '@/data/catalog';
+import VerbsPage from '@he/pages/VerbsPage';
+import LevelPage from '@he/pages/LevelPage';
+import PhrasesPage from '@he/pages/PhrasesPage';
+import GamesPage from '@he/pages/GamesPage';
+import AlefBetPage from '@he/pages/AlefBetPage';
+import { hebrew } from '@he/index';
+import { VERBS } from '@he/data/catalog';
 
 describe('VERB Hebrew sayfası', () => {
   it('fiil listesini basar ve ilk fiili seçili gösterir', () => {
@@ -119,35 +117,47 @@ describe('Alef-Bet sayfası', () => {
 
 describe('gezinme bütünlüğü', () => {
   /*
-   * Rota listesi App.tsx KAYNAĞINDAN okunuyor, elle yazılmıyor.
+   * Menü ve rotalar artık AYNI dil modülünde tanımlı, bu yüzden
+   * doğrudan karşılaştırılabiliyorlar.
    *
-   * Önceki sürümde burada elle tutulan bir dizi vardı ve testin
-   * koruması gereken şeyin kendisi — iki listenin ayrı düşmesi —
-   * testin içinde tekrar ediyordu: menüye yeni bir giriş eklendiğinde
-   * rota da diziye eklenmezse test kırılıyor ama sebebi rotanın
-   * eksikliği değil, dizinin güncellenmemiş olması oluyordu. Kaynaktan
-   * okuyunca test yalnızca gerçek eksikliği bildiriyor.
+   * Önceki sürümde rotalar App.tsx KAYNAĞINDAN okunuyordu; iki liste
+   * iki ayrı dosyadaydı ve biri güncellenmeden ötekine giriş eklenince
+   * sayfa sessizce ana sayfaya düşüyordu. Bir kez oldu: menüye dört
+   * seviye sekmesi ve VERB Hebrew eklendi, rota tablosuna eklenmedi.
+   *
+   * Şimdi iki liste bir arada olduğu için test kaynak metni ayrıştırmak
+   * yerine gerçek veriyi karşılaştırıyor.
    */
-  const routePaths = (): string[] => {
-    // jsdom ortamında import.meta.url bir file: adresi değil; kök dizin
-    // vitest'in çalışma dizini — proje kökü.
-    const src = readFileSync(resolve(process.cwd(), 'src/app/App.tsx'), 'utf-8');
-    return [...src.matchAll(/path="([^"]+)"/g)].map((m) => m[1]!);
-  };
+  const routePaths = hebrew.routes.map((r) => r.path);
 
-  it('menüdeki her adres uygulamada tanımlı bir rotaya karşılık gelir', () => {
-    const known = routePaths();
-    expect(known.length).toBeGreaterThan(5);
+  it('menüdeki her adres modülde tanımlı bir sayfaya karşılık gelir', () => {
+    expect(routePaths.length).toBeGreaterThan(5);
 
-    for (const item of NAV_ITEMS) {
-      const matches = known.some((pattern) => {
+    for (const item of hebrew.nav.flatMap((g) => g.items)) {
+      const matches = routePaths.some((pattern) => {
         if (pattern.includes(':')) {
+          // 'seviye/:level' → 'seviye/' ile başlayan her yol
           const base = pattern.split('/:')[0]!;
-          return item.to.startsWith(base + '/') || item.to === base;
+          return item.path.startsWith(base + '/');
         }
-        return item.to === pattern;
+        return item.path === pattern;
       });
-      expect(matches, `${item.to} icin rota yok`).toBe(true);
+      expect(matches, `"${item.label}" (${item.path || 'ana sayfa'}) için sayfa yok`).toBe(true);
+    }
+  });
+
+  it('her dil kimliği ve yolu tekil', () => {
+    const yollar = hebrew.routes.map((r) => r.path);
+    expect(new Set(yollar).size, 'aynı yol iki kez tanımlı').toBe(yollar.length);
+  });
+
+  it('menü girişleri dil önekiyle kuruluyor — mutlak adres yok', () => {
+    /*
+     * Menüde '/verb' gibi mutlak bir adres kalsaydı dil değiştiğinde o
+     * bağlantı İbranice'ye çakılı kalırdı.
+     */
+    for (const item of hebrew.nav.flatMap((g) => g.items)) {
+      expect(item.path.startsWith('/'), `"${item.label}" mutlak adres taşıyor`).toBe(false);
     }
   });
 });

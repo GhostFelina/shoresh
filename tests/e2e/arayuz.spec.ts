@@ -157,7 +157,7 @@ test('altbilgide sürüm ve son güncelleme damgası var', async ({ page }) => {
 });
 
 test('ekran klavyesi açılıp İbranice harf yazabiliyor', async ({ page }) => {
-  await ac(page, '/oyunlar/zaman-makinesi');
+  await ac(page, '/he/oyunlar/zaman-makinesi');
 
   const anahtar = page.getByRole('button', { name: /İbranice klavye/ });
   if ((await anahtar.count()) === 0) {

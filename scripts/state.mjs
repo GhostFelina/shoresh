@@ -32,13 +32,13 @@ console.log('Durum olculuyor...');
 
 /* --- İçerik sayıları: gerçek modüllerden, tahminle değil --- */
 const probe = `
-import { CATALOG_STATS, VERBS } from '@/data/catalog';
-import { LEXICON_STATS } from '@/data/lexicon';
-import { PHRASES } from '@/data/phrases';
-import { WRITTEN_SENTENCES } from '@/data/sentences';
-import { LETTERS, NIQQUDIM } from '@/data/alefbet';
-import { GAMES } from '@/features/games/engine';
-import { LESSONS } from '@/features/teacher/lesson';
+import { CATALOG_STATS, VERBS } from '@he/data/catalog';
+import { LEXICON_STATS } from '@he/data/lexicon';
+import { PHRASES } from '@he/data/phrases';
+import { WRITTEN_SENTENCES } from '@he/data/sentences';
+import { LETTERS, NIQQUDIM } from '@he/data/alefbet';
+import { GAMES } from '@he/games/engine';
+import { LESSONS } from '@he/teacher/lesson';
 import { RELEASES } from '@/data/changelog';
 import { PALETTES } from '@/lib/palette';
 import { BADGES, RANKS } from '@/engine/reward';
@@ -72,7 +72,19 @@ const probeOut = strip(sh('npx vitest run tests/unit/_state.test.ts 2>&1'));
 sh('node -e "require(\'fs\').unlinkSync(\'tests/unit/_state.test.ts\')"');
 
 const m = /__STATE__(\{.*\})/.exec(probeOut);
-const stats = m ? JSON.parse(m[1]) : {};
+if (!m) {
+  /*
+   * SESSİZCE '?' YAZMA.
+   * Dosyalar `src/languages/hebrew/**` altına taşındığında bu ölçüm
+   * betiği eski yolları içe aktarmaya devam etti; sonda her sayının
+   * yerine '?' yazıldı ve durum belgesi hiçbir şey söylemeden yalan
+   * söylemeye başladı. Ölçemiyorsa durmalı.
+   */
+  console.error('Icerik sayilari olculemedi. Probe ciktisi:');
+  console.error(probeOut.slice(-2000));
+  process.exit(1);
+}
+const stats = JSON.parse(m[1]);
 
 /* --- Test sayısı --- */
 const testOut = strip(sh('npm run -s test 2>&1'));

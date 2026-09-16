@@ -6,9 +6,9 @@
  * ayrı ayrı sınanıyor.
  */
 import { describe, expect, it } from 'vitest';
-import { VERBS, VERB_BY_ID, CATALOG_STATS } from '@/data/catalog';
-import { IRREGULAR_SEEDS } from '@/data/irregular';
-import { transliterate } from '@/engine/niqqud';
+import { VERBS, VERB_BY_ID, CATALOG_STATS } from '@he/data/catalog';
+import { IRREGULAR_SEEDS } from '@he/data/irregular';
+import { transliterate } from '@he/engine/niqqud';
 
 const V = (s: string) => s.normalize('NFC');
 

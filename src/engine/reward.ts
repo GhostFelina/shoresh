@@ -19,7 +19,7 @@
  *  - Seri çarpanı %50'de duruyor. Sınırsız olsaydı bir günlük kaçırma
  *    telafi edilemez bir kayıp gibi hissettirirdi.
  */
-import type { CEFR } from '@/types/hebrew';
+import type { CEFR } from '@/core/types';
 
 export interface AnswerReward {
   /** Bu cevaptan kazanılan XP. */

@@ -87,7 +87,7 @@ test('boş istek 400 dönüyor, çökmüyor', async ({ page }) => {
 });
 
 test('ses sayfasındaki seslendirme düğmesi istek başlatıyor', async ({ page }) => {
-  await ac(page, '/ses');
+  await ac(page, '/he/ses');
 
   const istekler: number[] = [];
   page.on('response', (r) => {

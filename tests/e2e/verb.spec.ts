@@ -12,7 +12,7 @@ import { ac } from './yardim';
 
 test('geniş ekranda çalışma alanı 1024pxin ötesine açılıyor', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const genislik = await page.evaluate(
     () => Math.round(document.querySelector('main')?.getBoundingClientRect().width ?? 0),
@@ -27,8 +27,8 @@ test('okuma sayfaları dar kalıyor — geniş düzen oraya sızmıyor', async (
    * yorucu olur. Bu test tam olarak o sızıntıyı kolluyor.
    */
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await ac(page, '/verb');
-  await page.goto('/kelimeler', { waitUntil: 'domcontentloaded' });
+  await ac(page, '/he/verb');
+  await page.goto('/he/kelimeler', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
 
   const genislik = await page.evaluate(
@@ -44,7 +44,7 @@ test('geniş ekranda bütün zamanlar aynı anda görünüyor', async ({ page })
    * ilişki ancak yan yanayken görülür.
    */
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const basliklar = await page.locator('main h3').allInnerTexts();
   for (const beklenen of ['ŞİMDİKİ', 'GEÇMİŞ', 'GELECEK', 'MASTAR', 'EMİR']) {
@@ -58,7 +58,7 @@ test('geniş ekranda bütün zamanlar aynı anda görünüyor', async ({ page })
 test('dar ekranda zaman seçici geri geliyor', async ({ page }) => {
   // Telefonda dört tabloyu yan yana koymak okunamaz olurdu.
   await page.setViewportSize({ width: 420, height: 900 });
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const secici = page.getByRole('button', { name: 'Geçmiş zaman', exact: true });
   await expect(secici, 'dar ekranda zaman seçici yok').toBeVisible();
@@ -81,7 +81,7 @@ test('dar ekranda zaman seçici geri geliyor', async ({ page }) => {
 });
 
 test('arama fiil listesini daraltıyor', async ({ page }) => {
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const sayac = page.locator('main span.numeric').first();
   const once = await sayac.innerText();
@@ -95,7 +95,7 @@ test('arama fiil listesini daraltıyor', async ({ page }) => {
 });
 
 test('binyan süzgeci çalışıyor ve temizlenebiliyor', async ({ page }) => {
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   await page.getByRole('button', { name: /Süzgeç/ }).click();
   await page.waitForTimeout(300);
@@ -123,7 +123,7 @@ test('binyan süzgeci çalışıyor ve temizlenebiliyor', async ({ page }) => {
 });
 
 test('fiil seçimi adrese yazılıyor — bağlantı paylaşılabiliyor', async ({ page }) => {
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const ikinci = page.locator('aside ul li button').nth(2);
   const metin = await ikinci.innerText();
@@ -142,7 +142,7 @@ test('fiil seçimi adrese yazılıyor — bağlantı paylaşılabiliyor', async 
 });
 
 test('ok tuşlarıyla listede gezinilebiliyor', async ({ page }) => {
-  await ac(page, '/verb');
+  await ac(page, '/he/verb');
 
   const liste = page.getByRole('list', { name: 'Fiil listesi' });
   await liste.focus();

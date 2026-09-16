@@ -11,8 +11,8 @@
  * yazımıdır; tahminle değil, bilinen fiillerle yazıldı.
  */
 import { describe, expect, it } from 'vitest';
-import { conjugate } from '@/engine/binyan';
-import { detectGizra } from '@/engine/detect-gizra';
+import { conjugate } from '@he/engine/binyan';
+import { detectGizra } from '@he/engine/detect-gizra';
 
 const split = (root: string): string[] => [...root];
 

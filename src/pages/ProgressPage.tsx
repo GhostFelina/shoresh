@@ -3,14 +3,9 @@ import { Link } from 'react-router-dom';
 import { AlertTriangle, Flame, RotateCcw, Trash2 } from 'lucide-react';
 import { overallStats, weakItems, type ItemProgress, type OverallStats } from '@/lib/progress';
 import { dbAvailable, wipeProgress } from '@/lib/db';
-import { parseItemKey } from '@/engine/srs';
-import { VERB_BY_ID } from '@/data/catalog';
-import { WORD_BY_ID } from '@/data/lexicon';
-import { PHRASES } from '@/data/phrases';
-import { LETTER_BY_ID, NIQQUD_BY_ID } from '@/data/alefbet';
-import { FORM_LABEL, type HebrewForm } from '@/types/hebrew';
 import { MixedText } from '@/components/MixedText';
 import { RewardPanels } from '@/features/rewards/RewardPanels';
+import { useLanguage, useLanguagePath } from '@/app/LanguageContext';
 
 /**
  * Öğe anahtarını okunabilir bir satıra çevirir.
@@ -20,35 +15,6 @@ import { RewardPanels } from '@/features/rewards/RewardPanels';
  * anahtar null döner: veri değişip bir öğe kaldırılmışsa eski ilerleme
  * kaydı ekranda çöp olarak görünmesin.
  */
-function describe(key: string): { he: string; tr: string; axis?: string } | null {
-  const { kind, id, axis } = parseItemKey(key);
-
-  if (kind === 'verb') {
-    const v = VERB_BY_ID.get(id);
-    if (!v) return null;
-    const axisLabel = axis && axis in FORM_LABEL ? FORM_LABEL[axis as HebrewForm].short : undefined;
-    return { he: v.lemma.vocalized, tr: v.tr[0] ?? '', axis: axisLabel };
-  }
-  if (kind === 'word') {
-    const w = WORD_BY_ID.get(id);
-    if (!w) return null;
-    return { he: w.vocalized, tr: w.tr[0] ?? '', axis: axis === 'gender' ? 'CİNSİYET' : undefined };
-  }
-  if (kind === 'phrase') {
-    const p = PHRASES.find((x) => x.id === id || x.plain === id);
-    if (!p) return null;
-    return { he: p.he, tr: p.tr };
-  }
-  if (kind === 'letter') {
-    const l = LETTER_BY_ID.get(id);
-    return l ? { he: l.glyph, tr: l.nameTr } : null;
-  }
-  if (kind === 'niqqud') {
-    const n = NIQQUD_BY_ID.get(id);
-    return n ? { he: n.mark, tr: n.nameTr } : null;
-  }
-  return null;
-}
 
 /**
  * YYYY-MM-DD'yi gün adına çevirir.
@@ -79,6 +45,13 @@ function Stat({ value, label, tone }: { value: number | string; label: string; t
 }
 
 export default function ProgressPage() {
+  const yol = useLanguagePath();
+  /*
+   * Anahtarı okunabilir hâle çevirmek DİLİN işi. Burada yapılsaydı
+   * sayfa İbranice kataloğunu içeri almak zorunda kalır ve Korece
+   * eklendiğinde "hangi dil?" koşulları buraya sızardı.
+   */
+  const dil = useLanguage();
   const [stats, setStats] = useState<OverallStats | null>(null);
   const [weak, setWeak] = useState<ItemProgress[]>([]);
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -153,7 +126,7 @@ export default function ProgressPage() {
             gerektiği buradan hesaplanır.
           </p>
           <Link
-            to="/oyunlar"
+            to={yol('oyunlar')}
             className="inline-block rounded-lg px-4 py-2 text-sm font-semibold card-interactive"
             style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
           >
@@ -238,16 +211,16 @@ export default function ProgressPage() {
                 </p>
                 <ul className="space-y-1">
                   {weak.map((p) => {
-                    const d = describe(p.key);
+                    const d = dil.describeItem(p.key);
                     if (!d) return null;
                     return (
                       <li
                         key={p.key}
                         className="card-2 flex items-center gap-3 px-3 py-2"
                       >
-                        <span className="he he-vocalized w-28 shrink-0 text-lg">{d.he}</span>
+                        <span className="he he-vocalized w-28 shrink-0 text-lg">{d.native}</span>
                         <span className="min-w-0 flex-1 truncate text-sm">
-                          <MixedText>{d.tr}</MixedText>
+                          <MixedText>{d.meaning}</MixedText>
                         </span>
                         {d.axis && (
                           <span

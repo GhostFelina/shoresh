@@ -36,7 +36,7 @@ test('oyun turu oynanabiliyor ve cevaplar XP kazandırıyor', async ({ page }) =
   await ac(page, '/');
   await ilerlemeyiSil(page);
 
-  await ac(page, '/oyunlar/kok-avcisi');
+  await ac(page, '/he/oyunlar/kok-avcisi');
   const cevaplanan = await oyunOyna(page, 5);
   expect(cevaplanan, 'hiç soru cevaplanamadı').toBeGreaterThan(2);
 
@@ -46,7 +46,7 @@ test('oyun turu oynanabiliyor ve cevaplar XP kazandırıyor', async ({ page }) =
    * Test o gecikmeyi beklemek zorunda.
    */
   await page.waitForTimeout(3200);
-  await ac(page, '/ilerleme');
+  await ac(page, '/he/ilerleme');
 
   const metin = await page.locator('main').innerText();
 
@@ -71,11 +71,11 @@ test('cevap kaydı ile XP yazımı birbirini ezmiyor — seri 1 oluyor', async (
   await ac(page, '/');
   await ilerlemeyiSil(page);
 
-  await ac(page, '/oyunlar/kok-avcisi');
+  await ac(page, '/he/oyunlar/kok-avcisi');
   await oyunOyna(page, 4);
   await page.waitForTimeout(3200);
 
-  await ac(page, '/ilerleme');
+  await ac(page, '/he/ilerleme');
   const metin = await page.locator('main').innerText();
 
   const seri = /(\d+)\s*\n?\s*gün arka arkaya/.exec(metin);
@@ -92,11 +92,11 @@ test('haftalık grafiğin çubukları gerçekten çiziliyor', async ({ page }) =
    */
   await ac(page, '/');
   await ilerlemeyiSil(page);
-  await ac(page, '/oyunlar/kok-avcisi');
+  await ac(page, '/he/oyunlar/kok-avcisi');
   await oyunOyna(page, 3);
   await page.waitForTimeout(3200);
 
-  await ac(page, '/ilerleme');
+  await ac(page, '/he/ilerleme');
 
   const yukseklikler = await page.evaluate(() => {
     const baslik = [...document.querySelectorAll('h2')].find((h) =>
@@ -118,7 +118,7 @@ test('öğretmen dersi baştan sona tamamlanabiliyor', async ({ page }) => {
   const hatalar = konsolHatalari(page);
   await ac(page, '/');
   await ilerlemeyiSil(page);
-  await ac(page, '/ogretmen/binyan-present-paal');
+  await ac(page, '/he/ogretmen/binyan-present-paal');
 
   // Adımlar: tanıtım, kural, örnek, birlikte×2, tek başına×2, özet.
   for (let adim = 0; adim < 12; adim++) {
@@ -154,7 +154,7 @@ test('öğretmen dersi baştan sona tamamlanabiliyor', async ({ page }) => {
 
   // Ders listesine dönmüş ve ders tamamlanmış sayılmalı.
   await beklenenIcerik(page);
-  expect(new URL(page.url()).pathname).toBe('/ogretmen');
+  expect(new URL(page.url()).pathname).toBe('/he/ogretmen');
 
   const tamamlanan = await page.evaluate(() => {
     try {
@@ -169,7 +169,7 @@ test('öğretmen dersi baştan sona tamamlanabiliyor', async ({ page }) => {
 });
 
 test('yanlış cevapta gerekçe gösteriliyor — sadece "yanlış" demiyor', async ({ page }) => {
-  await ac(page, '/ogretmen/binyan-present-paal');
+  await ac(page, '/he/ogretmen/binyan-present-paal');
 
   // İpuçlu soruya gelene kadar ilerle.
   for (let i = 0; i < 4; i++) {

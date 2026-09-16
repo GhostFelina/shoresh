@@ -12,7 +12,7 @@ import {
   LEXICON_STATS,
   TOPICS,
   WORDS,
-} from '@/data/lexicon';
+} from '@he/data/lexicon';
 
 describe('sözlük bütünlüğü', () => {
   it('hiçbir satır reddedilmez', () => {

@@ -8,8 +8,8 @@
  * Rastgelelik dışarıdan veriliyor, böylece sonuç belirli olur.
  */
 import { describe, expect, it } from 'vitest';
-import { GAMES, buildQueue } from '@/features/games/engine';
-import type { CEFR } from '@/types/hebrew';
+import { GAMES, buildQueue } from '@he/games/engine';
+import type { CEFR } from '@he/types';
 
 /** Belirli (deterministik) sözde-rastgele üreteç. */
 function seeded(seed: number): () => number {

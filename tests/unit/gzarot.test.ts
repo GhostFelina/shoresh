@@ -8,7 +8,7 @@
  * Beklenen biçimler standart ulpan çekim tablolarıdır.
  */
 import { describe, expect, it } from 'vitest';
-import { conjugate, isSupported } from '@/engine/binyan';
+import { conjugate, isSupported } from '@he/engine/binyan';
 
 const norm = (s: string) => s.normalize('NFC');
 const V = (s: string) => norm(s);

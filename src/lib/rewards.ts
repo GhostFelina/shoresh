@@ -23,7 +23,7 @@ import {
 import { DEFAULT_GOAL } from '@/engine/reward';
 import { db, dbAvailable, today, type AttemptRecord } from './db';
 import { masteryPercent } from '@/engine/srs';
-import type { CEFR } from '@/types/hebrew';
+import type { CEFR } from '@/core/types';
 
 export interface AwardInput {
   correct: boolean;

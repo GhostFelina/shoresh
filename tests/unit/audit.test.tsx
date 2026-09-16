@@ -13,18 +13,18 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { ReactElement } from 'react';
 
 import Shell from '@/app/Shell';
-import HomePage from '@/pages/HomePage';
-import LevelPage from '@/pages/LevelPage';
-import AlefBetPage from '@/pages/AlefBetPage';
-import ReadingPage from '@/pages/ReadingPage';
-import VerbsPage from '@/pages/VerbsPage';
-import BinyanimPage from '@/pages/BinyanimPage';
-import PhrasesPage from '@/pages/PhrasesPage';
-import WordsPage from '@/pages/WordsPage';
-import GamesPage from '@/pages/GamesPage';
-import SoundPage from '@/pages/SoundPage';
+import HomePage from '@he/pages/HomePage';
+import LevelPage from '@he/pages/LevelPage';
+import AlefBetPage from '@he/pages/AlefBetPage';
+import ReadingPage from '@he/pages/ReadingPage';
+import VerbsPage from '@he/pages/VerbsPage';
+import BinyanimPage from '@he/pages/BinyanimPage';
+import PhrasesPage from '@he/pages/PhrasesPage';
+import WordsPage from '@he/pages/WordsPage';
+import GamesPage from '@he/pages/GamesPage';
+import SoundPage from '@he/pages/SoundPage';
 import ProgressPage from '@/pages/ProgressPage';
-import { NAV_ITEMS } from '@/app/nav';
+import { hebrew } from '@he/index';
 
 function renderAt(path: string, element: ReactElement) {
   return render(
@@ -102,23 +102,27 @@ describe('erişilebilirlik — düğmelerin adı var mı', () => {
 });
 
 describe('bağlantılar', () => {
-  const KNOWN = [
-    '/',
-    '/alefbet',
-    '/okuma',
-    '/verb',
-    '/binyanim',
-    '/kaliplar',
-    '/kelimeler',
-    '/oyunlar',
-    '/ses',
-    '/ilerleme',
-  ];
-  const isKnown = (href: string) =>
-    KNOWN.includes(href) ||
-    href.startsWith('/seviye/') ||
-    href.startsWith('/oyunlar/') ||
-    href.startsWith('/verb?');
+  /*
+   * Geçerli adresler DİL MODÜLÜNDEN türetiliyor, elle yazılmıyor.
+   *
+   * Önceki sürümde burada elle tutulan bir liste vardı ve tam da
+   * korumaya çalıştığı hatayı kendisi üretti: adresler dil önekli hâle
+   * gelince liste eskidi ve test "/he/ses tanımsız" dedi — oysa sayfa
+   * duruyordu, eskiyen listeydi.
+   */
+  const desenler = hebrew.routes.map((r) =>
+    r.path ? `/${hebrew.id}/${r.path}` : `/${hebrew.id}`,
+  );
+
+  const isKnown = (href: string): boolean => {
+    const [yol] = href.split('?');
+    return desenler.some((desen) => {
+      if (!desen.includes(':')) return yol === desen;
+      // 'seviye/:level' gibi değişken parçalı desenler
+      const re = new RegExp('^' + desen.replace(/:[^/]+/g, '[^/]+') + '$');
+      return re.test(yol ?? '');
+    });
+  };
 
   for (const [name, path, element] of PAGES) {
     it(`${name} içindeki her bağlantı var olan bir sayfaya gidiyor`, () => {
@@ -132,21 +136,6 @@ describe('bağlantılar', () => {
       expect(broken, `${name} → tanımsız hedef: ${broken.join(', ')}`).toEqual([]);
     });
   }
-
-  it('kenar çubuğundaki her giriş erişilebilir', () => {
-    render(
-      <MemoryRouter>
-        <Shell>
-          <div />
-        </Shell>
-      </MemoryRouter>,
-    );
-    const nav = screen.getAllByRole('navigation')[0]!;
-    for (const item of NAV_ITEMS) {
-      const link = within(nav).queryAllByRole('link', { name: new RegExp(item.label, 'i') });
-      expect(link.length, `${item.label} kenar çubuğunda yok`).toBeGreaterThan(0);
-    }
-  });
 });
 
 describe('İbranice metin yönü', () => {
@@ -179,7 +168,7 @@ describe('İbranice metin yönü', () => {
 
 describe('ekran klavyesi', () => {
   it('İsrail klavye düzenindeki 27 harf biçimini de sunar', async () => {
-    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const { HebrewKeyboard } = await import('@he/HebrewKeyboard');
     const { container } = render(
       <HebrewKeyboard onInsert={() => {}} onBackspace={() => {}} onClear={() => {}} />,
     );
@@ -192,7 +181,7 @@ describe('ekran klavyesi', () => {
   });
 
   it('harfe dokununca o harfi bildirir', async () => {
-    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const { HebrewKeyboard } = await import('@he/HebrewKeyboard');
     const inserted: string[] = [];
     render(
       <HebrewKeyboard
@@ -207,7 +196,7 @@ describe('ekran klavyesi', () => {
   });
 
   it('devre dışıyken hiçbir tuş çalışmaz', async () => {
-    const { HebrewKeyboard } = await import('@/components/HebrewKeyboard');
+    const { HebrewKeyboard } = await import('@he/HebrewKeyboard');
     const inserted: string[] = [];
     const { container } = render(
       <HebrewKeyboard
@@ -278,5 +267,84 @@ describe('karışık metinde boşluk korunur — regresyon testi', () => {
     const bdis = [...container.querySelectorAll('bdi')];
     expect(bdis).toHaveLength(1);
     expect(bdis[0]!.textContent).toBe('אֲנִי צָרִיךְ לָלֶכֶת');
+  });
+});
+
+describe('bırakılmış adresler', () => {
+  /*
+   * NEDEN VAR: 'fiiller' sayfası 'verb' oldu ve eski adres yönlendirmeye
+   * bağlandı. Yönlendirmenin hedefi bir gün yeniden adlandırılırsa
+   * yönlendirme sessizce boşluğa bakar — kullanıcı eski bağlantısına
+   * tıklar, ana sayfaya düşer ve kimse fark etmez.
+   */
+  it('her bırakılmış adres var olan bir sayfayı gösteriyor', () => {
+    const yollar = new Set(hebrew.routes.map((r) => r.path));
+    for (const [eski, yeni] of Object.entries(hebrew.aliases ?? {})) {
+      expect(yollar.has(yeni), `${eski} → ${yeni}: böyle bir sayfa yok`).toBe(true);
+    }
+  });
+
+  it('bırakılmış adres var olan bir sayfanın üstüne binmiyor', () => {
+    // Aynı yol hem sayfa hem yönlendirme olursa hangisinin kazandığı
+    // rota sırasına kalır; bu da fark edilmeden değişebilir.
+    const yollar = new Set(hebrew.routes.map((r) => r.path));
+    for (const eski of Object.keys(hebrew.aliases ?? {})) {
+      expect(yollar.has(eski), `${eski} hem sayfa hem yönlendirme`).toBe(false);
+    }
+  });
+});
+
+describe('kenar çubuğu', () => {
+  /*
+   * Menü artık dil modülünde tanımlı ama kabuk onu GERÇEKTEN çiziyor mu?
+   * Modülde doğru durması yetmez; kabuk bir grubu atlarsa ya da dizi
+   * boş gelirse kullanıcı o sayfalara hiç ulaşamaz.
+   *
+   * Bu test yeniden yazım sırasında bir kez kazara silindi; lint
+   * "kullanılmayan Shell importu" diyerek yakaladı.
+   */
+  it('dil modülündeki her menü girişi kenar çubuğunda görünüyor', () => {
+    render(
+      <MemoryRouter initialEntries={[`/${hebrew.id}`]}>
+        <Shell>
+          <div />
+        </Shell>
+      </MemoryRouter>,
+    );
+    const nav = screen.getAllByRole('navigation')[0]!;
+    for (const item of hebrew.nav.flatMap((g) => g.items)) {
+      const link = within(nav).queryAllByRole('link', { name: new RegExp(item.label, 'i') });
+      expect(link.length, `${item.label} kenar çubuğunda yok`).toBeGreaterThan(0);
+    }
+  });
+
+  it('bağlantılar dil önekli kuruluyor', () => {
+    render(
+      <MemoryRouter initialEntries={[`/${hebrew.id}`]}>
+        <Shell>
+          <div />
+        </Shell>
+      </MemoryRouter>,
+    );
+    const nav = screen.getAllByRole('navigation')[0]!;
+    const hrefs = within(nav)
+      .getAllByRole('link')
+      .map((a) => a.getAttribute('href') ?? '');
+
+    expect(hrefs.length).toBeGreaterThan(10);
+    const oneksiz = hrefs.filter((h) => !h.startsWith(`/${hebrew.id}`));
+    expect(oneksiz, `dil öneki taşımayan bağlantılar: ${oneksiz.join(', ')}`).toEqual([]);
+  });
+
+  it('öğrenilen dil kenar çubuğunda yazıyor', () => {
+    // Kullanıcının istediği: "mantıklı bir konumda Hebrew yazsın".
+    render(
+      <MemoryRouter initialEntries={[`/${hebrew.id}`]}>
+        <Shell>
+          <div />
+        </Shell>
+      </MemoryRouter>,
+    );
+    expect(screen.getAllByText(hebrew.englishName).length).toBeGreaterThan(0);
   });
 });

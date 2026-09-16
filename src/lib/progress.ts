@@ -239,3 +239,74 @@ export async function overallStats(now: Date = new Date()): Promise<OverallStats
     lastWeek,
   };
 }
+
+/* ------------------------------------------------------------------ *
+ * Dil önekine geçiş
+ * ------------------------------------------------------------------ */
+
+const MIGRATION_FLAG = 'shoresh.keysScoped';
+
+/**
+ * Eski tekrar anahtarlarına dil öneki ekler.
+ *
+ * NEDEN GEREKLİ: Anahtarlar `verb:כתב:paal:present` biçimindeydi ve dil
+ * bilgisi taşımıyordu. İkinci dil eklendiğinde `word:사과:noun` ile
+ * İbranice bir kelime aynı ada düşebilir, iki dilin ilerlemesi
+ * birbirine karışırdı. Üstelik karışma SESSİZ olurdu: öğrenci hiç
+ * görmediği bir Korece kelimeyi "biliyor" sayılırdı.
+ *
+ * NEDEN ŞİMDİ: Göç ne kadar geç yapılırsa o kadar çok kayıt taşınır ve
+ * hata riski büyür. Şu an bütün kayıtlar İbranice, yani dönüşüm kesin.
+ *
+ * NEDEN DEXIE YÜKSELTMESİ DEĞİL: `key` birincil anahtar; Dexie'nin
+ * yükseltme kancasında birincil anahtar değiştirilemiyor. Sil-ve-yaz
+ * gerekiyor ve bu tek bir işlemde yapılmalı.
+ *
+ * Bir kez çalışır; bayrak `localStorage`da. Bayrak silinse bile işlem
+ * güvenli: zaten önekli anahtarlar ikinci kez öneklenmiyor.
+ */
+export async function migrateKeysToLanguage(languageId: string): Promise<number> {
+  try {
+    if (localStorage.getItem(MIGRATION_FLAG) === languageId) return 0;
+  } catch {
+    /* okunamadıysa göç yine çalışır; zararsız */
+  }
+  if (!(await dbAvailable())) return 0;
+
+  let moved = 0;
+  try {
+    await db.transaction('rw', db.progress, db.attempts, async () => {
+      const rows = await db.progress.toArray();
+      const eskiler = rows.filter((r) => !r.key.startsWith(`${languageId}:`));
+      if (eskiler.length > 0) {
+        await db.progress.bulkDelete(eskiler.map((r) => r.key));
+        await db.progress.bulkPut(
+          eskiler.map((r) => ({ ...r, key: `${languageId}:${r.key}` })),
+        );
+        moved = eskiler.length;
+      }
+
+      /*
+       * Cevap kayıtları da aynı anahtarı taşıyor. Taşınmasaydı istatistik
+       * ve rozet sayaçları eski anahtarlara bakmaya devam eder, ilerleme
+       * sayfasında sayılar tutmazdı.
+       */
+      const denemeler = await db.attempts.toArray();
+      const eskiDenemeler = denemeler.filter((a) => !a.key.startsWith(`${languageId}:`));
+      for (const a of eskiDenemeler) {
+        await db.attempts.update(a.id!, { key: `${languageId}:${a.key}` });
+      }
+    });
+  } catch {
+    // Göç başarısız olursa uygulama çalışmaya devam eder; bir sonraki
+    // açılışta yeniden denenir.
+    return 0;
+  }
+
+  try {
+    localStorage.setItem(MIGRATION_FLAG, languageId);
+  } catch {
+    /* bayrak yazılamadıysa göç bir daha çalışır — zararsız */
+  }
+  return moved;
+}
