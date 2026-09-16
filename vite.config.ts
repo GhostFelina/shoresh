@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -98,8 +98,31 @@ function ttsDevEndpoint(): Plugin {
   return {
     name: 'shoresh-tts-dev',
     configureServer(server) {
+      /*
+       * `.env.local` degerlerini `process.env`e tasi.
+       *
+       * Vite bu dosyayi yalnizca `import.meta.env` icin ve yalnizca
+       * `VITE_` onekli degiskenler icin okur. Sunucu tarafindaki uc
+       * noktalar (`api/*.js`) ise `process.env` bekliyor — tasinmazsa
+       * form yalnizca yayinda denenebilir, yerelde hep "kurulum eksik"
+       * derdi.
+       *
+       * Gizli anahtarlar burada ISTEMCIYE GITMIYOR: yalnizca gelistirme
+       * sunucusunun kendi surecine yaziliyor.
+       */
+      const env = loadEnv(server.config.mode, process.cwd(), '');
+      for (const [k, v] of Object.entries(env)) {
+        if (!(k in process.env)) process.env[k] = v;
+      }
+
       server.middlewares.use('/api/tts', async (req, res) => {
         const mod = await server.ssrLoadModule('/api/tts.js');
+        await (mod.default as (q: unknown, r: unknown) => Promise<void>)(req, res);
+      });
+      // Geri bildirim ucu da yayındaki gibi davransın; olmasaydı form
+      // yalnızca canlıda denenebilirdi.
+      server.middlewares.use('/api/feedback', async (req, res) => {
+        const mod = await server.ssrLoadModule('/api/feedback.js');
         await (mod.default as (q: unknown, r: unknown) => Promise<void>)(req, res);
       });
     },

@@ -19,6 +19,7 @@ const PhrasesPage = lazy(() => import('@/pages/PhrasesPage'));
 const WordsPage = lazy(() => import('@/pages/WordsPage'));
 const GamesPage = lazy(() => import('@/pages/GamesPage'));
 const TeacherPage = lazy(() => import('@/pages/TeacherPage'));
+const InboxPage = lazy(() => import('@/pages/InboxPage'));
 const SoundPage = lazy(() => import('@/pages/SoundPage'));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage'));
 
@@ -57,6 +58,13 @@ export default function App() {
           <Route path="/oyunlar/:gameId" element={<GamesPage />} />
           <Route path="/ses" element={<SoundPage />} />
           <Route path="/ilerleme" element={<ProgressPage />} />
+
+          {/*
+            Gelen kutusu MENÜDE YOK — bu sayfa öğrenciye değil, projeyi
+            yürütene ait. Menüde dursaydı her kullanıcı bir parola
+            kapısıyla karşılaşır ve uygulamanın parçası sanırdı.
+          */}
+          <Route path="/gelen-kutusu" element={<InboxPage />} />
 
           {/* Eski bağlantılar kırılmasın */}
           <Route path="/fiiller" element={<Navigate to="/verb" replace />} />

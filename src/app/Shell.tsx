@@ -8,6 +8,7 @@ import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
 import { RewardHud } from './Rewards';
 import { usePageWidthClass } from './Layout';
 import { VersionHistoryButton, VersionHistoryDialog } from './VersionHistory';
+import { FeedbackButton, FeedbackDialog } from './Feedback';
 import { BUILD_TIME, formatBuildTime } from '@/lib/version';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
@@ -106,6 +107,7 @@ export default function Shell({ children }: { children: ReactNode }) {
   const { theme, palette, changeTheme, changePalette } = useAppearance();
   const whatsNew = useWhatsNew();
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   // Sayfa kendi genişliğini bildiriyor; kabuk yalnızca uyguluyor.
   const genislik = usePageWidthClass();
 
@@ -211,6 +213,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             שֹׁרֶשׁ
           </span>
           <RewardHud />
+          <FeedbackButton onOpen={() => setFeedbackOpen(true)} />
           <VersionHistoryButton onOpen={() => setHistoryOpen(true)} />
           <PalettePicker theme={theme} palette={palette} onChange={changePalette} />
           <ThemeToggle theme={theme} onChange={changeTheme} />
@@ -259,6 +262,8 @@ export default function Shell({ children }: { children: ReactNode }) {
       )}
 
       {historyOpen && <VersionHistoryDialog onClose={() => setHistoryOpen(false)} />}
+
+      {feedbackOpen && <FeedbackDialog onClose={() => setFeedbackOpen(false)} />}
     </div>
   );
 }

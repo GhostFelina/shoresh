@@ -67,6 +67,32 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.19.0',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T21:47:36+03:00',
+    title: 'Geri bildirim formu',
+    summary:
+      'Sağ üstte, temanın yanında bir düğme: bir hata gördüğünde ya da bir şey istediğinde o sayfadan ayrılmadan bildirebiliyorsun.',
+    changes: [
+      { kind: 'yeni', text: 'Geri bildirim kutusu — hata, istek, öneri ve soru olarak dört tür.' },
+      { kind: 'yeni', text: 'Bulunduğun sayfa ve uygulama sürümü otomatik ekleniyor; bildirim araştırılabilir oluyor.' },
+      { kind: 'yeni', text: 'Yazdığın metin taslak olarak saklanıyor — kutu yanlışlıkla kapanırsa kaybolmuyor.' },
+      { kind: 'yeni', text: 'Parolayla açılan gelen kutusu sayfası; okundu işareti ve okunmamış süzgeci.' },
+      { kind: 'gelisme', text: 'Kurulum eksikse form bunu ÖNCEDEN söylüyor, sen yazdıktan sonra değil.' },
+      { kind: 'gelisme', text: 'İletişim bilgisi zorunlu değil — zorunlu olsaydı adını vermek istemeyen biri hiç bildirmezdi.' },
+    ],
+    benefits: [
+      {
+        title: 'Gördüğün yerden bildirebiliyorsun',
+        text: 'Hata her yerde çıkabilir. Form ayrı bir sayfada olsaydı hatayı gördüğün yerden ayrılıp onu aramak zorunda kalır, çoğu zaman da vazgeçerdin. Üst banttaki düğme o mesafeyi sıfırlıyor.',
+      },
+      {
+        title: 'Bildirimin gerçekten ulaşıyor',
+        text: 'Sessizce başarısız olan bir bildirim formu, form olmamasından daha kötüdür: derdini anlattığını sanırsın ve kimse duymaz. Bu yüzden gönderim başarısız olursa sebebi yazıyor ve testler her iki durumda da dürüst davranıldığını denetliyor.',
+      },
+    ],
+  },
+  {
     version: '1.18.0',
     date: '2026-09-16',
     releasedAt: '2026-09-16T21:28:24+03:00',
