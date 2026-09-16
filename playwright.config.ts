@@ -20,7 +20,16 @@
  */
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 5400;
+/**
+ * Port dışarıdan verilebilir: `SHORESH_PORT=5401 npm run test:e2e`.
+ *
+ * NEDEN GEREKLİ: `reuseExistingServer` açık ve port sabit 5400'dü. Aynı
+ * depo üzerinde ikinci bir çalışma kopyası (git worktree) varken E2E
+ * koşturmak, o kopyanın kodunu değil 5400'de ZATEN ÇALIŞAN sunucunun
+ * kodunu test ediyordu — testler yeşil yanıyor ama başka bir uygulamayı
+ * ölçüyordu. Sessiz ve tehlikeli bir yanlış; port ayrılabilir olmalı.
+ */
+const PORT = Number(process.env.SHORESH_PORT ?? 5400);
 const BASE = `http://localhost:${PORT}`;
 
 export default defineConfig({

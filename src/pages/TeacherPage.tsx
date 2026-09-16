@@ -4,20 +4,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Check as CheckIcon,
   GraduationCap,
   Lightbulb,
-  PlayCircle,
-  MicOff,
   RotateCcw,
   Volume2,
   X,
 } from 'lucide-react';
 import {
   LESSON_BY_ID,
-  LESSON_GROUPS,
   answerMatches,
-  availableLessons,
   clearLessonOpen,
   markLessonDone,
   markLessonOpen,
@@ -33,9 +28,10 @@ import { HebrewKeyboardToggle } from '@/components/HebrewKeyboard';
 import { recordAnswer } from '@/lib/progress';
 import { itemKey } from '@/engine/srs';
 import { useRewards } from '@/app/Rewards';
+import { Classroom } from '@/features/teacher/Classroom';
+import { PlacementFlow } from '@/features/teacher/PlacementExam';
+import { readPlacement } from '@/features/teacher/placement';
 import type { CEFR } from '@/types/hebrew';
-
-const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
 
 /** Koç sesini açık/kapalı tutar — tercih cihazda kalır. */
 function useVoicePref(): [boolean, (v: boolean) => void] {
@@ -522,12 +518,16 @@ function LessonRunner({
 export default function TeacherPage() {
   const { lessonId } = useParams<{ lessonId?: string }>();
   const navigate = useNavigate();
-  const [level, setLevel] = useState<CEFR>('A1');
+  /*
+   * Başlangıç seviyesi ölçümden geliyor, A1 sabitinden değil. Sabit
+   * kalsaydı B1 çıkan öğrenci her girişte listeyi elle yukarı çekmek
+   * zorunda kalırdı ve sınav hiçbir işe yaramazdı.
+   */
+  const [level, setLevel] = useState<CEFR>(() => readPlacement()?.level ?? 'A1');
   const [seed, setSeed] = useState(() => Date.now() % 100000);
   const [voiceOn, setVoiceOn] = useVoicePref();
 
   const coachAvailable = useMemo(() => canCoachSpeak(), []);
-  const lessons = useMemo(() => availableLessons(level), [level]);
   const [progress, setProgress] = useState(() => readLessonProgress());
 
   // Listeye her dönüşte ilerleme tazeleniyor; ders bitince kart hemen
@@ -543,6 +543,15 @@ export default function TeacherPage() {
 
   useEffect(() => () => stopCoach(), []);
 
+  /*
+   * Seviye tespit sınavı bir ders DEĞİL, ölçüm: kendi akışı var ve ders
+   * motoruna sokulmuyor. Rota yine de öğretmen modunun altında duruyor —
+   * sınav, sınıfın bir parçası; ayrı bir köşeye atılırsa kimse bulamaz.
+   */
+  if (lessonId === 'seviye-tespit') {
+    return <PlacementFlow onApplyLevel={setLevel} onExit={() => navigate('/ogretmen')} />;
+  }
+
   if (lessonId && lesson) {
     return (
       <LessonRunner
@@ -557,145 +566,12 @@ export default function TeacherPage() {
   }
 
   return (
-    <section className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Öğretmen Modu</h1>
-        <p className="max-w-2xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-          Oyunlar seni sınar; bu bölüm <strong>öğretir</strong>. Her ders aynı sırayla ilerler:
-          önce kural, sonra işlenmiş bir örnek, sonra ipuçlu bir soru, en sonunda ipuçsuz.
-          Yanlış cevapta puan düşmez — <em>neden</em> yanlış olduğu söylenir.
-        </p>
-      </header>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex gap-1.5">
-          {LEVELS.map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => setLevel(l)}
-              className={`card-2 card-interactive px-3 py-1.5 text-sm ${l === level ? 'is-selected' : ''}`}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setVoiceOn(!voiceOn)}
-          disabled={!coachAvailable}
-          className="card-2 card-interactive ms-auto flex items-center gap-2 px-3 py-1.5 text-sm disabled:opacity-50"
-          title={
-            coachAvailable
-              ? 'Öğretmenin Türkçe sesi'
-              : 'Bu cihazda Türkçe konuşma sesi bulunamadı — ders yazıyla devam eder'
-          }
-        >
-          {voiceOn && coachAvailable ? <Volume2 className="size-4" /> : <MicOff className="size-4" />}
-          {coachAvailable ? (voiceOn ? 'Sesli anlatım açık' : 'Sesli anlatım kapalı') : 'Türkçe ses yok'}
-        </button>
-      </div>
-
-      {/*
-        Türkçe ses yoksa bunu gizlemek yerine SÖYLÜYORUZ. Sessizce yazıya
-        düşmek, kullanıcıya "ses özelliği bozuk" hissi verirdi.
-      */}
-      {!coachAvailable && (
-        <p className="card-2 p-3 text-sm" style={{ color: 'var(--text-dim)' }}>
-          Bu cihazda Türkçe konuşma sesi kurulu değil, bu yüzden öğretmen sesli anlatmıyor.
-          Dersin bütün metni ekranda duruyor; İbranice örnekler yine seslendiriliyor.
-        </p>
-      )}
-
-      {/* Kaldığın yerden devam — yarıda bırakılan ders varsa en üstte. */}
-      {progress.open && LESSON_BY_ID.has(progress.open.id) && (
-        <button
-          type="button"
-          onClick={() => navigate(`/ogretmen/${progress.open!.id}`)}
-          className="card card-interactive flex w-full items-center gap-3 p-4 text-start"
-          style={{ borderColor: 'var(--color-brand-400)' }}
-        >
-          <PlayCircle className="size-6 shrink-0" style={{ color: 'var(--accent-text)' }} />
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs" style={{ color: 'var(--text-dim)' }}>
-              Kaldığın yerden devam et
-            </span>
-            <span className="block truncate text-sm font-semibold">
-              <MixedText>{LESSON_BY_ID.get(progress.open.id)!.title}</MixedText>
-            </span>
-          </span>
-        </button>
-      )}
-
-      {/*
-        Dersler KÜMELERE ayrılmış. Yetmiş ders tek bir uzun liste olsaydı
-        öğrenci nereden başlayacağını bilemezdi; kümeler kolaydan zora
-        değil, BAĞIMLILIĞA göre sıralı — harfleri tanımadan hareke
-        çalışılmaz.
-      */}
-      {LESSON_GROUPS.map((group) => {
-        const inGroup = lessons.filter((m) => m.group === group.id);
-        if (inGroup.length === 0) return null;
-        const doneCount = inGroup.filter((m) => progress.done[m.id]).length;
-
-        return (
-          <section key={group.id} className="space-y-2">
-            <div className="flex flex-wrap items-baseline gap-2">
-              <h2 className="text-sm font-semibold">{group.title}</h2>
-              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                {group.blurb}
-              </span>
-              <span
-                className="ms-auto numeric text-xs"
-                style={{ color: doneCount === inGroup.length ? 'var(--accent-text)' : 'var(--text-dim)' }}
-              >
-                {doneCount} / {inGroup.length}
-              </span>
-            </div>
-
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {inGroup.map((m) => {
-                const done = Boolean(progress.done[m.id]);
-                return (
-                  <li key={m.id}>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/ogretmen/${m.id}`)}
-                      className="card card-interactive h-full w-full space-y-1 p-4 text-start"
-                      style={done ? { borderColor: 'var(--color-brand-400)' } : undefined}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <span
-                          className="text-[11px] font-medium uppercase tracking-wide"
-                          style={{ color: 'var(--accent-text)' }}
-                        >
-                          {m.from}
-                        </span>
-                        {done && (
-                          <CheckIcon className="size-3.5" style={{ color: 'var(--color-brand-400)' }} />
-                        )}
-                      </span>
-                      <h3 className="text-sm font-semibold">
-                        <MixedText>{m.title}</MixedText>
-                      </h3>
-                      <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-                        {m.subtitle}
-                      </p>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        );
-      })}
-
-      {lessons.length === 0 && (
-        <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
-          Bu seviyede kurulabilen ders yok.
-        </p>
-      )}
-    </section>
+    <Classroom
+      level={level}
+      onLevel={setLevel}
+      voiceOn={voiceOn}
+      coachAvailable={coachAvailable}
+      onVoice={setVoiceOn}
+    />
   );
 }

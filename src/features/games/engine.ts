@@ -487,7 +487,7 @@ export function cumleKurucu(rng: Rng, level: CEFR): OrderQuestion | ChoiceQuesti
   return {
     kind: 'order',
     itemKey: itemKey('phrase', item.plain),
-    prompt: 'Sozcukleri dogru siraya diz',
+    prompt: 'Sözcükleri doğru sıraya diz',
     tokens,
     order: answerOrder,
     audio: item.plain,
