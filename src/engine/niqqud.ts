@@ -119,7 +119,25 @@ export const affix = (text: string): Segment => ({ text, affix: true });
 
 /** Segmentleri harekeli tek dizeye birleştirir ve sofit uygular. */
 export function toVocalized(segments: Segment[]): string {
-  return applyFinalForm(segments.map((s) => s.text).join(''));
+  return finalKafShva(applyFinalForm(segments.map((s) => s.text).join('')));
+}
+
+/**
+ * Kelime sonundaki ך’a sessiz şva ekler: הָלַךְ, חָתַךְ, לְבָרֵךְ.
+ *
+ * NEDEN AYRI ADIM: Bu şva yalnızca HAREKELİ yazıma aittir; harekesiz
+ * yazımda hiçbir işaret bulunmaz. İki yazımı da üreten
+ * `applyFinalForm` içine konsaydı harekesiz biçime de sızardı — nitekim
+ * ilk denemede tam olarak o oldu ve “harekesizde hareke kalmaz” testi
+ * kırmızıya döndü.
+ *
+ * Koşul: son harf ך ve ardında hiç hareke yoksa. Hareke varsa (ekli
+ * -ְךָ gibi) dokunulmaz.
+ */
+function finalKafShva(word: string): string {
+  const chars = [...word];
+  const last = chars.at(-1);
+  return last === 'ך' ? word + SHVA : word;
 }
 
 /**

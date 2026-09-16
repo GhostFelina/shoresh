@@ -128,14 +128,11 @@ function parseRow(line: string): HebrewVerb | null {
     return fail(line, `orta harf ${mid} dages alamaz — l"h pi'el kalibi bozulur, sablon yok`);
   }
 
-  if (
-    !isQuad &&
-    gizra === 'ayin-guttural' &&
-    (binyan === 'piel' || binyan === 'pual' || binyan === 'hitpael') &&
-    (mid === 'א' || mid === 'ר')
-  ) {
-    return fail(line, `orta harf ${mid} — pi'el ailesinde unlu uzar, sablon yok`);
-  }
+  /*
+   * Orta harf ר/א olan pi'el ailesi artik 'ayin-resh' gizrasina dusuyor
+   * ve kendi sablonu var (בֵּרֵך, הִצְטָרֵף). Yalniz pu'al'in
+   * karsiligi yazilmadi; o birlesim asagida desteklenmeyen olarak elenir.
+   */
 
   /**
    * Motor bu birleşimi üretemiyorsa satır REDDEDİLİR. Tam kök şablonuna

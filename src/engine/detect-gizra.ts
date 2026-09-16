@@ -44,8 +44,16 @@ export function detectGizra(root: string[], binyan: Binyan): Gizra {
   if (b === 'ו' || b === 'י') return 'ayin-vav';
 
   // 3) Pi'el ailesinde orta harf dageş alabiliyor mu
-  if (PIEL_FAMILY.has(binyan) && (GUTTURAL.includes(b) || b === 'ר')) {
-    return 'ayin-guttural';
+  if (PIEL_FAMILY.has(binyan)) {
+    /*
+     * ר ve א ile ח/ע AYNI sonucu vermez, bu yüzden ayrı sinıflar:
+     *   ח/ע — dageş yazılmaz ama önceki ünlü de UZAMAZ: שִׂחֵק, הִתְרַחֵץ
+     *   ר/א — dageş düşer ve önceki ünlü UZAR: בֵּרֵך (hirik→tzere),
+     *          לְבָרֵך (patah→kamatz)
+     * Tek sinıfta toplansalardı biri için doğru olan şablon öbürünü bozardı.
+     */
+    if (b === 'ר' || b === 'א') return 'ayin-resh';
+    if (GUTTURAL.includes(b)) return 'ayin-guttural';
   }
 
   // 4) İlk harf

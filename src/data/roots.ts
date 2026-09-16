@@ -19,12 +19,14 @@ import { A1_TABLES } from './roots-a1';
 import { A2_TABLES } from './roots-a2';
 import { B1_TABLES } from './roots-b1';
 import { B2_TABLES } from './roots-b2';
+import { EXTRA_TABLES } from './roots-extra';
 
 export const ALL_ROOT_TABLES = [
   ...A1_TABLES,
   ...A2_TABLES,
   ...B1_TABLES,
   ...B2_TABLES,
+  ...EXTRA_TABLES,
 ];
 
-export { A1_TABLES, A2_TABLES, B1_TABLES, B2_TABLES };
+export { A1_TABLES, A2_TABLES, B1_TABLES, B2_TABLES, EXTRA_TABLES };

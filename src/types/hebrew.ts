@@ -227,6 +227,7 @@ export type Gizra =
   | 'pe-alef' // 1. harf א — אכל, אמר
   | 'pe-guttural' // 1. harf ע/ח/ה — עבד, חשב
   | 'ayin-guttural' // 2. harf ע/ח/ה/א — שאל, בחר
+  | 'ayin-resh' // 2. harf ר/א, pi'el ailesinde — ברך, צרף, קרב
   | 'ayin-vav' // içi boş kök — קום, שיר, בוא
   | 'lamed-hey' // 3. harf ה — קנה, רצה, עשה
   | 'lamed-alef' // 3. harf א — מצא, קרא
@@ -241,6 +242,7 @@ export const GZAROT: readonly Gizra[] = [
   'pe-alef',
   'pe-guttural',
   'ayin-guttural',
+  'ayin-resh',
   'ayin-vav',
   'lamed-hey',
   'lamed-alef',
@@ -256,6 +258,7 @@ export const GIZRA_LABEL: Record<Gizra, { he: string; tr: string }> = {
   'pe-alef': { he: 'פ״א', tr: 'İlk harf א — gelecekte kaynaşır' },
   'pe-guttural': { he: 'פ״גרונית', tr: 'İlk harf gırtlaksı — hatef harekesi alır' },
   'ayin-guttural': { he: 'ע״גרונית', tr: 'Orta harf gırtlaksı — dageş almaz' },
+  'ayin-resh': { he: 'ע״ר/ע״א', tr: 'Orta harf ר/א — dageş yerine önceki ünlü uzar' },
   'ayin-vav': { he: 'ע״ו', tr: 'İçi boş kök — orta harf ünlüye dönüşür' },
   'lamed-hey': { he: 'ל״ה', tr: 'Son harf ה — eklerde düşer' },
   'lamed-alef': { he: 'ל״א', tr: 'Son harf א — sessizleşir' },

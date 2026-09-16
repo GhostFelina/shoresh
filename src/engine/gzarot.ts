@@ -43,20 +43,21 @@ import {
   type Segment,
 } from './morphology';
 import { HATAF_PATAH, HATAF_SEGOL, HOLAM, SEGOL, TZERE } from './niqqud';
+import { MORE_TEMPLATES } from './gzarot-more';
 import type { Binyan, Gizra } from '@/types/hebrew';
 
 type TemplateKey = `${Binyan}:${Gizra}`;
 
 /**
  * Gırtlaksı ilk harfin şva yerine aldığı hareke.
- * א ve ע yarım hareke (hatef) ister; ח ve ה sessiz şva taşıyabilir.
+ * א, ע ve ה yarım hareke (hatef) ister; yalnızca ח sessiz şva taşır.
  * Bu yüzden לַעֲבֹד ama לַחְשֹׁב.
  */
 const headReduced = (letter: string): string =>
-  letter === 'ע' || letter === 'א' ? HATAF_PATAH : SHVA;
+  letter === 'ח' ? SHVA : HATAF_PATAH;
 
 const headReducedSegol = (letter: string): string =>
-  letter === 'ע' || letter === 'א' ? HATAF_SEGOL : SHVA;
+  letter === 'ח' ? SHVA : HATAF_SEGOL;
 
 /**
  * פ״גרונית kökünde ikinci harf dageş kal alır mı?
@@ -1006,6 +1007,9 @@ export const GIZRA_TEMPLATES: Partial<Record<TemplateKey, BinyanTemplate>> = {
   'piel:ayin-guttural': AYIN_GUTTURAL_PIEL,
   'hitpael:ayin-guttural': AYIN_GUTTURAL_HITPAEL,
 
+  // Ikinci parti sablonlar ayri dosyada; burada haritaya katiliyor.
+  ...MORE_TEMPLATES,
+
   'hifil:ayin-vav': AYIN_VAV_HIFIL,
   'hifil:pe-guttural': PE_GUTTURAL_HIFIL,
   'hifil:pe-nun': PE_NUN_HIFIL,
@@ -1044,6 +1048,9 @@ export const SHLEMIM_COMPATIBLE = new Set<TemplateKey>([
   // kalıbı bozmaz (נִכְנַס gibi).
   'nifal:pe-nun',
   'nifal:ayin-guttural',
+  // Hif'il'de orta girtlaksi hirik male tasiyabilir; kalip hic bozulmaz.
+  // הִטְעִין / מַטְעִין / יַטְעִין — tam kok sablonuyla birebir ayni.
+  'hifil:ayin-guttural',
 ]);
 
 /** Bu gizra hangi binyanlarda motorla üretilebiliyor? */

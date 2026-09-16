@@ -10,6 +10,7 @@
  * benzer bir kalıpla karıştırır. Birebir çeviri o karışıklığı kesiyor.
  */
 import type { CEFR } from '@/types/hebrew';
+import { PHRASES_EXTRA } from './phrases-extra';
 
 export type PhraseTopic =
   | 'selamlaşma'
@@ -42,7 +43,7 @@ export interface Phrase {
   note?: string;
 }
 
-export const PHRASES: Phrase[] = [
+const PHRASES_BASE: Phrase[] = [
   /* --- Selamlaşma --- */
   { id: 'shalom', he: 'שָׁלוֹם', plain: 'שלום', translit: 'şalom', tr: 'merhaba; hoşça kal', literal: 'barış', topic: 'selamlaşma', cefr: 'A1', note: 'Hem karşılaşınca hem ayrılırken kullanılır.' },
   { id: 'boker-tov', he: 'בֹּקֶר טוֹב', plain: 'בוקר טוב', translit: 'boker tov', tr: 'günaydın', literal: 'sabah iyi', topic: 'selamlaşma', cefr: 'A1' },
@@ -235,6 +236,13 @@ export const PHRASES: Phrase[] = [
   { id: 'kach-li', he: 'קַח לִי רֶגַע', plain: 'קח לי רגע', translit: 'kah li rega', tr: 'bir saniye ver', topic: 'günlük', cefr: 'B1' },
   { id: 'bo-nelech', he: 'בּוֹא נֵלֵךְ', plain: 'בוא נלך', translit: 'bo nelah', tr: 'hadi gidelim', literal: 'gel gidelim', topic: 'günlük', cefr: 'A2', note: 'בּוֹא + 1. çoğul gelecek = "hadi …elim".' },
 ];
+
+/*
+ * Kalip listesi iki dosyadan gelir: burasi ulpanin ilk haftasi, ikinci
+ * dosya ise bir isi halletmek icin gerekenler. Birlesim tek yerde olsun
+ * diye burada yapiliyor; disari yalnizca PHRASES cikiyor.
+ */
+export const PHRASES: Phrase[] = [...PHRASES_BASE, ...PHRASES_EXTRA];
 
 export const PHRASE_TOPICS: PhraseTopic[] = [
   'selamlaşma',

@@ -6,5 +6,6 @@
  */
 import { CORE_TABLES } from './lexicon-core';
 import { EXTRA_TABLES } from './lexicon-extra';
+import { WIDE_TABLES } from './lexicon-wide';
 
-export const LEXICON_TABLES = [...CORE_TABLES, ...EXTRA_TABLES];
+export const LEXICON_TABLES = [...CORE_TABLES, ...EXTRA_TABLES, ...WIDE_TABLES];
