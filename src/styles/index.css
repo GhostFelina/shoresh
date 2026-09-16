@@ -381,6 +381,17 @@ body::before {
   body::before {
     animation: none !important;
   }
+
+  /*
+   * Sürekli dönen süs animasyonları tamamen durur. Giriş animasyonları
+   * durmaz, yalnızca süreleri sıfırlanır — `both` dolgusuyla son kareye
+   * atlarlar, yani öğeler GÖRÜNÜR kalır. Burada `none` yazılsaydı
+   * liste maddeleri başlangıç karesinde, yani görünmez kalırdı.
+   */
+  [style*='shoresh-sheen'],
+  [style*='shoresh-pulse'] {
+    animation: none !important;
+  }
 }
 
 /* ---------------------------------------------------------------- *
@@ -399,5 +410,69 @@ body::before {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Kutu ve liste hareketleri
+ *
+ * Sürüm kutusu aşağıdan hafifçe yükselerek ve büyüyerek geliyor.
+ * `cubic-bezier(0.16, 1, 0.3, 1)` — sonu çok yumuşak biten bir eğri;
+ * kutu yerine "oturuyor", zıplamıyor. Zıplayan bir kutu dikkati
+ * içeriğinden kendine çeker.
+ * ---------------------------------------------------------------- */
+@keyframes shoresh-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shoresh-dialog {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/** Liste maddeleri sırayla girer — göz listeyi yukarıdan izleyebilsin. */
+@keyframes shoresh-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/** Üst şeritteki renk geçişi yavaşça kayar. */
+@keyframes shoresh-sheen {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/** Simge hafifçe nefes alır — kutunun canlı olduğunu belli eder. */
+@keyframes shoresh-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
   }
 }

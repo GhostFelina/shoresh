@@ -13,31 +13,73 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
  * değişimiyle gömülüyordu. Dev sunucusunda bu değişim uygulanmadı ve
  * tarayıcıya tanımsız bir değişken gitti. Gerçek bir modül yazmak dev,
  * derleme ve test yollarının üçünde de aynı biçimde çalışır.
+ *
+ * DERLEME ZAMANI DA BURADA: "Son güncelleme" bilgisinin tek dürüst
+ * kaynağı derlemenin kendisidir. Elle yazılan bir tarih yayına çıkmayan
+ * bir değişiklikte de güncellenir ve kullanıcıya yalan söyler.
  */
 function versionModule(): Plugin {
   const pkgPath = fileURLToPath(new URL('./package.json', import.meta.url));
   const outPath = fileURLToPath(new URL('./src/generated/version.ts', import.meta.url));
 
-  const write = () => {
+  const HEADER = `/**
+ * OTOMATİK ÜRETİLİR — elle düzenleme.
+ *
+ * \`vite.config.ts\` içindeki sürüm eklentisi bu dosyayı her sunucu
+ * başlangıcında ve her derlemede yeniden yazar.
+ *
+ * NEDEN \`define\` KULLANILMIYOR: Sürüm önce \`define\` ile derleme anında
+ * metin değişimiyle gömülüyordu. İki ayrı sorun çıkardı:
+ *  1. Vite dev sunucusunda değişim uygulanmadı; tarayıcıya TANIMSIZ bir
+ *     değişken gitti ve onu okuyan başlık çöktü.
+ *  2. package.json değişse bile çalışan sunucu eski değeri sürdürüyordu.
+ * Gerçek bir modül olarak yazılınca dev, derleme ve testte aynı yoldan
+ * okunur — sihir yok, kırılacak bir şey yok.
+ */
+`;
+
+  const write = (stampTime: boolean) => {
     const version = (JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version: string }).version;
     const current = existsSync(outPath) ? readFileSync(outPath, 'utf-8') : '';
-    const next = current.replace(/APP_VERSION = '[^']*'/, `APP_VERSION = '${version}'`);
+
+    /*
+     * Zaman damgası YALNIZCA derlemede tazeleniyor.
+     *
+     * Dev sunucusunda da yazılsaydı dosya her başlatmada değişir, git
+     * sürekli kirli görünür ve "son güncelleme" yayına çıkmamış bir anı
+     * gösterirdi. Dev tarafında eski damga duruyor; orada zaten önemli
+     * olan sürüm numarası.
+     */
+    const stamp = stampTime
+      ? new Date().toISOString()
+      : (/BUILD_TIME = '([^']*)'/.exec(current)?.[1] ?? new Date().toISOString());
+
+    const next =
+      HEADER +
+      `export const APP_VERSION = '${version}';
+` +
+      `
+/** Derlemenin yapıldığı an — ISO 8601, UTC. */
+` +
+      `export const BUILD_TIME = '${stamp}';
+`;
+
     // Yalnızca gerçekten değiştiyse yaz — gereksiz yazma sonsuz yeniden
     // başlatma döngüsü kurar.
-    if (next !== current && next.includes(version)) writeFileSync(outPath, next, 'utf-8');
+    if (next !== current) writeFileSync(outPath, next, 'utf-8');
   };
 
   return {
     name: 'shoresh-version-module',
     buildStart() {
-      write();
+      write(true);
     },
     configureServer(server) {
-      write();
+      write(false);
       server.watcher.add(pkgPath);
       server.watcher.on('change', (file) => {
         if (file !== pkgPath) return;
-        write();
+        write(false);
         server.config.logger.info('package.json degisti - surum modulu yenilendi');
       });
     },

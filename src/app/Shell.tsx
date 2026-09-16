@@ -4,6 +4,8 @@ import { Menu, X } from 'lucide-react';
 import { NAV_GROUPS } from './nav';
 import { APP_VERSION } from '@/lib/version';
 import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
+import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
+import { BUILD_TIME, formatBuildTime } from '@/lib/version';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
 function Logo({ className = 'size-8' }: { className?: string }) {
@@ -99,6 +101,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 export default function Shell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { theme, palette, changeTheme, changePalette } = useAppearance();
+  const whatsNew = useWhatsNew();
 
   // Çekmece açıkken arkadaki sayfa kaymasın.
   useEffect(() => {
@@ -208,13 +211,33 @@ export default function Shell({ children }: { children: ReactNode }) {
         <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
 
         <footer
-          className="mx-auto max-w-5xl px-4 pb-10 pt-4 text-xs"
+          className="mx-auto max-w-5xl space-y-1 px-4 pb-10 pt-4 text-xs"
           style={{ color: 'var(--text-dim)' }}
         >
-          Shoresh v{APP_VERSION} — kökten öğrenilen İbranice. Çekimler kural motoruyla
-          üretilir, ezberle değil.
+          <p>
+            Shoresh v{APP_VERSION} — kökten öğrenilen İbranice. Çekimler kural motoruyla
+            üretilir, ezberle değil.
+          </p>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            {/* Damga derleme anında gömülüyor; elle yazılsaydı yayına
+                çıkmayan bir değişiklikte de güncellenir ve yalan söylerdi. */}
+            <span>Son güncelleme: {formatBuildTime(BUILD_TIME)}</span>
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={whatsNew.openAll}
+              className="underline underline-offset-2 transition"
+              style={{ color: 'var(--accent-text)' }}
+            >
+              Sürüm notları
+            </button>
+          </p>
         </footer>
       </div>
+
+      {whatsNew.releases && (
+        <WhatsNewDialog releases={whatsNew.releases} onClose={whatsNew.close} />
+      )}
     </div>
   );
 }
