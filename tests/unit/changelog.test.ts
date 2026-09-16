@@ -60,14 +60,23 @@ describe('sürüm notu verisi', () => {
     }
   });
 
-  it('tarihler geçerli ve yeniden eskiye', () => {
+  it('yayın anları geçerli ve yeniden eskiye', () => {
+    /*
+     * Karşılaştırma `date` değil `releasedAt` üzerinden: bir günde birden
+     * çok sürüm çıkabiliyor ve gün alanı o sırayı taşıyamıyor. İlk
+     * yazılışında gün alanı kullanılmıştı ve 1.8.0 için yanlış bir gün
+     * yazıldığı sessizce fark edilmemişti; bu test onu yakaladı.
+     */
     for (const r of RELEASES) {
-      expect(Number.isNaN(new Date(r.date).getTime()), r.version).toBe(false);
+      expect(Number.isNaN(new Date(r.date).getTime()), `${r.version} date`).toBe(false);
+      expect(Number.isNaN(new Date(r.releasedAt).getTime()), `${r.version} releasedAt`).toBe(false);
+      // Gün alanı, yayın anının günüyle aynı olmalı.
+      expect(r.releasedAt.startsWith(r.date), `${r.version} gün ile an tutmuyor`).toBe(true);
     }
     for (let i = 1; i < RELEASES.length; i++) {
-      const newer = new Date(RELEASES[i - 1]!.date).getTime();
-      const older = new Date(RELEASES[i]!.date).getTime();
-      expect(newer).toBeGreaterThanOrEqual(older);
+      const newer = new Date(RELEASES[i - 1]!.releasedAt).getTime();
+      const older = new Date(RELEASES[i]!.releasedAt).getTime();
+      expect(newer, `${RELEASES[i - 1]!.version} > ${RELEASES[i]!.version}`).toBeGreaterThan(older);
     }
   });
 });

@@ -17,6 +17,8 @@
  * SIRA: En yeni en üstte. `RELEASES[0]` o anki sürüm sayılır.
  */
 
+import { OLDER_RELEASES } from './changelog-history';
+
 export type ChangeKind = 'yeni' | 'gelisme' | 'duzeltme' | 'icerik';
 
 export interface Change {
@@ -33,6 +35,15 @@ export interface Release {
   version: string;
   /** Yayın tarihi — ISO 8601 (yalnızca gün). */
   date: string;
+  /**
+   * Yayın ANI — ISO 8601, saat ve saat dilimiyle.
+   *
+   * Değer uydurulmadı: her sürümün yayın commit'inin gerçek zamanı.
+   * Elle yazılan bir saat, yayına çıkmayan bir değişiklikte de
+   * güncellenir ve geçmiş kaydını yalan yapar — kaydın tek anlamı
+   * doğru olması.
+   */
+  releasedAt: string;
   title: string;
   summary: string;
   changes: Change[];
@@ -54,10 +65,36 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
   icerik: 'var(--accent-text-alt)',
 };
 
-export const RELEASES: Release[] = [
+const RECENT: Release[] = [
+  {
+    version: '1.15.0',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T20:24:26+03:00',
+    title: 'Sürüm geçmişi',
+    summary:
+      'Temanın yanındaki saat ikonu uygulamanın bütün geçmişini açıyor: on yedi sürüm, eskiden yeniye, gerçek tarih ve saatleriyle.',
+    changes: [
+      { kind: 'yeni', text: 'Üst bantta sürüm geçmişi düğmesi — bütün güncellemeler tek yerde.' },
+      { kind: 'yeni', text: 'Zaman çizgisi: her sürümün yayın anı, bir önceki sürümden ne kadar sonra çıktığı ve değişiklik türlerinin sayısı.' },
+      { kind: 'yeni', text: 'Sıra eskiden yeniye; tek düğmeyle ters çevrilebiliyor.' },
+      { kind: 'icerik', text: 'İlk yayından bu yana çıkan on yedi sürümün tamamı kayda geçirildi — 78 değişiklik.' },
+      { kind: 'duzeltme', text: 'Bir sürümün yayın günü yanlış yazılmıştı; kayıtlar artık yayın anıyla karşılaştırılıyor ve test gün ile anın tutmasını zorluyor.' },
+    ],
+    benefits: [
+      {
+        title: 'Uygulamanın nasıl geliştiğini görebiliyorsun',
+        text: 'Duyuru kutusu bir kez açılıp kapanıyor ve orada anlatılanlar kayboluyordu. Artık ne zaman ne eklendiği, hangi hatanın ne zaman düzeldiği kalıcı bir kayıt. Bir şeyin ne zaman değiştiğini merak ettiğinde bakacak bir yer var.',
+      },
+      {
+        title: 'Tarihler uydurma değil',
+        text: 'Her zaman damgası o sürümün yayın anından alınıyor, elle yazılmıyor. Elle yazılan bir tarih yayına çıkmayan bir değişiklikte de güncellenir ve kaydı yalan yapar; burada yazan saat gerçekten o sürümün çıktığı saattir.',
+      },
+    ],
+  },
   {
     version: '1.14.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T17:18:10+03:00',
     title: 'Öğretmen Modu iki katına çıktı',
     summary:
       'Ders sayısı 30’dan 71’e çıktı ve dersler altı öğrenme kümesine ayrıldı. Artık her ders iki ipuçlu, iki ipuçsuz soru soruyor ve yarıda bıraktığın yerden devam edebiliyorsun.',
@@ -89,6 +126,7 @@ export const RELEASES: Release[] = [
   {
     version: '1.13.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T17:02:19+03:00',
     title: 'İlerleme ve ödül sistemi',
     summary:
       'Artık her cevabın bir karşılığı var: XP kazanıyorsun, rütbe atlıyorsun, günlük hedefin ve serin birikiyor. On iki rozetin ölçütü baştan görünüyor.',
@@ -116,6 +154,7 @@ export const RELEASES: Release[] = [
   {
     version: '1.12.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T16:40:37+03:00',
     title: 'Sürüm notları ve zaman damgası',
     summary:
       'Artık her güncellemede ne değiştiğini bu kutuda göreceksin — ve uygulamanın en son ne zaman güncellendiğini her sayfanın altından okuyabilirsin.',
@@ -139,6 +178,7 @@ export const RELEASES: Release[] = [
   {
     version: '1.11.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T16:31:55+03:00',
     title: 'Beş renk paleti',
     summary:
       'Uygulama tek renk üzerine kuruluydu ve uzun kullanımda yoruyordu. Artık beş palet var ve hepsi okunabilirlik testinden geçiyor.',
@@ -164,6 +204,7 @@ export const RELEASES: Release[] = [
   {
     version: '1.10.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T16:18:00+03:00',
     title: 'Öğretmen Modu',
     summary:
       'Oyunlar seni sınıyordu; bu bölüm öğretiyor. Otuz ders, hepsi kuralı anlatıp örnek göstererek ilerliyor.',
@@ -187,6 +228,7 @@ export const RELEASES: Release[] = [
   {
     version: '1.9.0',
     date: '2026-09-16',
+    releasedAt: '2026-09-16T15:58:55+03:00',
     title: '1.572 öğe ve sekiz yeni çekim şablonu',
     summary:
       'Sözlük iki katına çıktı, fiil havuzu genişledi ve motorun çekemediği sekiz kalıp eklendi.',
@@ -211,7 +253,8 @@ export const RELEASES: Release[] = [
   },
   {
     version: '1.8.0',
-    date: '2026-09-15',
+    date: '2026-09-16',
+    releasedAt: '2026-09-16T12:47:35+03:00',
     title: 'Ses gerçekten çalışıyor',
     summary:
       'Seslendirme üç kez "düzeltilmiş" ama hiç ses çıkmamıştı. Sebebi tahminle değil ölçümle bulundu.',
@@ -228,6 +271,15 @@ export const RELEASES: Release[] = [
     ],
   },
 ];
+
+/**
+ * Bütün sürümler — yeniden eskiye.
+ *
+ * Son sürümler yukarıda yazılır, zamanla `changelog-history.ts` dosyasına
+ * taşınır. Tek dosyada tutulsaydı her sürümde biraz daha büyüyüp
+ * okunamaz hâle gelirdi.
+ */
+export const RELEASES: Release[] = [...RECENT, ...OLDER_RELEASES];
 
 export const LATEST = RELEASES[0]!;
 

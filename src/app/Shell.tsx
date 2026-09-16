@@ -6,6 +6,7 @@ import { APP_VERSION } from '@/lib/version';
 import { PalettePicker, ThemeToggle, useAppearance } from './Appearance';
 import { WhatsNewDialog, useWhatsNew } from './WhatsNew';
 import { RewardHud } from './Rewards';
+import { VersionHistoryButton, VersionHistoryDialog } from './VersionHistory';
 import { BUILD_TIME, formatBuildTime } from '@/lib/version';
 
 /** Markanın işareti: ש harfinin üç çatalı = üç kök harfi. */
@@ -103,6 +104,7 @@ export default function Shell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { theme, palette, changeTheme, changePalette } = useAppearance();
   const whatsNew = useWhatsNew();
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // Çekmece açıkken arkadaki sayfa kaymasın.
   useEffect(() => {
@@ -206,6 +208,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             שֹׁרֶשׁ
           </span>
           <RewardHud />
+          <VersionHistoryButton onOpen={() => setHistoryOpen(true)} />
           <PalettePicker theme={theme} palette={palette} onChange={changePalette} />
           <ThemeToggle theme={theme} onChange={changeTheme} />
         </header>
@@ -233,6 +236,15 @@ export default function Shell({ children }: { children: ReactNode }) {
             >
               Sürüm notları
             </button>
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="underline underline-offset-2 transition"
+              style={{ color: 'var(--accent-text)' }}
+            >
+              Tüm geçmiş
+            </button>
           </p>
         </footer>
       </div>
@@ -240,6 +252,8 @@ export default function Shell({ children }: { children: ReactNode }) {
       {whatsNew.releases && (
         <WhatsNewDialog releases={whatsNew.releases} onClose={whatsNew.close} />
       )}
+
+      {historyOpen && <VersionHistoryDialog onClose={() => setHistoryOpen(false)} />}
     </div>
   );
 }
