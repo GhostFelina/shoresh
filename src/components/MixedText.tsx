@@ -21,8 +21,20 @@ import { Fragment, type ReactElement } from 'react';
  * otomatik yapılıyor.
  */
 
-/** İbranice harfler ve yanlarında yer alabilecek harekeler. */
-const HEBREW_RUN = /([֐-׿יִ-ﭏ][֐-׿יִ-ﭏ\s־'"־]*)/g;
+/**
+ * İbranice öbek: bir ya da daha çok İbranice sözcük, aralarındaki
+ * boşluklarla birlikte.
+ *
+ * DİKKAT — boşluk yalnızca İKİ İbranice sözcük ARASINDA yutulur, öbeğin
+ * sonunda asla. İlk sürümde desen sondaki boşluğu da içine alıyordu ve
+ * ardından gelen Türkçe kelime İbranice öbeğe yapışıyordu:
+ *   "ilk harf הdüşer"      (doğrusu: "ilk harf ה düşer")
+ *   "fiil פ״יgibi çekilir"  (doğrusu: "fiil פ״י gibi çekilir")
+ * Bu yüzden desen "sözcük (boşluk sözcük)*" biçiminde yazıldı; sonu her
+ * zaman bir harfe denk gelir.
+ */
+const HEBREW_RUN =
+  /([֐-׿יִ-ﭏ][֐-׿יִ-ﭏ־'"״׳]*(?: +[֐-׿יִ-ﭏ][֐-׿יִ-ﭏ־'"״׳]*)*)/g;
 
 export function MixedText({
   children,

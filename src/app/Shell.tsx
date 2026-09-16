@@ -10,21 +10,26 @@ function Logo({ className = 'size-8' }: { className?: string }) {
     <svg viewBox="0 0 64 64" className={`${className} shrink-0`} aria-hidden="true">
       <defs>
         <linearGradient id="shoresh-mark" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--color-brand-300)" />
+          <stop offset="0" stopColor="var(--accent-text)" />
           <stop offset="1" stopColor="var(--color-accent-500)" />
         </linearGradient>
       </defs>
+      {/*
+        Üç kol tek noktada birleşip aşağı iniyor: hem ש harfinin üç çatalı
+        hem de toprağa inen kök. İlk sürümde kollar birleşmiyor, altta ayrı
+        bir çizgi duruyordu; kopuk üç çizgi gibi görünüyordu.
+      */}
       <g
         fill="none"
         stroke="url(#shoresh-mark)"
-        strokeWidth="5"
+        strokeWidth="5.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M20 18v12c0 4 2 7 6 8" />
-        <path d="M32 16v22" />
-        <path d="M44 18v12c0 4-2 7-6 8" />
-        <path d="M20 46h24" />
+        <path d="M17 15v14c0 8 6 13 15 15" />
+        <path d="M32 13v31" />
+        <path d="M47 15v14c0 8-6 13-15 15" />
+        <path d="M32 44v7" />
       </g>
     </svg>
   );
@@ -66,7 +71,7 @@ function ThemeToggle() {
 /** Kenar çubuğunun içeriği — masaüstünde sabit, telefonda çekmecede. */
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <nav className="space-y-5 pb-8">
+    <nav className="space-y-4 pb-6">
       {NAV_GROUPS.map((group) => (
         <div key={group.id} className="space-y-1">
           {group.title && (
@@ -84,10 +89,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   to={item.to}
                   end={item.end}
                   onClick={onNavigate}
-                  className="group flex items-center gap-2.5 rounded-lg px-3 py-2 transition"
+                  className="group flex items-center gap-2.5 rounded-lg px-3 py-1.5 transition"
                   style={({ isActive }) => ({
                     background: isActive ? 'var(--surface-2)' : 'transparent',
-                    color: isActive ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                    color: isActive ? 'var(--accent-text)' : 'var(--text-dim)',
                     boxShadow: isActive ? 'inset 2px 0 0 var(--color-brand-400)' : 'none',
                   })}
                 >
@@ -103,7 +108,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   )}
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{item.label}</span>
-                    <span className="block truncate text-[10px] opacity-70">{item.hint}</span>
+                    <span className="block truncate text-[10px] leading-tight opacity-70">{item.hint}</span>
                   </span>
                 </NavLink>
               </li>
@@ -133,14 +138,14 @@ export default function Shell({ children }: { children: ReactNode }) {
         className="sticky top-0 hidden h-dvh w-64 shrink-0 overflow-y-auto border-l-0 border-r px-3 py-4 lg:block"
         style={{ background: 'var(--surface)' }}
       >
-        <div className="mb-5 flex items-center gap-2.5 px-2">
+        <div className="mb-4 flex items-center gap-2.5 px-2">
           <Logo />
           <div className="leading-tight">
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-bold tracking-tight">Shoresh</span>
               <span
                 className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
-                style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
+                style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
               >
                 v{APP_VERSION}
               </span>
@@ -167,13 +172,13 @@ export default function Shell({ children }: { children: ReactNode }) {
             className="absolute inset-y-0 left-0 w-72 overflow-y-auto border-r px-3 py-4"
             style={{ background: 'var(--surface)' }}
           >
-            <div className="mb-5 flex items-center gap-2.5 px-2">
+            <div className="mb-4 flex items-center gap-2.5 px-2">
               <Logo />
               <div className="mr-auto flex items-baseline gap-1.5">
                 <span className="text-base font-bold">Shoresh</span>
                 <span
                   className="rounded px-1 py-px text-[9px] font-semibold tabular-nums"
-                  style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
+                  style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
                 >
                   v{APP_VERSION}
                 </span>

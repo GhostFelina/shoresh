@@ -1,3 +1,35 @@
+## 1.7.0
+
+**Artık ekrana bakabiliyorum.** Playwright ile her sayfa masaüstü (1440) ve
+telefon (390) genişliğinde, koyu ve açık temada çekiliyor — `npm run shots`.
+Chrome DevTools’a dokunulmadı; kural zaten "DevTools yasak, Playwright serbest"
+şeklindeydi. İlk koşu dört gerçek hata buldu, dördü de düzeltildi:
+
+1. **Açık tema okunmuyordu.** Vurgu rengi (`#5eead4`) koyu zemin için
+   tasarlanmış bir tondu ve beyaz üzerinde kontrastı 1.4:1’e düşüyordu;
+   bütün sayaçlar, başlıklar ve bağlantılar soluk kalıyordu. Metin vurgusu
+   artık zeminden ayrı bir belirteç ve açık temada koyu tonu kullanıyor.
+
+2. **İki yönlü metin boşluk yutuyordu** — bu bir REGRESYONDU, v1.5.0’da
+   eklediğim `MixedText` yaratmıştı. Desen İbranice öbeğin sonundaki boşluğu
+   da içine alıyor, ardından gelen Türkçe kelime yapışıyordu:
+   *"ilk harf הdüşer"*, *"fiil פ״יgibi çekilir"*. Desen yeniden yazıldı ve
+   tekrarını engelleyen regresyon testi eklendi.
+
+3. **Kelimeler sayfası 24.356 piksel uzunluğundaydı** — 353 kelimenin tamamı
+   tek seferde çiziliyordu. Hem kullanılamaz hem yavaş. "Daha fazla göster"
+   eklendi; sayfa 5.080 piksele indi (%79 azalma). Kalıplar ve seviye
+   sayfalarına da uygulandı.
+
+4. **Logo kopuk görünüyordu** — üç çizgi birleşmiyor, altta ayrı bir çizgi
+   duruyordu. Üç kol artık tek noktada birleşip aşağı iniyor: hem ש harfinin
+   üç çatalı hem toprağa inen kök.
+
+Ayrıca kenar çubuğu sıkılaştırıldı; 11 giriş artık 900 piksel yüksekliğinde
+bir ekrana kaydırmadan sığıyor (İlerleme sekmesi görünmüyordu).
+
+283 birim testi.
+
 ## 1.6.0
 
 **İbranice ekran klavyesi.** Rakip uygulamaları incelerken bizde olmayan

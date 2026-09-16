@@ -54,7 +54,7 @@ function Stat({ value, label, tone }: { value: number | string; label: string; t
     <div className="card-2 px-4 py-3">
       <div
         className="text-2xl numeric font-bold"
-        style={{ color: tone ?? 'var(--color-brand-300)' }}
+        style={{ color: tone ?? 'var(--accent-text)' }}
       >
         {typeof value === 'number' ? value.toLocaleString('tr-TR') : value}
       </div>

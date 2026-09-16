@@ -6,6 +6,7 @@ import { PHRASES } from '@/data/phrases';
 import { generateSentence } from '@/engine/sentence';
 import { speak } from '@/lib/speech';
 import { LEVELS } from '@/app/nav';
+import { ShowMoreButton, useShowMore } from '@/components/ShowMore';
 import {
   BINYAN_LABEL,
   BINYANIM,
@@ -79,14 +80,14 @@ function VerbRow({ verb }: { verb: HebrewVerb }) {
         <span className="he he-vocalized w-28 shrink-0 text-xl">{verb.lemma.vocalized}</span>
         <span
           className="w-24 shrink-0 text-xs italic"
-          style={{ color: 'var(--color-brand-300)' }}
+          style={{ color: 'var(--accent-text)' }}
         >
           {verb.lemma.translit}
         </span>
         <span className="min-w-0 flex-1 truncate text-sm">{verb.tr.join(', ')}</span>
         <span
           className="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] sm:block"
-          style={{ background: 'var(--surface)', color: 'var(--color-accent-400)' }}
+          style={{ background: 'var(--surface)', color: 'var(--accent-text-alt)' }}
         >
           {BINYAN_LABEL[verb.binyan].tr}
         </span>
@@ -110,7 +111,7 @@ function VerbRow({ verb }: { verb: HebrewVerb }) {
             <div className="flex items-center gap-3 rounded-lg px-3 py-2" style={{ background: 'var(--surface)' }}>
               <div className="min-w-0 flex-1">
                 <div className="he he-vocalized text-lg">{example.he}</div>
-                <div className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                <div className="text-xs italic" style={{ color: 'var(--accent-text)' }}>
                   {example.translit}
                 </div>
                 <div className="text-xs" style={{ color: 'var(--text-dim)' }}>
@@ -131,7 +132,7 @@ function VerbRow({ verb }: { verb: HebrewVerb }) {
           <Link
             to={`/verb?id=${encodeURIComponent(verb.id)}`}
             className="inline-flex items-center gap-1 text-xs font-medium"
-            style={{ color: 'var(--color-brand-300)' }}
+            style={{ color: 'var(--accent-text)' }}
           >
             Tam çekim tablosu
             <ArrowLeft className="size-3 rotate-180" />
@@ -174,6 +175,7 @@ export default function LevelPage() {
   }, [verbs]);
 
   const totalForms = verbs.reduce((n, v) => n + formCount(v), 0);
+  const page = useShowMore(shown, 40, `${level}|${query}|${binyanFilter}`);
 
   if (!meta) {
     return <p className="py-10 text-sm">Böyle bir seviye yok.</p>;
@@ -185,7 +187,7 @@ export default function LevelPage() {
         <div className="flex flex-wrap items-baseline gap-3">
           <span
             className="rounded-lg px-2.5 py-1 text-lg font-bold"
-            style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
+            style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
           >
             {level}
           </span>
@@ -198,7 +200,7 @@ export default function LevelPage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--accent-text)' }}>
             {verbs.length}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -206,7 +208,7 @@ export default function LevelPage() {
           </div>
         </div>
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--accent-text)' }}>
             {totalForms.toLocaleString('tr-TR')}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -214,7 +216,7 @@ export default function LevelPage() {
           </div>
         </div>
         <div className="card-2 px-4 py-3">
-          <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-2xl numeric font-bold" style={{ color: 'var(--accent-text)' }}>
             {phrases.length}
           </div>
           <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -238,7 +240,7 @@ export default function LevelPage() {
           ))}
         </ul>
         <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-          <strong style={{ color: 'var(--color-brand-300)' }}>Hedef:</strong> {guide.goal}
+          <strong style={{ color: 'var(--accent-text)' }}>Hedef:</strong> {guide.goal}
         </p>
       </section>
 
@@ -261,7 +263,7 @@ export default function LevelPage() {
             className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: binyanFilter === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
-              color: binyanFilter === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
+              color: binyanFilter === 'all' ? 'var(--accent-text)' : 'var(--text-dim)',
             }}
           >
             Hepsi ({verbs.length})
@@ -274,7 +276,7 @@ export default function LevelPage() {
               className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: binyanFilter === b ? 'var(--color-brand-400)' : 'var(--border)',
-                color: binyanFilter === b ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                color: binyanFilter === b ? 'var(--accent-text)' : 'var(--text-dim)',
               }}
             >
               {BINYAN_LABEL[b].tr} ({binyanCounts.get(b)})
@@ -283,7 +285,7 @@ export default function LevelPage() {
         </div>
 
         <ul className="space-y-1.5">
-          {shown.map((v) => (
+          {page.visible.map((v) => (
             <VerbRow key={v.id} verb={v} />
           ))}
           {shown.length === 0 && (
@@ -292,6 +294,13 @@ export default function LevelPage() {
             </li>
           )}
         </ul>
+
+        <ShowMoreButton
+          hidden={page.hidden}
+          onMore={page.showMore}
+          onAll={page.showAll}
+          step={40}
+        />
       </section>
 
       {/* Kalıplar */}
@@ -308,7 +317,7 @@ export default function LevelPage() {
               >
                 <span className="he he-vocalized flex-1 text-lg">{p.he}</span>
                 <span className="flex-1 text-left">
-                  <span className="block text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                  <span className="block text-xs italic" style={{ color: 'var(--accent-text)' }}>
                     {p.translit}
                   </span>
                   <span className="block text-xs">{p.tr}</span>

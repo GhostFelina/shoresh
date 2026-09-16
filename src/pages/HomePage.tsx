@@ -13,7 +13,7 @@ import { canSpeakHebrew, speechStatus } from '@/lib/speech';
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="card-2 px-4 py-3">
-      <div className="text-2xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+      <div className="text-2xl numeric font-bold" style={{ color: 'var(--accent-text)' }}>
         {typeof value === 'number' ? value.toLocaleString('tr-TR') : value}
       </div>
       <div className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
@@ -100,7 +100,7 @@ function TodayCard() {
         <div className="card-2 px-3 py-2">
           <div
             className="text-xl numeric font-bold"
-            style={{ color: 'var(--color-brand-300)' }}
+            style={{ color: 'var(--accent-text)' }}
           >
             {stats.strong}
           </div>
@@ -185,11 +185,11 @@ export default function HomePage() {
               <div className="flex items-center gap-2">
                 <span
                   className="grid size-7 place-items-center rounded-lg text-xs font-bold"
-                  style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
+                  style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
                 >
                   {s.step}
                 </span>
-                <s.icon className="size-4" style={{ color: 'var(--color-accent-400)' }} />
+                <s.icon className="size-4" style={{ color: 'var(--accent-text-alt)' }} />
                 <h3 className="font-semibold">{s.title}</h3>
                 <ArrowLeft className="mr-auto size-4 rotate-180 opacity-0 transition group-hover:opacity-60" />
               </div>
@@ -217,7 +217,7 @@ export default function HomePage() {
           ].map(([he, tr, mean, note]) => (
             <div key={he} className="card-2 flex items-baseline gap-3 px-3 py-2">
               <span className="he he-vocalized text-xl">{he}</span>
-              <span className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+              <span className="text-xs italic" style={{ color: 'var(--accent-text)' }}>
                 {tr}
               </span>
               <span className="mr-auto text-sm">{mean}</span>
@@ -233,7 +233,7 @@ export default function HomePage() {
       <section className="card-2 space-y-1 p-4">
         <h2
           className="text-xs font-semibold"
-          style={{ color: speechReady ? 'var(--color-brand-300)' : '#fbbf24' }}
+          style={{ color: speechReady ? 'var(--accent-text)' : '#fbbf24' }}
         >
           Seslendirme: {speechStatus().layer === 'device-voice'
             ? 'cihaz sesi'
@@ -243,7 +243,7 @@ export default function HomePage() {
         </h2>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
           {speechStatus().message}{' '}
-          <Link to="/ses" className="underline" style={{ color: 'var(--color-brand-300)' }}>
+          <Link to="/ses" className="underline" style={{ color: 'var(--accent-text)' }}>
             Ses sayfasından
           </Link>{' '}
           sınayabilir ve kalıcı çözümün adımlarını görebilirsin.

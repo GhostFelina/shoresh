@@ -42,7 +42,7 @@ export default function BinyanimPage() {
             <section key={b} className="card space-y-3 p-4">
               <div className="flex flex-wrap items-baseline gap-2">
                 <h2 className="text-lg font-bold">{BINYAN_LABEL[b].tr}</h2>
-                <span className="he text-lg" style={{ color: 'var(--color-brand-300)' }}>
+                <span className="he text-lg" style={{ color: 'var(--accent-text)' }}>
                   {BINYAN_LABEL[b].he}
                 </span>
                 {pair && (
@@ -71,7 +71,7 @@ export default function BinyanimPage() {
                         {label}
                       </dt>
                       <dd className="he he-vocalized flex-1 text-lg">{c.vocalized}</dd>
-                      <dd className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                      <dd className="text-xs italic" style={{ color: 'var(--accent-text)' }}>
                         {c.translit}
                       </dd>
                     </div>

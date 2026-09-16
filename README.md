@@ -45,7 +45,20 @@ npm run dev        # http://localhost:5400
 npm run verify     # typecheck + lint + birim testleri
 npm run test       # yalnız birim testleri
 npm run build      # üretim derlemesi
+npm run shots      # her sayfanın ekran görüntüsü -> screenshots/
 ```
+
+### Görsel denetim
+
+`npm run shots` her sayfayı masaüstü (1440) ve telefon (390) genişliğinde,
+koyu ve açık temada çekip `screenshots/` altına koyar. Otomatik denetim
+(`tests/unit/audit.test.tsx`) ölçülebilir şeyleri yakalar — erişilebilir ad,
+bağlantı hedefi, metin yönü. Ama "bu sayfa kalabalık", "bu renk okunmuyor"
+gibi yargılar ancak sayfaya BAKARAK verilir; bu betik o bakışı mümkün kılar.
+
+Nitekim ilk koşuda dört gerçek hata buldu: açık temada okunmayan vurgu
+rengi, boşluk yutan iki yönlü metin, 24.000 piksel uzunluğunda kelime
+listesi ve kopuk görünen logo.
 
 ## Mimari
 

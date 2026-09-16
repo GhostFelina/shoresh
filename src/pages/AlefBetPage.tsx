@@ -63,7 +63,7 @@ export default function AlefBetPage() {
             className="card-2 px-3 py-1.5 text-xs card-interactive"
             style={{
               borderColor: order === key ? 'var(--color-brand-400)' : 'var(--border)',
-              color: order === key ? 'var(--color-brand-300)' : 'var(--text-dim)',
+              color: order === key ? 'var(--accent-text)' : 'var(--text-dim)',
             }}
           >
             {label}
@@ -100,7 +100,7 @@ export default function AlefBetPage() {
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-baseline gap-2">
               <h2 className="text-xl font-bold">{selected.nameTr}</h2>
-              <span className="he text-lg" style={{ color: 'var(--color-brand-300)' }}>
+              <span className="he text-lg" style={{ color: 'var(--accent-text)' }}>
                 {selected.nameHe}
               </span>
             </div>
@@ -147,7 +147,7 @@ export default function AlefBetPage() {
 
         {selected.confusedWith && selected.confusedWith.length > 0 && (
           <div className="card-2 space-y-2 p-3">
-            <h3 className="text-xs font-semibold" style={{ color: 'var(--color-brand-300)' }}>
+            <h3 className="text-xs font-semibold" style={{ color: 'var(--accent-text)' }}>
               Karıştırma
             </h3>
             <div className="flex items-center gap-3">

@@ -37,7 +37,7 @@ function Cell({ label, c }: { label: string; c: Conjugation | undefined }) {
       <span className="he hidden flex-1 text-base sm:block" style={{ color: 'var(--text-dim)' }}>
         {c.plain}
       </span>
-      <span className="w-28 shrink-0 text-left text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+      <span className="w-28 shrink-0 text-left text-xs italic" style={{ color: 'var(--accent-text)' }}>
         {c.translit}
       </span>
       <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
@@ -108,7 +108,7 @@ function Examples({ verb }: { verb: HebrewVerb }) {
   return (
     <section className="card space-y-3 p-4">
       <h3 className="flex items-center gap-2 text-sm font-semibold">
-        <MessageSquareText className="size-4" style={{ color: 'var(--color-accent-400)' }} />
+        <MessageSquareText className="size-4" style={{ color: 'var(--accent-text-alt)' }} />
         Örnek cümleler
       </h3>
 
@@ -130,7 +130,7 @@ function Examples({ verb }: { verb: HebrewVerb }) {
                 </span>
                 <span className="min-w-0 flex-1 space-y-0.5">
                   <span className="he he-vocalized block text-lg leading-relaxed">{s.he}</span>
-                  <span className="block text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                  <span className="block text-xs italic" style={{ color: 'var(--accent-text)' }}>
                     {s.translit}
                   </span>
                   <span className="block text-sm">{s.tr}</span>
@@ -181,7 +181,7 @@ function Examples({ verb }: { verb: HebrewVerb }) {
                     <span className="he he-vocalized block text-lg">{s.he}</span>
                     <span
                       className="block text-[11px] italic"
-                      style={{ color: 'var(--color-brand-300)' }}
+                      style={{ color: 'var(--accent-text)' }}
                     >
                       {s.translit}
                     </span>
@@ -269,7 +269,7 @@ export default function VerbsPage() {
                     </span>
                     <span
                       className="shrink-0 rounded px-1.5 py-0.5 text-[10px]"
-                      style={{ background: 'var(--surface)', color: 'var(--color-accent-400)' }}
+                      style={{ background: 'var(--surface)', color: 'var(--accent-text-alt)' }}
                     >
                       {BINYAN_LABEL[v.binyan].tr}
                     </span>
@@ -293,7 +293,7 @@ export default function VerbsPage() {
                 <span className="he he-vocalized he-serif text-4xl font-bold">
                   {verb.lemma.vocalized}
                 </span>
-                <span className="text-lg italic" style={{ color: 'var(--color-brand-300)' }}>
+                <span className="text-lg italic" style={{ color: 'var(--accent-text)' }}>
                   {verb.lemma.translit}
                 </span>
                 <span className="text-lg">{verb.tr.join(', ')}</span>
@@ -345,7 +345,7 @@ export default function VerbsPage() {
 
               {siblings.length > 0 && (
                 <div className="card-2 space-y-1 p-3">
-                  <h3 className="text-xs font-semibold" style={{ color: 'var(--color-brand-300)' }}>
+                  <h3 className="text-xs font-semibold" style={{ color: 'var(--accent-text)' }}>
                     Aynı kök, başka binyan — anlam değişir
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -376,7 +376,7 @@ export default function VerbsPage() {
                   className="card-2 px-3 py-1.5 text-xs card-interactive"
                   style={{
                     borderColor: form === f ? 'var(--color-brand-400)' : 'var(--border)',
-                    color: form === f ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                    color: form === f ? 'var(--accent-text)' : 'var(--text-dim)',
                   }}
                 >
                   {FORM_LABEL[f].tr}

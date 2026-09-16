@@ -227,7 +227,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
     return (
       <div className="card space-y-4 p-6 text-center">
         <h2 className="text-xl font-bold">Tur bitti</h2>
-        <div className="text-5xl numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+        <div className="text-5xl numeric font-bold" style={{ color: 'var(--accent-text)' }}>
           {s.correct}/{queue.length}
         </div>
         <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
@@ -282,7 +282,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg numeric font-bold" style={{ color: 'var(--color-brand-300)' }}>
+          <div className="text-lg numeric font-bold" style={{ color: 'var(--accent-text)' }}>
             {s.correct}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--text-dim)' }}>
@@ -621,7 +621,7 @@ function TypeBody({
       {state.hintsUsed > 0 && (
         <ul className="space-y-0.5">
           {q.hints.slice(0, state.hintsUsed).map((h) => (
-            <li key={h} className="text-xs" style={{ color: 'var(--color-accent-400)' }}>
+            <li key={h} className="text-xs" style={{ color: 'var(--accent-text-alt)' }}>
               → {h}
             </li>
           ))}
@@ -695,7 +695,7 @@ export default function GamesPage() {
             className="card-2 px-3 py-1 text-xs card-interactive"
             style={{
               borderColor: level === l ? 'var(--color-brand-400)' : 'var(--border)',
-              color: level === l ? 'var(--color-brand-300)' : 'var(--text-dim)',
+              color: level === l ? 'var(--accent-text)' : 'var(--text-dim)',
             }}
           >
             {l}
@@ -730,12 +730,12 @@ export default function GamesPage() {
             >
               <div className="flex items-baseline gap-2">
                 <h2 className="text-base font-bold">{g.title}</h2>
-                <span className="he text-sm" style={{ color: 'var(--color-brand-300)' }}>
+                <span className="he text-sm" style={{ color: 'var(--accent-text)' }}>
                   {g.he}
                 </span>
                 <span
                   className="mr-auto rounded px-1.5 py-0.5 text-[10px]"
-                  style={{ background: 'var(--surface-2)', color: 'var(--color-accent-400)' }}
+                  style={{ background: 'var(--surface-2)', color: 'var(--accent-text-alt)' }}
                 >
                   {g.teaches}
                 </span>

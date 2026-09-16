@@ -45,6 +45,20 @@
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
   --glow-brand: 0 0 0 1px color-mix(in srgb, var(--color-brand-400) 35%, transparent);
 
+  /*
+   * METİN için marka rengi, ZEMİN için marka renginden AYRI tutuluyor.
+   *
+   * #5eead4 koyu zemin üzerinde parlak ve okunur, ama beyaz üzerinde
+   * kontrastı 1.4:1'e düşüyor — rakamlar ve bağlantılar okunmaz oluyordu.
+   * Açık temada aynı ailenin çok daha koyu tonu kullanılıyor. Zemin/kenarlık
+   * renkleri ise iki temada da parlak ton olarak kalabilir, çünkü orada
+   * kontrast metinle değil yüzeyle ölçülür.
+   */
+  --accent-text: var(--color-brand-300);
+  --accent-text-alt: var(--color-accent-400);
+  /* Dişil rozeti — eril rozetinden ayrışsın ama okunur kalsın. */
+  --accent-fem: #f0abfc;
+
   color-scheme: dark;
 }
 
@@ -58,6 +72,11 @@
 
   --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.05), 0 8px 20px -14px rgb(15 23 42 / 0.25);
   --shadow-lift: 0 2px 6px rgb(15 23 42 / 0.08), 0 18px 40px -20px rgb(15 23 42 / 0.35);
+
+  /* Beyaz üzerinde okunabilir tonlar — WCAG AA eşiğini geçer. */
+  --accent-text: #0f766e;
+  --accent-text-alt: #4338ca;
+  --accent-fem: #a21caf;
 
   color-scheme: light;
 }
@@ -215,7 +234,7 @@ body::before {
     100deg,
     var(--text) 0%,
     var(--text) 40%,
-    var(--color-brand-300) 100%
+    var(--accent-text) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;

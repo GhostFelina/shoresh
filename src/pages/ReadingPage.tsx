@@ -47,7 +47,7 @@ export default function ReadingPage() {
                 <span className="he he-serif text-3xl leading-none">
                   {n.id === 'shuruk' ? n.mark : CARRIER + n.mark}
                 </span>
-                <span className="text-lg font-bold" style={{ color: 'var(--color-brand-300)' }}>
+                <span className="text-lg font-bold" style={{ color: 'var(--accent-text)' }}>
                   {n.sound}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export default function ReadingPage() {
             <div key={w.plain} className="card-2 grid grid-cols-[1fr_1fr_6rem_1fr_2.5rem] items-center gap-2 px-3 py-2">
               <span className="he he-vocalized he-serif text-xl">{w.vocalized}</span>
               <span className="he he-serif text-xl">{w.plain}</span>
-              <span className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+              <span className="text-xs italic" style={{ color: 'var(--accent-text)' }}>
                 {w.translit}
               </span>
               <span className="text-xs">{w.tr}</span>

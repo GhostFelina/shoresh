@@ -282,7 +282,7 @@ export default function SoundPage() {
             >
               <span className="he he-vocalized flex-1 text-xl">{s.he}</span>
               <span className="flex-1 text-left">
-                <span className="block text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                <span className="block text-xs italic" style={{ color: 'var(--accent-text)' }}>
                   {s.translit}
                 </span>
                 <span className="block text-xs">{s.tr}</span>
@@ -358,7 +358,7 @@ export default function SoundPage() {
             <li key={step} className="flex items-start gap-2.5 text-sm">
               <span
                 className="grid size-5 shrink-0 place-items-center rounded text-[10px] font-bold"
-                style={{ background: 'var(--surface-2)', color: 'var(--color-brand-300)' }}
+                style={{ background: 'var(--surface-2)', color: 'var(--accent-text)' }}
               >
                 {i + 1}
               </span>
@@ -367,7 +367,7 @@ export default function SoundPage() {
           ))}
         </ol>
         {status.hasDeviceVoice && (
-          <p className="text-xs" style={{ color: 'var(--color-brand-300)' }}>
+          <p className="text-xs" style={{ color: 'var(--accent-text)' }}>
             Cihazında zaten İbranice ses var — bu adımlara gerek yok.
           </p>
         )}

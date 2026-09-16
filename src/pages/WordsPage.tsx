@@ -9,6 +9,7 @@ import {
 } from '@/data/lexicon';
 import { speak } from '@/lib/speech';
 import { MixedText } from '@/components/MixedText';
+import { ShowMoreButton, useShowMore } from '@/components/ShowMore';
 import type { CEFR, HebrewWord, WordClass } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
@@ -23,7 +24,7 @@ function GenderBadge({ gender }: { gender: HebrewWord['gender'] }) {
       className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold"
       style={{
         background: 'var(--surface)',
-        color: isM ? 'var(--color-accent-400)' : '#f0abfc',
+        color: isM ? 'var(--accent-text-alt)' : 'var(--accent-fem)',
       }}
       title={isM ? 'eril — sıfat da eril olur' : 'dişil — sıfat da dişil olur'}
     >
@@ -42,7 +43,7 @@ function WordRow({ word }: { word: HebrewWord }) {
       >
         <span className="he he-vocalized he-serif w-32 shrink-0 text-xl">{word.vocalized}</span>
         <span className="min-w-0 flex-1 text-left">
-          <span className="block text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+          <span className="block text-xs italic" style={{ color: 'var(--accent-text)' }}>
             {word.translit}
           </span>
           <span className="block truncate text-sm">{word.tr.join(', ')}</span>
@@ -108,6 +109,9 @@ export default function WordsPage() {
     });
   }, [query, topic, wordClass, level]);
 
+  // Süzgeç değişince sayaç sıfırlanmalı: yeni bir listeye bakılıyor.
+  const page = useShowMore(shown, 60, `${query}|${topic}|${wordClass}|${level}`);
+
   return (
     <div className="space-y-5">
       <header className="space-y-1">
@@ -129,7 +133,7 @@ export default function WordsPage() {
           <div key={l as string} className="card-2 px-4 py-3">
             <div
               className="text-2xl numeric font-bold"
-              style={{ color: 'var(--color-brand-300)' }}
+              style={{ color: 'var(--accent-text)' }}
             >
               {v as number}
             </div>
@@ -180,7 +184,7 @@ export default function WordsPage() {
               className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: level === l ? 'var(--color-brand-400)' : 'var(--border)',
-                color: level === l ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                color: level === l ? 'var(--accent-text)' : 'var(--text-dim)',
               }}
             >
               {l === 'all' ? 'Tüm seviyeler' : l}
@@ -194,7 +198,7 @@ export default function WordsPage() {
               className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: wordClass === c ? 'var(--color-accent-400)' : 'var(--border)',
-                color: wordClass === c ? 'var(--color-accent-400)' : 'var(--text-dim)',
+                color: wordClass === c ? 'var(--accent-text-alt)' : 'var(--text-dim)',
               }}
             >
               {c === 'all' ? 'Tüm türler' : WORD_CLASS_LABEL[c]}
@@ -209,7 +213,7 @@ export default function WordsPage() {
             className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: topic === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
-              color: topic === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
+              color: topic === 'all' ? 'var(--accent-text)' : 'var(--text-dim)',
             }}
           >
             Tüm konular
@@ -222,7 +226,7 @@ export default function WordsPage() {
               className="card-2 px-2.5 py-1 text-xs card-interactive"
               style={{
                 borderColor: topic === t ? 'var(--color-brand-400)' : 'var(--border)',
-                color: topic === t ? 'var(--color-brand-300)' : 'var(--text-dim)',
+                color: topic === t ? 'var(--accent-text)' : 'var(--text-dim)',
               }}
             >
               {t} ({topicCounts.get(t)})
@@ -232,7 +236,7 @@ export default function WordsPage() {
       </div>
 
       <ul className="space-y-1.5">
-        {shown.map((w) => (
+        {page.visible.map((w) => (
           <WordRow key={w.id} word={w} />
         ))}
         {shown.length === 0 && (
@@ -241,6 +245,8 @@ export default function WordsPage() {
           </li>
         )}
       </ul>
+
+      <ShowMoreButton hidden={page.hidden} onMore={page.showMore} onAll={page.showAll} />
 
       {/* Eş yazımlılar */}
       {HOMOGRAPHS.length > 0 && (
@@ -263,7 +269,7 @@ export default function WordsPage() {
                       className="flex items-baseline gap-2 text-sm card-interactive"
                     >
                       <span className="he he-vocalized text-lg">{w.vocalized}</span>
-                      <span className="text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                      <span className="text-xs italic" style={{ color: 'var(--accent-text)' }}>
                         {w.translit}
                       </span>
                       <span className="text-xs">{w.tr[0]}</span>

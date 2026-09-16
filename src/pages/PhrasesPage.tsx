@@ -3,6 +3,7 @@ import { Volume2 } from 'lucide-react';
 import { PHRASES, PHRASE_TOPICS, TOPIC_LABEL, type PhraseTopic } from '@/data/phrases';
 import { speak } from '@/lib/speech';
 import { MixedText } from '@/components/MixedText';
+import { ShowMoreButton, useShowMore } from '@/components/ShowMore';
 
 export default function PhrasesPage() {
   const [topic, setTopic] = useState<PhraseTopic | 'all'>('all');
@@ -26,6 +27,8 @@ export default function PhrasesPage() {
       );
     });
   }, [topic, query]);
+
+  const page = useShowMore(shown, 50, `${query}|${topic}`);
 
   return (
     <div className="space-y-5">
@@ -57,7 +60,7 @@ export default function PhrasesPage() {
           className="card-2 px-2.5 py-1 text-xs card-interactive"
           style={{
             borderColor: topic === 'all' ? 'var(--color-brand-400)' : 'var(--border)',
-            color: topic === 'all' ? 'var(--color-brand-300)' : 'var(--text-dim)',
+            color: topic === 'all' ? 'var(--accent-text)' : 'var(--text-dim)',
           }}
         >
           Hepsi
@@ -70,7 +73,7 @@ export default function PhrasesPage() {
             className="card-2 px-2.5 py-1 text-xs card-interactive"
             style={{
               borderColor: topic === t ? 'var(--color-brand-400)' : 'var(--border)',
-              color: topic === t ? 'var(--color-brand-300)' : 'var(--text-dim)',
+              color: topic === t ? 'var(--accent-text)' : 'var(--text-dim)',
             }}
           >
             {TOPIC_LABEL[t]} ({counts.get(t)})
@@ -79,13 +82,13 @@ export default function PhrasesPage() {
       </div>
 
       <ul className="space-y-1.5">
-        {shown.map((p) => (
+        {page.visible.map((p) => (
           <li key={p.id} className="card-2 px-3 py-2.5">
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <div className="he he-vocalized he-serif text-xl">{p.he}</div>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                  <span className="text-sm italic" style={{ color: 'var(--color-brand-300)' }}>
+                  <span className="text-sm italic" style={{ color: 'var(--accent-text)' }}>
                     {p.translit}
                   </span>
                   <span className="text-sm font-medium">{p.tr}</span>
@@ -103,7 +106,7 @@ export default function PhrasesPage() {
               </div>
               <span
                 className="shrink-0 rounded px-1.5 py-0.5 text-[10px]"
-                style={{ background: 'var(--surface)', color: 'var(--color-accent-400)' }}
+                style={{ background: 'var(--surface)', color: 'var(--accent-text-alt)' }}
               >
                 {p.cefr}
               </span>
@@ -124,6 +127,13 @@ export default function PhrasesPage() {
           </li>
         )}
       </ul>
+
+      <ShowMoreButton
+        hidden={page.hidden}
+        onMore={page.showMore}
+        onAll={page.showAll}
+        step={50}
+      />
     </div>
   );
 }

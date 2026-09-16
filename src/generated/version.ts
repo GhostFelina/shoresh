@@ -12,4 +12,4 @@
  * Gerçek bir modül olarak yazılınca dev, derleme ve testte aynı yoldan
  * okunur — sihir yok, kırılacak bir şey yok.
  */
-export const APP_VERSION = '1.6.0';
+export const APP_VERSION = '1.7.0';

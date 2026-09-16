@@ -246,3 +246,37 @@ describe('karışık yönlü metin', () => {
     expect(container.querySelectorAll('bdi')).toHaveLength(0);
   });
 });
+
+describe('karışık metinde boşluk korunur — regresyon testi', () => {
+  it('İbranice öbekten sonraki boşluk yutulmaz', async () => {
+    const { MixedText } = await import('@/components/MixedText');
+    /*
+     * İlk sürümde desen sondaki boşluğu da içine alıyordu ve ardından
+     * gelen Türkçe kelime İbranice öbeğe yapışıyordu: "ilk harf הdüşer".
+     * Ekran görüntüsünde görülüp düzeltildi; bu test tekrarını engelliyor.
+     */
+    const { container } = render(
+      <MixedText>{'ilk harf ה düşer ve fiil פ״י gibi çekilir'}</MixedText>,
+    );
+    const text = container.textContent ?? '';
+    expect(text).toContain('ה düşer');
+    expect(text).toContain('פ״י gibi');
+    expect(text).not.toContain('הdüşer');
+    expect(text).not.toContain('פ״יgibi');
+  });
+
+  it('metnin tamamı korunur, hiçbir karakter kaybolmaz', async () => {
+    const { MixedText } = await import('@/components/MixedText');
+    const source = 'בְּרֶגֶל = "ayakla", yani yürüyerek. Araçla gitmek לִנְסֹעַ fiiliyle söylenir.';
+    const { container } = render(<MixedText>{source}</MixedText>);
+    expect(container.textContent).toBe(source);
+  });
+
+  it('çok sözcüklü İbranice öbek tek parça kalır', async () => {
+    const { MixedText } = await import('@/components/MixedText');
+    const { container } = render(<MixedText>{'Kalıp: אֲנִי צָרִיךְ לָלֶכֶת demek'}</MixedText>);
+    const bdis = [...container.querySelectorAll('bdi')];
+    expect(bdis).toHaveLength(1);
+    expect(bdis[0]!.textContent).toBe('אֲנִי צָרִיךְ לָלֶכֶת');
+  });
+});
