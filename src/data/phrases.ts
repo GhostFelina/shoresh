@@ -23,7 +23,8 @@ export type PhraseTopic =
   | 'duygu'
   | 'günlük'
   | 'kutlama'
-  | 'sınıf';
+  | 'sınıf'
+  | 'yapı';
 
 export interface Phrase {
   id: string;
@@ -177,6 +178,62 @@ export const PHRASES: Phrase[] = [
   { id: 'ani-lomed-ivrit', he: 'אֲנִי לוֹמֵד עִבְרִית', plain: 'אני לומד עברית', translit: 'ani lomed ivrit', tr: 'İbranice öğreniyorum (erkek)', topic: 'sınıf', cefr: 'A1' },
   { id: 'ani-lomedet-ivrit', he: 'אֲנִי לוֹמֶדֶת עִבְרִית', plain: 'אני לומדת עברית', translit: 'ani lomedet ivrit', tr: 'İbranice öğreniyorum (kadın)', topic: 'sınıf', cefr: 'A1' },
   { id: 'tuchal-lachzor', he: 'תּוּכַל לַחְזֹר', plain: 'תוכל לחזור', translit: 'tuhal lahzor', tr: 'tekrar edebilir misin? (erkeğe)', topic: 'sınıf', cefr: 'A2' },
+
+  /* --- Fiil kalıpları ---
+     Bunlar kelime değil YAPI: içine istediğin fiili koyarsın ve cümle
+     kurulur. Bir öğrencinin konuşmaya geçişini en çok hızlandıran şey
+     bu kalıpları otomatikleştirmektir — 20 kalıp, yüzlerce cümle. */
+  { id: 'yesh-li', he: 'יֵשׁ לִי', plain: 'יש לי', translit: 'yeş li', tr: 'bende var; …m var', literal: 'var bana', topic: 'yapı', cefr: 'A1', note: 'İbranicede "sahip olmak" fiili YOKTUR. Sahiplik יֵשׁ + לְ ile kurulur: יֵשׁ לִי כֶּלֶב "köpeğim var".' },
+  { id: 'ein-li', he: 'אֵין לִי', plain: 'אין לי', translit: 'eyn li', tr: 'bende yok; …m yok', literal: 'yok bana', topic: 'yapı', cefr: 'A1', note: 'יֵשׁ\'in olumsuzu לֹא ile değil, ayrı bir kelimeyle kurulur: אֵין.' },
+  { id: 'ani-tsarich', he: 'אֲנִי צָרִיךְ לְ־', plain: 'אני צריך ל', translit: 'ani tsarih le-', tr: '…mem gerek (erkek)', topic: 'yapı', cefr: 'A1', note: 'Ardından MASTAR gelir: אֲנִי צָרִיךְ לָלֶכֶת "gitmem gerek".' },
+  { id: 'ani-tsricha', he: 'אֲנִי צְרִיכָה לְ־', plain: 'אני צריכה ל', translit: 'ani tsriha le-', tr: '…mem gerek (kadın)', topic: 'yapı', cefr: 'A1', note: 'צָרִיךְ bir sıfattır, fiil değil — bu yüzden cinsiyete göre değişir.' },
+  { id: 'ani-yachol', he: 'אֲנִי יָכוֹל לְ־', plain: 'אני יכול ל', translit: 'ani yahol le-', tr: '…bilirim (erkek)', topic: 'yapı', cefr: 'A1', note: 'Yetenek ve izin: אֲנִי יָכוֹל לַעֲזֹר "yardım edebilirim".' },
+  { id: 'ani-yechola', he: 'אֲנִי יְכוֹלָה לְ־', plain: 'אני יכולה ל', translit: 'ani yehola le-', tr: '…bilirim (kadın)', topic: 'yapı', cefr: 'A1' },
+  { id: 'efshar', he: 'אֶפְשָׁר לְ־', plain: 'אפשר ל', translit: 'efşar le-', tr: '…mek mümkün mü?', literal: 'mümkün', topic: 'yapı', cefr: 'A1', note: 'Kişi çekmez, herkes için aynıdır. Kibarca istemenin en kolay yolu: אֶפְשָׁר לְקַבֵּל חֶשְׁבּוֹן "hesabı alabilir miyim".' },
+  { id: 'i-efshar', he: 'אִי אֶפְשָׁר', plain: 'אי אפשר', translit: 'i efşar', tr: 'mümkün değil', topic: 'yapı', cefr: 'A2' },
+  { id: 'assur', he: 'אָסוּר לְ־', plain: 'אסור ל', translit: 'asur le-', tr: 'yasak; …mamalı', topic: 'yapı', cefr: 'A2' },
+  { id: 'mutar', he: 'מֻתָּר לְ־', plain: 'מותר ל', translit: 'mutar le-', tr: 'serbest; …bilir', topic: 'yapı', cefr: 'A2' },
+  { id: 'kedai', he: 'כְּדַאי לְ־', plain: 'כדאי ל', translit: 'kedai le-', tr: '…mekte fayda var', topic: 'yapı', cefr: 'B1', note: 'Tavsiye kalıbı: כְּדַאי לְךָ לָלֶכֶת "gitsen iyi olur".' },
+  { id: 'ani-ohev-le', he: 'אֲנִי אוֹהֵב לְ־', plain: 'אני אוהב ל', translit: 'ani ohev le-', tr: '…meyi severim', topic: 'yapı', cefr: 'A1', note: 'Fiil + mastar: אֲנִי אוֹהֵב לִקְרֹא "okumayı severim".' },
+  { id: 'mitchil-le', he: 'מַתְחִיל לְ־', plain: 'מתחיל ל', translit: 'mathil le-', tr: '…meye başlıyor', topic: 'yapı', cefr: 'A2' },
+  { id: 'mamshich-le', he: 'מַמְשִׁיךְ לְ־', plain: 'ממשיך ל', translit: 'mamşih le-', tr: '…meye devam ediyor', topic: 'yapı', cefr: 'B1' },
+  { id: 'gomer-le', he: 'מְסַיֵּם לְ־', plain: 'מסיים ל', translit: 'mesayem le-', tr: '…meyi bitiriyor', topic: 'yapı', cefr: 'B1' },
+  { id: 'kedei-le', he: 'כְּדֵי לְ־', plain: 'כדי ל', translit: 'kedey le-', tr: '…mek için', topic: 'yapı', cefr: 'A2', note: 'Amaç bildirir: בָּאתִי כְּדֵי לִלְמֹד "öğrenmek için geldim".' },
+  { id: 'bimkom', he: 'בִּמְקוֹם לְ־', plain: 'במקום ל', translit: 'bimkom le-', tr: '…mek yerine', literal: 'yerinde', topic: 'yapı', cefr: 'B1' },
+  { id: 'bli-le', he: 'בְּלִי לְ־', plain: 'בלי ל', translit: 'bli le-', tr: '…meden', topic: 'yapı', cefr: 'B1' },
+  { id: 'achrei-she', he: 'אַחֲרֵי שֶׁ־', plain: 'אחרי ש', translit: 'aharey şe-', tr: '…dikten sonra', topic: 'yapı', cefr: 'B1' },
+  { id: 'lifnei-she', he: 'לִפְנֵי שֶׁ־', plain: 'לפני ש', translit: 'lifney şe-', tr: '…meden önce', topic: 'yapı', cefr: 'B1' },
+  { id: 'im', he: 'אִם', plain: 'אם', translit: 'im', tr: 'eğer', topic: 'yapı', cefr: 'A2' },
+  { id: 'ki', he: 'כִּי', plain: 'כי', translit: 'ki', tr: 'çünkü', topic: 'yapı', cefr: 'A1' },
+  { id: 'aval', he: 'אֲבָל', plain: 'אבל', translit: 'aval', tr: 'ama', topic: 'yapı', cefr: 'A1' },
+  { id: 'lachen', he: 'לָכֵן', plain: 'לכן', translit: 'lahen', tr: 'bu yüzden', topic: 'yapı', cefr: 'A2' },
+  { id: 'gam', he: 'גַּם', plain: 'גם', translit: 'gam', tr: 'de, da; ayrıca', topic: 'yapı', cefr: 'A1' },
+  { id: 'rak', he: 'רַק', plain: 'רק', translit: 'rak', tr: 'sadece', topic: 'yapı', cefr: 'A1' },
+  { id: 'od-lo', he: 'עוֹד לֹא', plain: 'עוד לא', translit: 'od lo', tr: 'henüz değil', topic: 'yapı', cefr: 'A2' },
+  { id: 'yoter-mi', he: 'יוֹתֵר מִ־', plain: 'יותר מ', translit: 'yoter mi-', tr: '…den daha çok', topic: 'yapı', cefr: 'A2', note: 'Karşılaştırma: גָּדוֹל יוֹתֵר מִמֶּנִּי "benden daha büyük".' },
+  { id: 'hachi', he: 'הֲכִי', plain: 'הכי', translit: 'hahi', tr: 'en …', topic: 'yapı', cefr: 'A2', note: 'Üstünlük: הֲכִי טוֹב "en iyi".' },
+  { id: 'tsarich-lomar', he: 'צָרִיךְ לוֹמַר', plain: 'צריך לומר', translit: 'tsarih lomar', tr: 'söylemek gerekir', topic: 'yapı', cefr: 'B1' },
+
+  /* --- Ek günlük ifadeler --- */
+  { id: 'ma-ata-ose', he: 'מָה אַתָּה עוֹשֶׂה', plain: 'מה אתה עושה', translit: 'ma ata ose', tr: 'ne yapıyorsun? (erkeğe)', topic: 'günlük', cefr: 'A1' },
+  { id: 'ein-davar', he: 'אֵין דָּבָר', plain: 'אין דבר', translit: 'eyn davar', tr: 'önemli değil', literal: 'yok bir şey', topic: 'nezaket', cefr: 'A2' },
+  { id: 'kama-zman', he: 'כַּמָּה זְמַן', plain: 'כמה זמן', translit: 'kama zman', tr: 'ne kadar süre?', topic: 'soru', cefr: 'A2' },
+  { id: 'eize-yom', he: 'אֵיזֶה יוֹם הַיּוֹם', plain: 'איזה יום היום', translit: 'eyze yom hayom', tr: 'bugün günlerden ne?', topic: 'zaman', cefr: 'A2' },
+  { id: 'lo-yodea', he: 'אֲנִי לֹא יוֹדֵעַ', plain: 'אני לא יודע', translit: 'ani lo yodea', tr: 'bilmiyorum (erkek)', topic: 'günlük', cefr: 'A1' },
+  { id: 'lo-yodaat', he: 'אֲנִי לֹא יוֹדַעַת', plain: 'אני לא יודעת', translit: 'ani lo yodaat', tr: 'bilmiyorum (kadın)', topic: 'günlük', cefr: 'A1' },
+  { id: 'tov-meod', he: 'טוֹב מְאֹד', plain: 'טוב מאוד', translit: 'tov meod', tr: 'çok iyi', topic: 'günlük', cefr: 'A1' },
+  { id: 'lo-tov', he: 'לֹא טוֹב', plain: 'לא טוב', translit: 'lo tov', tr: 'iyi değil', topic: 'günlük', cefr: 'A1' },
+  { id: 'ze-hashuv', he: 'זֶה חָשׁוּב', plain: 'זה חשוב', translit: 'ze haşuv', tr: 'bu önemli', topic: 'günlük', cefr: 'A2' },
+  { id: 'ze-lo-meshane', he: 'זֶה לֹא מְשַׁנֶּה', plain: 'זה לא משנה', translit: 'ze lo meşane', tr: 'fark etmez', literal: 'bu değiştirmiyor', topic: 'günlük', cefr: 'B1' },
+  { id: 'tihye-bari', he: 'תִּהְיֶה בָּרִיא', plain: 'תהיה בריא', translit: 'tihye bari', tr: 'sağ ol; sağlıcakla', literal: 'sağlıklı ol', topic: 'nezaket', cefr: 'A2' },
+  { id: 'nu', he: 'נוּ', plain: 'נו', translit: 'nu', tr: 'e hadi; eee?', topic: 'günlük', cefr: 'A2', note: 'Sabırsızlık ya da "devam et" anlamı taşır. Tonlamayla değişir.' },
+  { id: 'achla', he: 'אַחְלָה', plain: 'אחלה', translit: 'ahla', tr: 'süper; harika', topic: 'günlük', cefr: 'A2', note: 'Arapçadan; gençler arasında çok yaygın.' },
+  { id: 'chaval-al-hazman', he: 'חֲבָל עַל הַזְּמַן', plain: 'חבל על הזמן', translit: 'haval al hazman', tr: 'inanılmaz (iyi ya da kötü)', literal: 'zamana yazık', topic: 'günlük', cefr: 'B1', note: 'Bağlama göre hem "muhteşem" hem "berbat" demek olabilir.' },
+  { id: 'be-emet', he: 'בֶּאֱמֶת', plain: 'באמת', translit: 'beemet', tr: 'gerçekten mi?', literal: 'hakikatte', topic: 'günlük', cefr: 'A2' },
+  { id: 'ma-pitom', he: 'מָה פִּתְאֹם', plain: 'מה פתאום', translit: 'ma pitom', tr: 'ne münasebet! yok canım!', literal: 'ne aniden', topic: 'günlük', cefr: 'B1' },
+  { id: 'al-tidag', he: 'אַל תִּדְאַג', plain: 'אל תדאג', translit: 'al tidag', tr: 'merak etme (erkeğe)', topic: 'günlük', cefr: 'A2', note: 'Olumsuz emir לֹא ile değil, אַל + gelecek zaman ile kurulur.' },
+  { id: 'kach-li', he: 'קַח לִי רֶגַע', plain: 'קח לי רגע', translit: 'kah li rega', tr: 'bir saniye ver', topic: 'günlük', cefr: 'B1' },
+  { id: 'bo-nelech', he: 'בּוֹא נֵלֵךְ', plain: 'בוא נלך', translit: 'bo nelah', tr: 'hadi gidelim', literal: 'gel gidelim', topic: 'günlük', cefr: 'A2', note: 'בּוֹא + 1. çoğul gelecek = "hadi …elim".' },
 ];
 
 export const PHRASE_TOPICS: PhraseTopic[] = [
@@ -192,6 +249,7 @@ export const PHRASE_TOPICS: PhraseTopic[] = [
   'günlük',
   'kutlama',
   'sınıf',
+  'yapı',
 ];
 
 export const TOPIC_LABEL: Record<PhraseTopic, string> = {
@@ -207,6 +265,7 @@ export const TOPIC_LABEL: Record<PhraseTopic, string> = {
   günlük: 'Günlük konuşma',
   kutlama: 'Kutlama',
   sınıf: 'Derste',
+  yapı: 'Fiil kalıpları',
 };
 
 export function phrasesByLevel(level: CEFR): Phrase[] {

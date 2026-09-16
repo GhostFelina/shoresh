@@ -15,6 +15,7 @@ const VerbsPage = lazy(() => import('@/pages/VerbsPage'));
 const BinyanimPage = lazy(() => import('@/pages/BinyanimPage'));
 const PhrasesPage = lazy(() => import('@/pages/PhrasesPage'));
 const GamesPage = lazy(() => import('@/pages/GamesPage'));
+const SoundPage = lazy(() => import('@/pages/SoundPage'));
 
 function Loading() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
 
           <Route path="/oyunlar" element={<GamesPage />} />
           <Route path="/oyunlar/:gameId" element={<GamesPage />} />
+          <Route path="/ses" element={<SoundPage />} />
 
           {/* Eski bağlantılar kırılmasın */}
           <Route path="/fiiller" element={<Navigate to="/verb" replace />} />

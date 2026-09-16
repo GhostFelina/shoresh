@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { MessageSquareText, Search, Volume2 } from 'lucide-react';
 import { CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
 import { sentenceSet } from '@/engine/sentence';
+import { writtenFor } from '@/data/sentences';
 import { speak } from '@/lib/speech';
 import {
   BINYAN_LABEL,
@@ -98,46 +99,101 @@ function FormBlock({ verb, form }: { verb: HebrewVerb; form: HebrewForm }) {
  * kuramaz.
  */
 function Examples({ verb }: { verb: HebrewVerb }) {
-  const sentences = sentenceSet(verb);
-  if (sentences.length === 0) return null;
+  const written = writtenFor(verb.id);
+  const generated = sentenceSet(verb);
+  if (written.length === 0 && generated.length === 0) return null;
 
   return (
-    <section className="card space-y-2 p-4">
+    <section className="card space-y-3 p-4">
       <h3 className="flex items-center gap-2 text-sm font-semibold">
         <MessageSquareText className="size-4" style={{ color: 'var(--color-accent-400)' }} />
         Örnek cümleler
       </h3>
-      <p className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
-        Cümleler bu fiilin kendi çekim tablosundan üretildi — tablo doğruysa cümle de doğrudur.
-      </p>
-      <ul className="space-y-1">
-        {sentences.map((s, i) => (
-          <li key={`${s.form}-${i}`}>
-            <button
-              type="button"
-              onClick={() => speak(s.plain)}
-              className="card-2 group flex w-full items-center gap-3 px-3 py-2 text-left transition hover:brightness-125"
-            >
-              <span
-                className="w-16 shrink-0 text-[10px] uppercase tracking-wide"
-                style={{ color: 'var(--text-dim)' }}
+
+      {/* Elle yazılmış cümleler — nesnesi ve bağlamı olanlar önce gelir. */}
+      {written.length > 0 && (
+        <ul className="space-y-1.5">
+          {written.map((s, i) => (
+            <li key={`w-${i}`} className="card-2 px-3 py-2.5">
+              <button
+                type="button"
+                onClick={() => speak(s.plain)}
+                className="group flex w-full items-start gap-3 text-left"
               >
-                {FORM_LABEL[s.form].short}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="he he-vocalized block text-lg">{s.he}</span>
-                <span className="block text-[11px] italic" style={{ color: 'var(--color-brand-300)' }}>
-                  {s.translit}
+                <span
+                  className="w-16 shrink-0 text-[10px] uppercase tracking-wide"
+                  style={{ color: 'var(--text-dim)' }}
+                >
+                  {FORM_LABEL[s.form].short}
                 </span>
-              </span>
-              <span className="w-32 shrink-0 text-xs" style={{ color: 'var(--text-dim)' }}>
-                {s.tr}
-              </span>
-              <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
-            </button>
-          </li>
-        ))}
-      </ul>
+                <span className="min-w-0 flex-1 space-y-0.5">
+                  <span className="he he-vocalized block text-lg leading-relaxed">{s.he}</span>
+                  <span className="block text-xs italic" style={{ color: 'var(--color-brand-300)' }}>
+                    {s.translit}
+                  </span>
+                  <span className="block text-sm">{s.tr}</span>
+                </span>
+                <Volume2 className="mt-1 size-3.5 shrink-0 opacity-0 transition group-hover:opacity-70" />
+              </button>
+              {s.note && (
+                <p
+                  className="mt-1.5 border-t pt-1.5 text-[11px] leading-snug"
+                  style={{ color: 'var(--text-dim)' }}
+                >
+                  {s.note}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Çekim tablosundan üretilen cümleler */}
+      {generated.length > 0 && (
+        <details className="group" open={written.length === 0}>
+          <summary
+            className="cursor-pointer text-[11px] select-none"
+            style={{ color: 'var(--text-dim)' }}
+          >
+            Çekim tablosundan üretilen {generated.length} cümle
+            {written.length > 0 ? ' — her kişi ve zaman için' : ''}
+          </summary>
+          <p className="pt-1.5 text-[11px]" style={{ color: 'var(--text-dim)' }}>
+            Bu cümleler fiilin kendi çekim tablosundan doğar: tablo doğruysa cümle de doğrudur.
+          </p>
+          <ul className="space-y-1 pt-1.5">
+            {generated.map((s, i) => (
+              <li key={`g-${s.form}-${i}`}>
+                <button
+                  type="button"
+                  onClick={() => speak(s.plain)}
+                  className="card-2 group/g flex w-full items-center gap-3 px-3 py-2 text-left transition hover:brightness-125"
+                >
+                  <span
+                    className="w-16 shrink-0 text-[10px] uppercase tracking-wide"
+                    style={{ color: 'var(--text-dim)' }}
+                  >
+                    {FORM_LABEL[s.form].short}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="he he-vocalized block text-lg">{s.he}</span>
+                    <span
+                      className="block text-[11px] italic"
+                      style={{ color: 'var(--color-brand-300)' }}
+                    >
+                      {s.translit}
+                    </span>
+                  </span>
+                  <span className="w-32 shrink-0 text-xs" style={{ color: 'var(--text-dim)' }}>
+                    {s.tr}
+                  </span>
+                  <Volume2 className="size-3.5 shrink-0 opacity-0 transition group-hover/g:opacity-70" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </section>
   );
 }

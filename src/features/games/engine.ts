@@ -11,6 +11,7 @@
 import { LETTERS, NIQQUDIM } from '@/data/alefbet';
 import { VERBS } from '@/data/catalog';
 import { PHRASES } from '@/data/phrases';
+import { WRITTEN_SENTENCES } from '@/data/sentences';
 import {
   BINYAN_LABEL,
   FORM_LABEL,
@@ -28,7 +29,10 @@ export type GameId =
   | 'kok-avcisi'
   | 'binyan-esleme'
   | 'zaman-makinesi'
-  | 'kulak-testi';
+  | 'kulak-testi'
+  | 'cumle-kurucu'
+  | 'kelime-esleme'
+  | 'binyan-donusturucu';
 
 /** Çoktan seçmeli soru — beş oyunun ortak biçimi. */
 export interface ChoiceQuestion {
@@ -67,7 +71,28 @@ export interface TypeQuestion {
   hints: string[];
 }
 
-export type Question = ChoiceQuestion | TypeQuestion;
+/**
+ * Sözcükleri doğru sıraya dizerek cevaplanan soru.
+ *
+ * Neden ayrı bir tür: İbranicede söz dizimi Türkçeden farklıdır
+ * (özne-fiil-nesne, sıfat isimden SONRA). Çoktan seçmeli bir soru bunu
+ * ölçemez; öğrenci sırayı kendi kurmadan fark etmez.
+ */
+export interface OrderQuestion {
+  kind: 'order';
+  prompt: string;
+  /** Karıştırılmış sözcükler — ekranda bu sırayla çıkar. */
+  tokens: string[];
+  /** Doğru sıra: `tokens` dizisindeki konumlar. */
+  order: number[];
+  /** Harekesiz tam cümle — seslendirme için. */
+  audio: string;
+  /** Tam cümlenin Türkçesi. */
+  tr: string;
+  explain: string;
+}
+
+export type Question = ChoiceQuestion | TypeQuestion | OrderQuestion;
 
 export type Rng = () => number;
 
@@ -363,6 +388,178 @@ export function kulakTesti(rng: Rng, level: CEFR): ChoiceQuestion {
   };
 }
 
+
+/* ================================================================== *
+ * 7) CUMLE KURUCU
+ * ================================================================== */
+
+/** Cumle havuzu: elle yazilmis ornekler + kaliplar. */
+function sentencePool(
+  level: CEFR,
+): Array<{ he: string; plain: string; tr: string; note?: string }> {
+  const order: CEFR[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const max = order.indexOf(level);
+  const allowed = new Set(VERBS.filter((v) => order.indexOf(v.cefr) <= max).map((v) => v.id));
+
+  const out: Array<{ he: string; plain: string; tr: string; note?: string }> = [];
+  for (const [id, list] of Object.entries(WRITTEN_SENTENCES)) {
+    if (!allowed.has(id)) continue;
+    for (const w of list) {
+      // En az uc sozcuk olmali, yoksa dizmek diye bir sey kalmaz.
+      if (w.he.trim().split(/\s+/).length >= 3) {
+        out.push({ he: w.he, plain: w.plain, tr: w.tr, note: w.note });
+      }
+    }
+  }
+  for (const ph of PHRASES) {
+    if (order.indexOf(ph.cefr) > max) continue;
+    if (ph.he.trim().split(/\s+/).length >= 3) {
+      out.push({ he: ph.he, plain: ph.plain, tr: ph.tr, note: ph.literal });
+    }
+  }
+  return out;
+}
+
+/**
+ * Ibranicede sifat isimden SONRA gelir, iyelik ayri sozcukle kurulur.
+ * Bunlar coktan secmeli soruyla olculemez; ogrenci sirayi kendi kurmadan
+ * farki gormez.
+ */
+export function cumleKurucu(rng: Rng, level: CEFR): OrderQuestion | ChoiceQuestion {
+  const pool = sentencePool(level);
+  // Havuz bossa oyunu bos birakmak yerine kok sorusuna dusulur.
+  if (pool.length === 0) return kokAvcisi(rng, level);
+
+  const item = pick(pool, rng);
+  const words = item.he.trim().split(/\s+/);
+
+  /**
+   * Karistirilmis dizi ile dogru sira ARASINDAKI eslesme indeksle
+   * tutulur; sozcuk metniyle tutulsaydi ayni sozcuk iki kez geceni
+   * cumlelerde (ör. "kol") yanlis eslesirdi.
+   */
+  const idx = shuffle(
+    words.map((_, i) => i),
+    rng,
+  );
+  const tokens = idx.map((i) => words[i]!);
+  const answerOrder = words.map((_, position) => idx.indexOf(position));
+
+  return {
+    kind: 'order',
+    prompt: 'Sozcukleri dogru siraya diz',
+    tokens,
+    order: answerOrder,
+    audio: item.plain,
+    tr: item.tr,
+    explain: item.he + ' - ' + item.tr + (item.note ? ' \u00b7 ' + item.note : ''),
+  };
+}
+
+/* ================================================================== *
+ * 8) KELIME ESLEME
+ * ================================================================== */
+
+/**
+ * Ibranice -> Turkce ile Turkce -> Ibranice AYRI becerilerdir. Birincisi
+ * tanimaktir, ikincisi uretmeye yakindir ve cok daha zordur. Oyun ikisini
+ * karisik sorar ki ogrenci "biliyorum" yanilsamasina dusmesin.
+ */
+export function kelimeEsleme(rng: Rng, level: CEFR): ChoiceQuestion {
+  const pool = verbPool(level);
+  const verb = pick(pool, rng);
+  const c = verb.table.infinitive;
+
+  if (rng() < 0.5) {
+    const { options, answer } = buildOptions(
+      verb.tr[0]!,
+      pool.map((v) => v.tr[0]!),
+      rng,
+    );
+    return {
+      kind: 'choice',
+      prompt: 'Bu fiil ne demek?',
+      display: c.vocalized,
+      audio: c.plain,
+      options,
+      answer,
+      explain:
+        c.vocalized + ' ("' + c.translit + '") = ' + verb.tr.join(', ') +
+        ' \u00b7 ' + BINYAN_LABEL[verb.binyan].tr,
+    };
+  }
+
+  const { options, answer } = buildOptions(
+    c.vocalized,
+    pool.map((v) => v.table.infinitive.vocalized),
+    rng,
+  );
+  return {
+    kind: 'choice',
+    prompt: '"' + verb.tr[0] + '" Ibranicede hangisi?',
+    options,
+    answer,
+    optionsAreHebrew: true,
+    explain:
+      c.vocalized + ' ("' + c.translit + '") = ' + verb.tr.join(', ') +
+      ' \u00b7 kok ' + verb.rootDisplay,
+  };
+}
+
+/* ================================================================== *
+ * 9) BINYAN DONUSTURUCU
+ * ================================================================== */
+
+/**
+ * Ibranicenin en guclu ve en cok atlanan yani: kalibi degistirince anlam
+ * ongorulebilir bicimde kayar. Bunu goren ogrenci bilmedigi bir fiili
+ * tahmin edebilir hale gelir.
+ */
+export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
+  const pool = verbPool(level);
+
+  // Yalnizca birden cok binyanda gecen kokler ise yarar.
+  const byRoot = new Map<string, HebrewVerb[]>();
+  for (const v of pool) {
+    const k = v.root.join('');
+    const list = byRoot.get(k) ?? [];
+    list.push(v);
+    byRoot.set(k, list);
+  }
+  const families = [...byRoot.values()].filter((f) => f.length >= 2);
+  if (families.length === 0) return kelimeEsleme(rng, level);
+
+  const family = pick(families, rng);
+  const from = pick(family, rng);
+  const target = pick(
+    family.filter((v) => v.id !== from.id),
+    rng,
+  );
+
+  const { options, answer } = buildOptions(
+    target.table.present.ms.vocalized,
+    pool.map((v) => v.table.present.ms.vocalized),
+    rng,
+  );
+
+  return {
+    kind: 'choice',
+    prompt:
+      from.rootDisplay + ' koku ' + BINYAN_LABEL[target.binyan].tr +
+      ' kalibinda hangisi? (anlami: "' + target.tr[0] + '")',
+    display: from.table.present.ms.vocalized,
+    audio: from.table.present.ms.plain,
+    options,
+    answer,
+    optionsAreHebrew: true,
+    explain:
+      from.table.present.ms.vocalized + ' (' + BINYAN_LABEL[from.binyan].tr + ', "' +
+      from.tr[0] + '") \u2192 ' + target.table.present.ms.vocalized + ' (' +
+      BINYAN_LABEL[target.binyan].tr + ', "' + target.tr[0] +
+      '"). Ayni kok ' + from.rootDisplay + ', degisen yalnizca kalip.',
+  };
+}
+
 /* ------------------------------------------------------------------ *
  * Kayıt defteri
  * ------------------------------------------------------------------ */
@@ -435,6 +632,33 @@ export const GAMES: GameMeta[] = [
     needsAudio: true,
     generate: (rng, level) => kulakTesti(rng, level),
   },
+  {
+    id: 'cumle-kurucu',
+    title: 'Cümle Kurucu',
+    he: 'בּוֹנֶה מִשְׁפָּטִים',
+    teaches: 'Söz dizimi',
+    why: 'İbranicede sıfat isimden SONRA gelir, iyelik ayrı sözcükle kurulur. Bunlar çoktan seçmeli soruyla ölçülemez — sırayı kendin kurmadan farkı görmezsin.',
+    needsAudio: false,
+    generate: (rng, level) => cumleKurucu(rng, level),
+  },
+  {
+    id: 'kelime-esleme',
+    title: 'Kelime Eşleme',
+    he: 'הַתְאָמַת מִלִּים',
+    teaches: 'İki yönlü anlam',
+    why: 'İbranice→Türkçe tanımaktır, Türkçe→İbranice üretmeye yakındır ve çok daha zordur. Oyun ikisini karışık sorar ki "biliyorum" yanılsamasına düşmeyesin.',
+    needsAudio: false,
+    generate: (rng, level) => kelimeEsleme(rng, level),
+  },
+  {
+    id: 'binyan-donusturucu',
+    title: 'Binyan Dönüştürücü',
+    he: 'מְמִיר בִּנְיָנִים',
+    teaches: 'Kalıp ↔ anlam',
+    why: 'İbranicenin en güçlü yanı: kalıbı değiştirince anlam öngörülebilir biçimde kayar. לומד "öğrenir" → מלמד "öğretir". Bunu gören öğrenci bilmediği fiili tahmin edebilir.',
+    needsAudio: false,
+    generate: (rng, level) => binyanDonusturucu(rng, level),
+  },
 ];
 
 export const GAME_BY_ID = new Map(GAMES.map((g) => [g.id, g]));
@@ -448,7 +672,10 @@ export function buildQueue(game: GameMeta, level: CEFR, count: number, rng: Rng)
   while (out.length < count && guard < count * 25) {
     guard++;
     const q = game.generate(rng, level);
-    const key = `${q.prompt}|${q.display ?? ''}|${q.audio ?? ''}`;
+    const key =
+      q.kind === 'order'
+        ? 'order|' + q.audio
+        : `${q.prompt}|${q.display ?? ''}|${q.audio ?? ''}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(q);

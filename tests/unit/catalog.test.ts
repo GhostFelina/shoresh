@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOG_ISSUES, CATALOG_STATS, VERBS, siblingsOf } from '@/data/catalog';
 import { conjugate } from '@/engine/binyan';
+import { WRITTEN_SENTENCES } from '@/data/sentences';
 
 describe('katalog bütünlüğü', () => {
   it('hiçbir satır reddedilmez', () => {
@@ -78,5 +79,35 @@ describe('dört harfli kökler (מרובעים)', () => {
 
   it("dört harfli kök pa'al'de bulunmaz", () => {
     expect(() => conjugate(['ת', 'כ', 'נ', 'ן'], 'paal')).toThrow(/pi'el/);
+  });
+});
+
+describe('elle yazılmış örnek cümleler', () => {
+  it('her anahtar katalogda gerçekten var olan bir fiile işaret eder', () => {
+    const ids = new Set(VERBS.map((v) => v.id));
+    for (const key of Object.keys(WRITTEN_SENTENCES)) {
+      expect(ids.has(key), `${key} katalogda yok`).toBe(true);
+    }
+  });
+
+  it('her cümle üç yazımını da taşır ve boş değildir', () => {
+    for (const [key, list] of Object.entries(WRITTEN_SENTENCES)) {
+      expect(list.length, `${key} bos`).toBeGreaterThan(0);
+      for (const s of list) {
+        expect(s.he.length, key).toBeGreaterThan(0);
+        expect(s.plain.length, key).toBeGreaterThan(0);
+        expect(s.translit.length, key).toBeGreaterThan(0);
+        expect(s.tr.length, key).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('harekesiz yazımda hareke kalmaz — seslendirmeye bu gider', () => {
+    const MARKS = /[\u05B0-\u05BC\u05C1\u05C2]/;
+    for (const [key, list] of Object.entries(WRITTEN_SENTENCES)) {
+      for (const s of list) {
+        expect(MARKS.test(s.plain), `${key} → ${s.plain}`).toBe(false);
+      }
+    }
   });
 });

@@ -7,29 +7,48 @@ import {
   buildQueue,
   type ChoiceQuestion,
   type GameMeta,
+  type OrderQuestion,
   type Question,
   type TypeQuestion,
 } from '@/features/games/engine';
-import { speak, speechStatus } from '@/lib/speech';
+import { hasUserGesture, speak, speechStatus } from '@/lib/speech';
 import type { CEFR } from '@/types/hebrew';
 
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
 const ROUND_LENGTH = 10;
 
-/** Seslendirme düğmesi — durum bildirimiyle birlikte. */
+/**
+ * Seslendirme düğmesi.
+ *
+ * Üç ayrı başarısızlık durumu var ve üçü ayrı şey söyler:
+ *  - `blocked`  → tarayıcı otomatik oynatmayı engelledi; kullanıcı dokununca çalışır
+ *  - `failed`   → hiçbir katman ses veremedi
+ *  - `playing`  → çalıyor
+ * Üçünü "bozuk" diye tek kovaya atmak kullanıcıyı yanıltırdı.
+ */
 function SpeakButton({ text, big = false }: { text: string; big?: boolean }) {
-  const [state, setState] = useState<'idle' | 'playing' | 'failed'>('idle');
+  const [state, setState] = useState<'idle' | 'playing' | 'failed' | 'blocked'>('idle');
 
   const play = useCallback(() => {
     setState('playing');
     void speak(text, {
-      rate: 0.75,
+      slow: true,
       onEnd: () => setState('idle'),
       onUnavailable: () => setState('failed'),
+      onBlocked: () => setState('blocked'),
     });
-    // Ses bitiş olayı gelmezse düğme sonsuza kadar "çalıyor" kalmasın.
-    window.setTimeout(() => setState((s) => (s === 'playing' ? 'idle' : s)), 6000);
+    // Bitiş olayı gelmezse düğme sonsuza kadar "çalıyor" kalmasın.
+    window.setTimeout(() => setState((s) => (s === 'playing' ? 'idle' : s)), 7000);
   }, [text]);
+
+  const border =
+    state === 'playing'
+      ? 'var(--color-brand-400)'
+      : state === 'failed'
+        ? '#f87171'
+        : state === 'blocked'
+          ? '#fbbf24'
+          : 'var(--border)';
 
   return (
     <button
@@ -38,11 +57,15 @@ function SpeakButton({ text, big = false }: { text: string; big?: boolean }) {
       className={`card-2 grid shrink-0 place-items-center transition hover:brightness-125 ${
         big ? 'size-20' : 'size-10'
       }`}
-      style={{
-        borderColor: state === 'playing' ? 'var(--color-brand-400)' : 'var(--border)',
-        color: state === 'failed' ? '#f87171' : 'inherit',
-      }}
-      aria-label="Seslendir"
+      style={{ borderColor: border }}
+      aria-label={state === 'blocked' ? 'Dinlemek için dokun' : 'Seslendir'}
+      title={
+        state === 'blocked'
+          ? 'Tarayıcı otomatik sesi engelledi — dokununca çalar'
+          : state === 'failed'
+            ? 'Ses verilemedi'
+            : 'Seslendir'
+      }
     >
       <Volume2 className={big ? 'size-8' : 'size-4'} />
     </button>
@@ -91,10 +114,14 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
   const q: Question | undefined = queue[s.index];
   const finished = s.index >= queue.length;
 
-  /** Sesli sorularda soru gelir gelmez bir kez çalsın. */
+  /**
+   * Sesli sorularda soru gelir gelmez bir kez çalsın — ama yalnızca
+   * kullanıcı sayfayla etkileştiyse. Aksi hâlde tarayıcı engeller ve
+   * boşuna bir hata üretiriz.
+   */
   useEffect(() => {
-    if (q?.audio && game.needsAudio && !s.answered) {
-      void speak(q.audio, { rate: 0.75 });
+    if (q?.audio && game.needsAudio && !s.answered && hasUserGesture()) {
+      void speak(q.audio, { slow: true });
     }
   }, [q, game.needsAudio, s.answered]);
 
@@ -213,7 +240,7 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
       <div className="card space-y-4 p-5">
         <p className="text-sm font-medium">{q.prompt}</p>
 
-        {q.display && (
+        {q.kind !== 'order' && q.display && (
           <div className="flex items-center justify-center gap-4 py-2">
             <span
               className={`he he-vocalized ${q.serif ? 'he-serif' : ''} text-center text-5xl`}
@@ -224,13 +251,19 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           </div>
         )}
 
-        {!q.display && q.audio && (
+        {q.kind !== 'order' && !q.display && q.audio && (
           <div className="flex justify-center py-4">
             <SpeakButton text={q.audio} big />
           </div>
         )}
 
-        {q.kind === 'choice' ? (
+        {q.kind === 'order' ? (
+          <OrderBody
+            q={q}
+            state={s}
+            onCheck={(right) => commit(right)}
+          />
+        ) : q.kind === 'choice' ? (
           <ChoiceBody
             q={q}
             state={s}
@@ -275,7 +308,14 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
               ) : (
                 <>
                   <X className="size-4" style={{ color: '#f87171' }} />
-                  {q.kind === 'type' ? (
+                  {q.kind === 'order' ? (
+                    <span>
+                      Doğrusu:{' '}
+                      <span className="he he-vocalized text-lg">
+                        {q.order.map((i) => q.tokens[i]).join(' ')}
+                      </span>
+                    </span>
+                  ) : q.kind === 'type' ? (
                     <span>
                       Doğrusu: <span className="he he-vocalized text-lg">{q.answer}</span>
                     </span>
@@ -304,6 +344,110 @@ function Runner({ game, level, onExit }: { game: GameMeta; level: CEFR; onExit: 
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+
+/**
+ * Sözcük dizme gövdesi.
+ *
+ * Sürükle-bırak YOK: dokunmatik ekranda sürükleme hem zor hem de erişilebilir
+ * değil. Bunun yerine sözcüğe dokunulur, cümleye eklenir; yanlış eklenen
+ * sözcüğe dokununca geri alınır. Klavyeyle de çalışır.
+ *
+ * İbranice sağdan sola dizildiği için kurulan cümle `dir="rtl"` içinde
+ * gösteriliyor — soldan sağa dizilseydi doğru sıra ekranda ters görünürdü.
+ */
+function OrderBody({
+  q,
+  state,
+  onCheck,
+}: {
+  q: OrderQuestion;
+  state: RunState;
+  onCheck: (right: boolean) => void;
+}) {
+  const [placed, setPlaced] = useState<number[]>([]);
+
+  // Yeni soruya geçilince dizilim sıfırlanır.
+  useEffect(() => {
+    setPlaced([]);
+  }, [q]);
+
+  const remaining = q.tokens.map((_, i) => i).filter((i) => !placed.includes(i));
+  const complete = placed.length === q.tokens.length;
+
+  const check = () => {
+    const right =
+      placed.length === q.order.length && placed.every((v, i) => v === q.order[i]);
+    onCheck(right);
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px]" style={{ color: 'var(--text-dim)' }}>
+        Sözcüklere sırayla dokun. Yanlış koyduğunu geri almak için üstteki sözcüğe dokun.
+      </p>
+
+      {/* Kurulan cümle */}
+      <div
+        className="card-2 he he-vocalized min-h-16 rounded-lg px-3 py-3 text-xl"
+        dir="rtl"
+      >
+        {placed.length === 0 ? (
+          <span className="text-sm opacity-40" dir="ltr">
+            henüz boş
+          </span>
+        ) : (
+          <span className="flex flex-wrap gap-2">
+            {placed.map((idx, pos) => (
+              <button
+                key={`${idx}-${pos}`}
+                type="button"
+                disabled={state.answered}
+                onClick={() => setPlaced((prev) => prev.filter((_, i) => i !== pos))}
+                className="rounded px-2 py-0.5 transition hover:brightness-125"
+                style={{ background: 'var(--surface)' }}
+              >
+                {q.tokens[idx]}
+              </button>
+            ))}
+          </span>
+        )}
+      </div>
+
+      {/* Havuz */}
+      <div className="flex flex-wrap gap-2" dir="rtl">
+        {remaining.map((idx) => (
+          <button
+            key={idx}
+            type="button"
+            disabled={state.answered}
+            onClick={() => setPlaced((prev) => [...prev, idx])}
+            className="card-2 he he-vocalized px-3 py-2 text-lg transition hover:brightness-125"
+          >
+            {q.tokens[idx]}
+          </button>
+        ))}
+        {remaining.length === 0 && (
+          <span className="text-xs opacity-50" dir="ltr">
+            bütün sözcükler yerleştirildi
+          </span>
+        )}
+      </div>
+
+      {!state.answered && (
+        <button
+          type="button"
+          onClick={check}
+          disabled={!complete}
+          className="w-full rounded-lg py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
+          style={{ background: 'var(--color-brand-500)', color: '#04120f' }}
+        >
+          {complete ? 'Kontrol et' : `${q.tokens.length - placed.length} sözcük kaldı`}
+        </button>
+      )}
     </div>
   );
 }
@@ -446,7 +590,7 @@ export default function GamesPage() {
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">Oyunlar</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-          Altı oyun, altı ayrı beceri. Hepsi aynı veriden beslenir — katalog düzeltilince
+          Dokuz oyun, dokuz ayrı beceri. Hepsi aynı veriden beslenir — katalog düzeltilince
           oyunlar da düzelir. Sorular her turda yeniden üretilir, ezberlenecek sabit bir
           liste yok.
         </p>

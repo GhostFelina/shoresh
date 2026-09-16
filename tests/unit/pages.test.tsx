@@ -79,7 +79,7 @@ describe('Kalıplar sayfası', () => {
 });
 
 describe('Oyunlar sayfası', () => {
-  it('altı oyunu da listeler', () => {
+  it('dokuz oyunu da listeler', () => {
     render(
       <MemoryRouter>
         <GamesPage />
@@ -92,6 +92,9 @@ describe('Oyunlar sayfası', () => {
       'Binyan Eşleme',
       'Zaman Makinesi',
       'Kulak Testi',
+      'Cümle Kurucu',
+      'Kelime Eşleme',
+      'Binyan Dönüştürücü',
     ]) {
       expect(screen.getByText(title), title).toBeInTheDocument();
     }
@@ -121,6 +124,7 @@ describe('gezinme bütünlüğü', () => {
       '/binyanim',
       '/kaliplar',
       '/oyunlar',
+      '/ses',
     ];
     for (const item of NAV_ITEMS) {
       const matches = known.some((pattern) => {

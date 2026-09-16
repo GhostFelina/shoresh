@@ -1,3 +1,39 @@
+## 1.1.0
+
+**Ses — kök neden bulundu ve giderildi.** Çevrimiçi seslendirme katmanı hiç
+çalışmıyordu: kodda `audio.crossOrigin = "anonymous"` ayarlıydı, bu tarayıcıyı
+CORS denetimine zorluyor, seslendirme uç noktası `Access-Control-Allow-Origin`
+göndermediği için denetim düşüyor ve ses HİÇ yüklenmiyordu. Ayar kaldırıldı;
+kaynak artık sıradan bir medya olarak çalınıyor (uç nokta buna
+`Cross-Origin-Resource-Policy: cross-origin` ile izin veriyor).
+
+Yanında üç düzeltme daha:
+- Kalıcı kilit kaldırıldı. Tek bir ağ hatası katmanı sonsuza kadar kapatıyordu;
+  artık üç hatadan sonra 60 saniye dinlenip yeniden deniyor.
+- Tarayıcının otomatik oynatma engeli artık HATA sayılmıyor. Ayrı bir durum
+  olarak gösteriliyor: "dokununca çalar".
+- İndirilen ses bellekte önbelleğe alınıyor; aynı kelime ikinci kez anında çalıyor.
+
+**Yeni: Ses sayfası** (`/ses`) — hangi katmanın çalıştığını gösterir, dört örnekle
+sınama yaptırır, her adımı tek tek denetleyen bir tanılama çalıştırır ve işletim
+sistemine göre İbranice ses paketi kurulum adımlarını verir.
+
+**Üç yeni oyun** (toplam 9):
+- **Cümle Kurucu** — sözcükleri doğru sıraya dizme. Yeni etkileşim türü;
+  sürükle-bırak yerine dokunarak, dokunmatikte ve klavyeyle çalışır.
+- **Kelime Eşleme** — İbranice↔Türkçe iki yönlü.
+- **Binyan Dönüştürücü** — aynı kök, başka kalıp.
+
+**Örnek cümleler** — en sık 40 fiil için elle yazılmış, nesneli ve bağlamlı
+cümleler eklendi; her birinde öğrettiği dilbilgisi notu var (אֶת, שֶׁלִּי, edat
+seçimi). Üretilen cümleler ikinci katman olarak duruyor.
+
+**Fiil kalıpları** — `יֵשׁ לִי`, `צָרִיךְ לְ־`, `אֶפְשָׁר לְ־`, `כְּדֵי לְ־` gibi 30 yapı
+eklendi. Bunlar kelime değil kalıp: içine fiil koyunca cümle kuruluyor.
+
+154 birim testi. Oyun üreteçleri için sözleşme testleri eklendi (doğru cevap
+seçenekler arasında mı, seçenekler tekil mi, sıralama gerçekten permütasyon mu).
+
 ## 1.0.2
 
 - **Erişim:** Vercel Deployment Protection (SSO) kapatıldı. Önceden

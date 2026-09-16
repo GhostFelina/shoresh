@@ -101,6 +101,7 @@ export const A2_HIFIL = `
 `;
 
 export const A2_HITPAEL = `
+סדר|hitpael|idare etmek; yoluna girmek|A2|74,76,80,58
 חתן|hitpael|evlenmek|A2|72,78,76,62
 עסק|hitpael|uğraşmak; meşgul olmak|A2|66,64,66,68
 נהג|hitpael|davranmak|A2|64,62,64,68

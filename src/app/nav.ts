@@ -6,6 +6,7 @@ import {
   Languages,
   Quote,
   Type,
+  Volume2,
   type LucideIcon,
 } from 'lucide-react';
 import type { CEFR } from '@/types/hebrew';
@@ -77,7 +78,10 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'pratik',
     title: 'Pratik',
-    items: [{ to: '/oyunlar', label: 'Oyunlar', hint: '6 alıştırma oyunu', icon: Gamepad2 }],
+    items: [
+      { to: '/oyunlar', label: 'Oyunlar', hint: 'Alıştırma oyunları', icon: Gamepad2 },
+      { to: '/ses', label: 'Ses', hint: 'Seslendirme ve tanılama', icon: Volume2 },
+    ],
   },
 ];
 
