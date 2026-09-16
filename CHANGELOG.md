@@ -1,3 +1,29 @@
+## 1.3.0
+
+**Sözlük katmanı eklendi — 353 kelime.** Şimdiye kadar 367 fiil vardı ama
+"ev", "su", "kırmızı" yoktu; öğrenci fiil çekebiliyor ama cümle kuramıyordu.
+İsim, sıfat, zarf, edat ve sayılar 24 konu başlığı altında eklendi.
+
+**Cinsiyet zorunlu alan yapıldı.** İbranicede cinsiyetsiz isim yoktur ve
+sıfat, sayı, fiil hepsi isme uyar: `בַּיִת גָּדוֹל` ama `דִּירָה גְּדוֹלָה`.
+Veri modelinde isteğe bağlı olsaydı eksik veri sessizce geçer, öğrenci
+yanlış uyum kurardı. Test bunu sert biçimde denetliyor.
+
+**Eş yazımlılar ayrı gösteriliyor.** `מורה` hem "öğretmen (erkek)" hem
+"öğretmen (kadın)"; `חברה` hem "arkadaş" hem "şirket". Harekesiz yazımları
+aynı, anlamları farklı. Kimlik harekeli yazımdan kuruluyor — harekesizden
+kurulsaydı bu çiftlerden biri sessizce elenirdi. Sözlük sayfasında ayrı bir
+bölümde toplanıyorlar, çünkü harekesiz metin okumanın en zor yanı bu.
+
+**İki yeni oyun (toplam 11):**
+- **Cinsiyet Ustası** — Türkçede dilbilgisel cinsiyet yok, bu İbranicenin
+  bir Türk için en yabancı yanı. Havuz bilerek tuzaklı: `-ה` ile biten
+  kelimelerin çoğu dişildir ama `לַיְלָה` "gece" erildir.
+- **Kelime Avı** — fiil dışı söz varlığı, iki yönlü. Çeldiriciler hep aynı
+  türden gelir: isme isim, sıfata sıfat.
+
+367 fiil · 353 kelime · 150 kalıp · 8.696 çekim · 180 birim testi.
+
 ## 1.2.0
 
 **Düzensiz fiiller eklendi — en büyük içerik boşluğu kapandı.** İbranicenin

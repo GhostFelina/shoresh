@@ -3,6 +3,7 @@ import { ArrowLeft, BookOpen, Languages, Type } from 'lucide-react';
 import { CATALOG_STATS, CATALOG_ISSUES } from '@/data/catalog';
 import { WRITTEN_SENTENCE_COUNT } from '@/data/sentences';
 import { PHRASES } from '@/data/phrases';
+import { LEXICON_STATS } from '@/data/lexicon';
 import { LETTERS_ALPHABETIC } from '@/data/alefbet';
 import { canSpeakHebrew, speechStatus } from '@/lib/speech';
 
@@ -70,16 +71,16 @@ export default function HomePage() {
           </p>
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Stat value={CATALOG_STATS.total} label="kök + binyan" />
-            <Stat value={CATALOG_STATS.totalForms} label="çekim biçimi" />
+            <Stat value={CATALOG_STATS.total} label="fiil (kök + binyan)" />
+            <Stat value={LEXICON_STATS.total} label="kelime" />
             <Stat value={PHRASES.length} label="kalıp ifade" />
-            <Stat value={WRITTEN_SENTENCE_COUNT} label="örnek cümle" />
+            <Stat value={CATALOG_STATS.totalForms} label="çekim biçimi" />
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Stat value={LETTERS_ALPHABETIC.length} label="alfabe harfi" />
-            <Stat value={7} label="binyan kalıbı" />
+            <Stat value={WRITTEN_SENTENCE_COUNT} label="örnek cümle" />
             <Stat value={CATALOG_STATS.irregular} label="düzensiz fiil" />
-            <Stat value={9} label="alıştırma oyunu" />
+            <Stat value={11} label="alıştırma oyunu" />
           </div>
         </div>
       </section>

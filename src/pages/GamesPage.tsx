@@ -590,7 +590,7 @@ export default function GamesPage() {
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">Oyunlar</h1>
         <p className="max-w-3xl text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-          Dokuz oyun, dokuz ayrı beceri. Hepsi aynı veriden beslenir — katalog düzeltilince
+          On bir oyun, on bir ayrı beceri. Hepsi aynı veriden beslenir — katalog düzeltilince
           oyunlar da düzelir. Sorular her turda yeniden üretilir, ezberlenecek sabit bir
           liste yok.
         </p>

@@ -23,9 +23,9 @@ function seeded(seed: number): () => number {
 const LEVELS: CEFR[] = ['A1', 'A2', 'B1', 'B2'];
 
 describe('oyun üreteçleri', () => {
-  it('dokuz oyun kayıtlı', () => {
-    expect(GAMES).toHaveLength(9);
-    expect(new Set(GAMES.map((g) => g.id)).size).toBe(9);
+  it('on bir oyun kayıtlı', () => {
+    expect(GAMES).toHaveLength(11);
+    expect(new Set(GAMES.map((g) => g.id)).size).toBe(11);
   });
 
   for (const game of GAMES) {

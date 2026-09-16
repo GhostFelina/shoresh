@@ -12,6 +12,7 @@ import { LETTERS, NIQQUDIM } from '@/data/alefbet';
 import { VERBS } from '@/data/catalog';
 import { PHRASES } from '@/data/phrases';
 import { WRITTEN_SENTENCES } from '@/data/sentences';
+import { WORDS } from '@/data/lexicon';
 import {
   BINYAN_LABEL,
   FORM_LABEL,
@@ -32,7 +33,9 @@ export type GameId =
   | 'kulak-testi'
   | 'cumle-kurucu'
   | 'kelime-esleme'
-  | 'binyan-donusturucu';
+  | 'binyan-donusturucu'
+  | 'cinsiyet-ustasi'
+  | 'kelime-avi';
 
 /** Çoktan seçmeli soru — beş oyunun ortak biçimi. */
 export interface ChoiceQuestion {
@@ -575,6 +578,109 @@ export function binyanDonusturucu(rng: Rng, level: CEFR): ChoiceQuestion {
   };
 }
 
+
+/* ================================================================== *
+ * 10) CINSIYET USTASI
+ * ================================================================== */
+
+/**
+ * Turkcede dilbilgisel cinsiyet YOKTUR. Bir Turk ogrenci icin Ibranicenin
+ * en yabanci yani budur ve en cok da burada hata yapar: cinsiyeti bilmeden
+ * sifat, sayi ve fiil uyumu kurulamaz (בַּיִת גָּדוֹל ama דִּירָה גְּדוֹלָה).
+ *
+ * Oyun bilerek TUZAKLI: -ah ile biten kelimelerin cogu disildir ama
+ * hepsi degil (לַיְלָה "gece" erildir). Kural ezberleyip gecmek mumkun
+ * olmasin diye havuz karisik tutuluyor.
+ */
+export function cinsiyetUstasi(rng: Rng, level: CEFR): ChoiceQuestion {
+  const order: CEFR[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const max = order.indexOf(level);
+  const pool = WORDS.filter(
+    (w) => w.gender !== undefined && w.wordClass === 'noun' && order.indexOf(w.cefr) <= max,
+  );
+  const usable = pool.length >= 4 ? pool : WORDS.filter((w) => w.gender && w.wordClass === 'noun');
+  const word = pick(usable, rng);
+
+  // Sıra sabit: eril önce. Karıştırmıyoruz çünkü ikili bir soruda
+  // karıştırmak öğrenmeye hiçbir şey katmaz, yalnızca okumayı yavaşlatır.
+  const answer = word.gender === 'm' ? 0 : 1;
+
+  const endsWithHey = word.plain.endsWith('\u05d4');
+  const hint = endsWithHey
+    ? ' \u05d4 ile bitiyor: bu kelimelerin cogu disildir ama istisnalari vardir.'
+    : '';
+
+  return {
+    kind: 'choice',
+    prompt: 'Bu isim eril mi, disil mi?',
+    display: word.vocalized,
+    audio: word.plain,
+    options: ['eril (\u05d6\u05db\u05e8)', 'di\u015fil (\u05e0\u05e7\u05d1\u05d4)'],
+    answer,
+    explain:
+      word.vocalized + ' ("' + word.translit + '") = ' + word.tr[0] + ' \u2014 ' +
+      (word.gender === 'm' ? 'eril' : 'di\u015fil') + '.' + hint +
+      ' Sifat da buna uyar.',
+  };
+}
+
+/* ================================================================== *
+ * 11) KELIME AVI
+ * ================================================================== */
+
+/**
+ * Sozlukten iki yonlu anlam sorusu. Fiil oyunundan ayri durmasinin sebebi
+ * havuzun bambaska olmasi: burada isim, sifat, zarf ve edat var. Bunlar
+ * fiillerden farkli bir bellek isi — ayri calisilmasi gerekir.
+ */
+export function kelimeAvi(rng: Rng, level: CEFR): ChoiceQuestion {
+  const order: CEFR[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const max = order.indexOf(level);
+  const pool = WORDS.filter((w) => order.indexOf(w.cefr) <= max);
+  const usable = pool.length >= 4 ? pool : WORDS;
+  const word = pick(usable, rng);
+
+  // Celdiriciler AYNI TURDEN gelir: isme isim, sifata sifat.
+  const sameClass = usable.filter((w) => w.wordClass === word.wordClass);
+  const distractorPool = sameClass.length >= 4 ? sameClass : usable;
+
+  if (rng() < 0.5) {
+    const { options, answer } = buildOptions(
+      word.tr[0]!,
+      distractorPool.map((w) => w.tr[0]!),
+      rng,
+    );
+    return {
+      kind: 'choice',
+      prompt: 'Bu kelime ne demek?',
+      display: word.vocalized,
+      audio: word.plain,
+      options,
+      answer,
+      explain:
+        word.vocalized + ' ("' + word.translit + '") = ' + word.tr.join(', ') +
+        (word.gender ? ' \u00b7 ' + (word.gender === 'm' ? 'eril' : 'di\u015fil') : '') +
+        ' \u00b7 konu: ' + word.topic,
+    };
+  }
+
+  const { options, answer } = buildOptions(
+    word.vocalized,
+    distractorPool.map((w) => w.vocalized),
+    rng,
+  );
+  return {
+    kind: 'choice',
+    prompt: '"' + word.tr[0] + '" Ibranicede hangisi?',
+    options,
+    answer,
+    optionsAreHebrew: true,
+    explain:
+      word.vocalized + ' ("' + word.translit + '") = ' + word.tr.join(', ') +
+      ' \u00b7 harekesiz yazimi ' + word.plain,
+  };
+}
+
 /* ------------------------------------------------------------------ *
  * Kayıt defteri
  * ------------------------------------------------------------------ */
@@ -673,6 +779,24 @@ export const GAMES: GameMeta[] = [
     why: 'İbranicenin en güçlü yanı: kalıbı değiştirince anlam öngörülebilir biçimde kayar. לומד "öğrenir" → מלמד "öğretir". Bunu gören öğrenci bilmediği fiili tahmin edebilir.',
     needsAudio: false,
     generate: (rng, level) => binyanDonusturucu(rng, level),
+  },
+  {
+    id: 'cinsiyet-ustasi',
+    title: 'Cinsiyet Ustası',
+    he: 'אַלּוּף הַמִּין',
+    teaches: 'Eril / dişil',
+    why: 'Türkçede dilbilgisel cinsiyet yoktur — İbranicenin bir Türk için en yabancı yanı budur. Cinsiyeti bilmeden sıfat, sayı ve fiil uyumu kurulamaz: בַּיִת גָּדוֹל ama דִּירָה גְּדוֹלָה.',
+    needsAudio: false,
+    generate: (rng, level) => cinsiyetUstasi(rng, level),
+  },
+  {
+    id: 'kelime-avi',
+    title: 'Kelime Avı',
+    he: 'צַיִד מִלִּים',
+    teaches: 'Söz varlığı',
+    why: 'Fiil dışı söz varlığı: isim, sıfat, zarf, edat. Çeldiriciler hep aynı türden gelir — isme isim, sıfata sıfat — böylece soru "hangisi kelime" değil "hangi kelime" diye sorulur.',
+    needsAudio: false,
+    generate: (rng, level) => kelimeAvi(rng, level),
   },
 ];
 

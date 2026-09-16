@@ -6,6 +6,7 @@ import {
   Languages,
   Quote,
   Type,
+  BookA,
   Volume2,
   type LucideIcon,
 } from 'lucide-react';
@@ -73,6 +74,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: '/verb', label: 'VERB Hebrew', hint: 'Kök + binyan + çekim', icon: Languages },
       { to: '/binyanim', label: 'Binyanlar', hint: '7 kalıbın haritası', icon: GraduationCap },
       { to: '/kaliplar', label: 'Kalıplar', hint: 'Hazır ifadeler', icon: Quote },
+      { to: '/kelimeler', label: 'Kelimeler', hint: 'İsim, sıfat, zarf', icon: BookA },
     ],
   },
   {

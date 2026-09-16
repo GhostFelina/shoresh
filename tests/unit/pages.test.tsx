@@ -79,7 +79,7 @@ describe('Kalıplar sayfası', () => {
 });
 
 describe('Oyunlar sayfası', () => {
-  it('dokuz oyunu da listeler', () => {
+  it('on bir oyunu da listeler', () => {
     render(
       <MemoryRouter>
         <GamesPage />
@@ -95,6 +95,8 @@ describe('Oyunlar sayfası', () => {
       'Cümle Kurucu',
       'Kelime Eşleme',
       'Binyan Dönüştürücü',
+      'Cinsiyet Ustası',
+      'Kelime Avı',
     ]) {
       expect(screen.getByText(title), title).toBeInTheDocument();
     }
@@ -123,6 +125,7 @@ describe('gezinme bütünlüğü', () => {
       '/verb',
       '/binyanim',
       '/kaliplar',
+      '/kelimeler',
       '/oyunlar',
       '/ses',
     ];
