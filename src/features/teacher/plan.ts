@@ -142,17 +142,24 @@ export function buildDailyPlan(input: PlanInput): PlanEntry[] {
     });
   }
 
-  // 4) Sıradaki ders — liste sırası öğrenme sırasıdır.
-  for (const meta of lessons) {
-    if (out.length >= PLAN_MAX) break;
-    if (!notDone(meta)) continue;
+  /*
+   * 4) Sıradaki ders — YALNIZCA BİR TANE.
+   *
+   * NEDEN BİR: Program dört maddeye kadar "sıradaki ders" ile
+   * doldurulduğunda dört kart da aynı gerekçeyi taşıyordu ("sıradaki
+   * konu bu"). Seçilmiş bir program değil, doldurulmuş bir liste gibi
+   * görünüyordu — ölçülmedi, ekrana bakılınca görüldü. Öğretmenin
+   * seçtiği tek bir yeni konu, dört rastgele konudan değerli.
+   */
+  const sonraki = lessons.find(notDone);
+  if (sonraki) {
     push({
       kind: 'next',
-      lessonId: meta.id,
-      title: meta.title,
-      subtitle: meta.subtitle,
+      lessonId: sonraki.id,
+      title: sonraki.title,
+      subtitle: sonraki.subtitle,
       because: 'Sıradaki konu bu; öncekiler tamam.',
-      to: `/ogretmen/${meta.id}`,
+      to: `/ogretmen/${sonraki.id}`,
       minutes: 6,
     });
   }

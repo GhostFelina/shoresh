@@ -75,6 +75,13 @@ describe('program sırası', () => {
     expect(review).toBeLessThan(next);
   });
 
+  it('programda en fazla BİR "sıradaki ders" olur', () => {
+    // Dört madde de "sıradaki konu bu" derse program seçilmiş değil,
+    // doldurulmuş görünür.
+    const plan = buildDailyPlan(input({ dueCount: 0 }));
+    expect(plan.filter((e) => e.kind === 'next')).toHaveLength(1);
+  });
+
   it('tekrar bekleyen yoksa tekrar maddesi görünmez', () => {
     expect(buildDailyPlan(input({ dueCount: 0 })).some((e) => e.kind === 'review')).toBe(false);
   });
