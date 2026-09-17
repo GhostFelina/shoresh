@@ -22,6 +22,7 @@ import { hasLanguage, languages } from '@/core/language';
 setupLanguages();
 
 const InboxPage = lazy(() => import('@/pages/InboxPage'));
+const LandingPage = lazy(() => import('./LandingPage'));
 
 function Loading() {
   return (
@@ -56,42 +57,68 @@ export default function App() {
   return (
     <RewardProvider>
       <LayoutProvider>
-        <Shell>
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              {/* Kök adres son kullanılan dile gider. */}
-              <Route path="/" element={<Navigate to={`/${startLanguageId()}`} replace />} />
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            {/*
+              KÖK ADRES ARTIK KARŞILAMA SAYFASI, yönlendirme değil.
+              Önceden son kullanılan dile atıyordu; tek dil varken
+              doğruydu, dört dil görünür olunca kullanıcı uygulamayı
+              "İbranice uygulaması" sanıyordu.
 
-              {/*
-                Gelen kutusu DİL DIŞI: bildirimler öğrenilen dile değil
-                projeyi yürütene ait. Menüde de yok.
-              */}
-              <Route path="/gelen-kutusu" element={<InboxPage />} />
+              KABUĞUN DIŞINDA: kenar çubuğu bir dilin İÇİNDEKİ
+              gezinmedir. Dil seçilmeden onu göstermek, seçim yapılmış
+              gibi davranmak olurdu.
+            */}
+            <Route path="/" element={<LandingPage />} />
 
-              {languages().map((dil) => (
-                <Route key={dil.id} path={`/${dil.id}`} element={<LanguageRoute module={dil} />}>
-                  {Object.entries(dil.aliases ?? {}).map(([eski, yeni]) => (
-                    <Route
-                      key={`alias-${eski}`}
-                      path={eski}
-                      element={<Navigate to={`/${dil.id}/${yeni}`} replace />}
-                    />
-                  ))}
-                  {dil.routes.map((r) =>
-                    r.path === '' ? (
-                      <Route key="index" index element={<r.element />} />
-                    ) : (
-                      <Route key={r.path} path={r.path} element={<r.element />} />
-                    ),
-                  )}
-                </Route>
-              ))}
-
-              <Route path="*" element={<LegacyOrNotFound />} />
-            </Routes>
-          </Suspense>
-        </Shell>
+            <Route path="/*" element={<KabukIcinde />} />
+          </Routes>
+        </Suspense>
       </LayoutProvider>
     </RewardProvider>
+  );
+}
+
+/**
+ * Kabuklu bölüm — kenar çubuğu, üst bant ve dil sayfaları.
+ *
+ * Ayrı bir bileşen çünkü karşılama sayfası kabuğu KULLANMIYOR. Tek bir
+ * `Routes` içinde kalsaydı kabuk her yerde çizilir, karşılama sayfası
+ * da boş bir kenar çubuğuyla açılırdı.
+ */
+function KabukIcinde() {
+  return (
+    <Shell>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {/*
+            Gelen kutusu DİL DIŞI: bildirimler öğrenilen dile değil
+            projeyi yürütene ait. Menüde de yok.
+          */}
+          <Route path="gelen-kutusu" element={<InboxPage />} />
+
+          {languages().map((dil) => (
+            <Route key={dil.id} path={dil.id} element={<LanguageRoute module={dil} />}>
+              {Object.entries(dil.aliases ?? {}).map(([eski, yeni]) => (
+                <Route
+                  key={`alias-${eski}`}
+                  path={eski}
+                  element={<Navigate to={`/${dil.id}/${yeni}`} replace />}
+                />
+              ))}
+              {dil.routes.map((r) =>
+                r.path === '' ? (
+                  <Route key="index" index element={<r.element />} />
+                ) : (
+                  <Route key={r.path} path={r.path} element={<r.element />} />
+                ),
+              )}
+            </Route>
+          ))}
+
+          <Route path="*" element={<LegacyOrNotFound />} />
+        </Routes>
+      </Suspense>
+    </Shell>
   );
 }

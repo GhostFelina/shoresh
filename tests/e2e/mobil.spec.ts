@@ -11,7 +11,7 @@ import { expect, test } from '@playwright/test';
 import { ac, beklenenIcerik } from './yardim';
 
 test('menü düğmesi çekmeceyi açıyor ve gezinme çalışıyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
 
   // Masaüstü kenar çubuğu telefonda görünmemeli.
   await expect(page.locator('aside')).toBeHidden();
@@ -71,7 +71,7 @@ test('sayfa yatay kaymıyor — içerik ekrana sığıyor', async ({ page }) => 
 });
 
 test('üst bant telefonda da sürüm ve ayar düğmelerini gösteriyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   await expect(page.getByRole('button', { name: 'Sürüm geçmişi' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Renk paleti' })).toBeVisible();
 });

@@ -10,7 +10,7 @@ import { expect, test } from '@playwright/test';
 import { APP_VERSION, ac, konsolHatalari } from './yardim';
 
 test('tema değişiyor ve seçim kalıcı', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
 
   /*
    * SABİT BEKLEME YOK. İlk yazımda `waitForTimeout(400)` kullanılıyordu ve
@@ -35,7 +35,7 @@ test('tema değişiyor ve seçim kalıcı', async ({ page }) => {
 
 test('palet değişince marka rengi gerçekten değişiyor', async ({ page }) => {
   const hatalar = konsolHatalari(page);
-  await ac(page, '/');
+  await ac(page, '/he');
 
   const rengiOku = () =>
     page.evaluate(() =>
@@ -74,7 +74,7 @@ test('bütün paletler okunabilir renk üretiyor', async ({ page }) => {
    * uygulama adımında bir şey kopmuşsa (yanlış değişken adı gibi) bunu
    * yalnızca bu test görür.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
   await page.getByRole('button', { name: 'Renk paleti' }).click();
   const adet = await page.locator('[role="menuitemradio"]').count();
   await page.keyboard.press('Escape');
@@ -101,7 +101,13 @@ test('sürüm kutusu açılıyor, sadece Kapat ile kapanıyor ve bir daha açıl
   page,
 }) => {
   // Bu test kutuyu BİLEREK işaretsiz açıyor, `ac()` yardımcısını kullanmıyor.
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  /*
+   * ADRES `/he`, `/` DEĞİL: sürüm kutusu kabuğun içinde yaşıyor, kök
+   * adreste ise artık karşılama sayfası var ve kabuk çizilmiyor. Kök
+   * adres kalsaydı test "kutu açılmadı" derdi — oysa kutu doğru yerde,
+   * test yanlış kapıya bakıyor olurdu.
+   */
+  await page.goto('/he', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => localStorage.removeItem('shoresh.seenVersion'));
   await page.reload({ waitUntil: 'domcontentloaded' });
 
@@ -125,7 +131,7 @@ test('sürüm kutusu açılıyor, sadece Kapat ile kapanıyor ve bir daha açıl
 });
 
 test('sürüm geçmişi paneli bütün sürümleri eskiden yeniye gösteriyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
 
   await page.getByRole('button', { name: 'Sürüm geçmişi' }).click();
   const panel = page.getByRole('dialog');
@@ -150,7 +156,7 @@ test('sürüm geçmişi paneli bütün sürümleri eskiden yeniye gösteriyor', 
 });
 
 test('altbilgide sürüm ve son güncelleme damgası var', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   const altbilgi = page.locator('footer');
   await expect(altbilgi).toContainText(`v${APP_VERSION}`);
   await expect(altbilgi).toContainText(/Son güncelleme:/);

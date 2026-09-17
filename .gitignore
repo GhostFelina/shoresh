@@ -39,3 +39,6 @@ blob-report/
 # Üçüncü taraf veri kaynakları (CMUdict vb.) — yerel kalır
 data-sources/
 screenshots/
+
+# Yerel deneme betikleri — makineye özel yollar içeriyor
+scripts/_*.mjs

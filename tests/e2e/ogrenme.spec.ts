@@ -33,7 +33,7 @@ async function oyunOyna(page: Page, adet: number): Promise<number> {
 
 test('oyun turu oynanabiliyor ve cevaplar XP kazandırıyor', async ({ page }) => {
   const hatalar = konsolHatalari(page);
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
 
   await ac(page, '/he/oyunlar/kok-avcisi');
@@ -68,7 +68,7 @@ test('cevap kaydı ile XP yazımı birbirini ezmiyor — seri 1 oluyor', async (
    * dışında oku-değiştir-yaz yaptıkları için biri ötekini eziyordu.
    * Belirti tam olarak buydu: XP birikiyor ama seri 0 kalıyor.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
 
   await ac(page, '/he/oyunlar/kok-avcisi');
@@ -90,7 +90,7 @@ test('haftalık grafiğin çubukları gerçekten çiziliyor', async ({ page }) =
    * bütün çubuklar sıfır yükseklikte kalıyordu. Grafik boş görünüyordu
    * ama hiçbir hata vermiyordu.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
   await ac(page, '/he/oyunlar/kok-avcisi');
   await oyunOyna(page, 3);
@@ -116,7 +116,7 @@ test('haftalık grafiğin çubukları gerçekten çiziliyor', async ({ page }) =
 
 test('öğretmen dersi baştan sona tamamlanabiliyor', async ({ page }) => {
   const hatalar = konsolHatalari(page);
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
   await ac(page, '/he/ogretmen/binyan-present-paal');
 

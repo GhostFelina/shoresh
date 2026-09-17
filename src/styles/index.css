@@ -819,3 +819,183 @@ body::before {
     animation: none;
   }
 }
+
+/* ================================================================== *
+ * KARŞILAMA SAYFASI
+ *
+ * Buradaki parçalar yalnızca kök adreste kullanılıyor. Uygulamanın
+ * içinde bilerek yokllar: çalışırken dikkat dağıtan hareket öğrenmeyi
+ * zorlaştırır, ama tanıtım ekranında hareketin işi vardır.
+ * ================================================================== */
+
+/**
+ * Canlı zemin.
+ *
+ * İki büyük renk lekesi çok yavaş yer değiştiriyor. `transform`
+ * kullanılıyor, `background-position` değil: ikincisi her karede
+ * yeniden boyama demek ve büyük yüzeyde ölçülebilir bir maliyeti var.
+ */
+.aurora {
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+  opacity: 0.55;
+  background:
+    radial-gradient(
+      28rem 20rem at 25% 30%,
+      color-mix(in srgb, var(--color-brand-500) 65%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      26rem 18rem at 75% 60%,
+      color-mix(in srgb, var(--color-accent-500) 60%, transparent),
+      transparent 70%
+    );
+  animation: shoresh-aurora 24s ease-in-out infinite alternate;
+}
+
+:root[data-theme='light'] .aurora {
+  opacity: 0.35;
+}
+
+@keyframes shoresh-aurora {
+  0% {
+    transform: translate3d(-4%, -2%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, 4%, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-2%, 3%, 0) scale(1.02);
+  }
+}
+
+/**
+ * Öne çıkan kart — canlı olan tek dilin çevresindeki halka.
+ * Vurgu KENARLIKLA değil halkayla yapılıyor: kenarlık kalınlaştırmak
+ * kartı öbürlerinden farklı ÖLÇÜDE yapar ve ızgara kayar.
+ */
+.card-featured {
+  box-shadow:
+    var(--shadow-lift),
+    0 0 0 1px color-mix(in srgb, var(--accent-text) 45%, transparent),
+    0 0 40px -10px color-mix(in srgb, var(--color-brand-500) 60%, transparent);
+}
+
+/** Yazı şeridi — dört dilin kendi harfleri, sessiz bir arka plan öğesi. */
+.script-band {
+  font-size: 2.25rem;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  color: color-mix(in srgb, var(--text-dim) 40%, transparent);
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora {
+    animation: none;
+  }
+}
+
+/* ---- Toz parçacıkları ------------------------------------------- *
+ * Karşılama ekranında yukarı doğru süzülen ince noktalar.
+ *
+ * NEDEN CSS, NEDEN CANVAS DEĞİL: Canvas her kare için JavaScript
+ * çalıştırır; bu sayfa açılışta zaten kod yüklüyor ve ilk boyamayı
+ * geciktirmek istemiyoruz. Buradaki hareket tamamen birleştirici
+ * (compositor) üzerinde: yalnızca `transform` ve `opacity` değişiyor,
+ * düzen ve boyama hiç tetiklenmiyor.
+ *
+ * Parçacıklar `aria-hidden` bir katmanda; ekran okuyucu için yoklar.
+ * ---------------------------------------------------------------- */
+.dust {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
+}
+
+.dust span {
+  position: absolute;
+  bottom: -10%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-text);
+  opacity: 0;
+  animation: shoresh-dust linear infinite;
+}
+
+@keyframes shoresh-dust {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  12% {
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(14px, -40vh, 0) scale(1.1);
+  }
+}
+
+/* ---- Girişte beliren içerik -------------------------------------- *
+ * Sayfa açılırken öğeler sırayla belirir. Gecikme satır içi
+ * `animationDelay` ile veriliyor; sınıf sayısını şişirmemek için.
+ * ---------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  animation: shoresh-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes shoresh-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Yazı şeridi hareketi ---------------------------------------- *
+ * Dört dilin harfleri sırayla hafifçe parlıyor — sayfanın "çok dilli"
+ * olduğunu söylemenin sessiz yolu.
+ * ---------------------------------------------------------------- */
+.script-band span {
+  animation: shoresh-glyph 6s ease-in-out infinite;
+}
+
+@keyframes shoresh-glyph {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+    color: var(--accent-text);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dust span,
+  .script-band span {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    animation: none;
+  }
+}

@@ -38,7 +38,7 @@ async function soruyuCevapla(page: import('@playwright/test').Page): Promise<voi
 
 test('sınav baştan sona yürüyor ve karne çıkarıyor', async ({ page }) => {
   const hatalar = konsolHatalari(page);
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
   await ac(page, '/he/ogretmen/seviye-tespit');
 
@@ -61,7 +61,7 @@ test('sınav baştan sona yürüyor ve karne çıkarıyor', async ({ page }) => 
 test('ölçüm kaydediliyor — sınava dönünce karne açılıyor, sınav baştan başlamıyor', async ({
   page,
 }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   await ilerlemeyiSil(page);
   await ac(page, '/he/ogretmen/seviye-tespit');
 

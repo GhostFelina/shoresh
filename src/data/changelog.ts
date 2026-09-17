@@ -67,6 +67,74 @@ export const CHANGE_TINT: Record<ChangeKind, string> = {
 
 const RECENT: Release[] = [
   {
+    version: '1.22.0',
+    date: '2026-09-17',
+    releasedAt: '2026-09-17T10:36:43+03:00',
+    title: 'Karşılama ekranı ve yeni tasarım dili',
+    summary:
+      'Uygulama artık bir dille değil, bir seçimle açılıyor: karşılama ekranı dört dili ve motorun ne yaptığını gösteriyor. Görsel dil de baştan kuruldu — düğmeler, ikonlar ve başlık panelleri tek bir sistemden geliyor.',
+    changes: [
+      {
+        kind: 'yeni',
+        text: 'Kök adres artık karşılama ekranı. Önceden son kullanılan dile yönlendiriyordu; tek dil varken doğruydu ama dört dil görünür olunca uygulama "İbranice uygulaması" sanılıyordu.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Karşılama ekranı dört dili gösteriyor: İbranice hazır, Korece, Arapça ve Mandarin yolda. Her kart o dilin motorunun ne işe yarayacağını yazıyor — "aynı uygulama başka kelimelerle" değil.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Yol haritasındaki diller ayrı bir kayıt defterinde (`core/roadmap.ts`), sayfanın içinde değil. Bir dil kurulduğunda tek yapılacak şey onu listeden silmek; birim testi iki listede birden duran dili yakalıyor. Kurulmamış dillere bağlantı verilmiyor — tıklanıp boş adrese düşülmesin diye.',
+      },
+      {
+        kind: 'yeni',
+        text: 'Markaya, logoya veya üstteki isme tıklayınca karşılama ekranına dönülüyor. Dil değiştirmenin yolu bu; kenar çubuğundaki seçici yalnızca kurulu diller arasında geziyor.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Tasarım dili v2: düğme görünümü otuz ayrı dosyada satır içi yazılıydı ve hiçbiri ötekine benzemiyordu — artık tek yerden geliyor (.btn). Çıplak duran 16px ikonlar kaba oturdu (.icon-chip), başlık panelleri, kart ışığı ve ortak ritim eklendi.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'İbranice ana sayfası geniş düzene geçti ve sekiz eşit sayaç yerine üç büyük sayaç + bir şerit gösteriyor; hepsi aynı ağırlıktayken hiçbiri okunmuyordu. Sayaçlar dil modülünden geliyor, sayfa Korece’de de aynı düzenle çalışacak.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Klavyeyle gezinenler için odak halkası eklendi — tarayıcının kendi anahattı koyu zeminde görünmüyordu. Hareketi azaltılmış cihazlarda süs animasyonları duruyor, geri bildirim animasyonları kalıyor.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Kontrast ölçüm aracı geçişli zeminleri okuyamadığı için birincil düğmeyi "1.07:1" diye yanlış bildiriyordu. Artık bu öğeleri atlıyor ve kaç tane atladığını yazıyor — sessizce geçseydi gerçek bir sorunu da saklayabilirdi.',
+      },
+      {
+        kind: 'duzeltme',
+        text: 'Türkçe harf tuzağı: bir test "YAKINDA" ile "yakında"yı eşleştiremiyordu, çünkü JavaScript’in harf küçültmesi Türkçe değil — I harfi "ı" yerine "i"ye iniyor. Karşılaştırma artık Türkçe yerele göre yapılıyor.',
+      },
+      {
+        kind: 'gelisme',
+        text: 'Test sayısı 516 birim + 65 uçtan uca. Yeni testler karşılama ekranını, dil seçimini ve markadan geri dönüşü gerçek tarayıcıda doğruluyor.',
+      },
+    ],
+    benefits: [
+      {
+        title: 'Uygulamanın ne olduğu ilk ekranda belli',
+        text: 'Açılışta doğrudan İbranice çalışma alanına düşmüyorsun. Önce ne öğrenmek istediğini seçiyorsun, uygulamanın çok dilli olduğunu da orada görüyorsun.',
+      },
+      {
+        title: 'Dil değiştirmek tek tık',
+        text: 'Sol üstteki markaya tıkladığın an seçim ekranı açılıyor. Ayar sayfasında dil aramana gerek yok.',
+      },
+      {
+        title: 'Ekran artık göze daha kolay geliyor',
+        text: 'Düğmeler birbirine benziyor, ikonlar ortada kaybolmuyor, ana sayfa dar bir sütuna sıkışmıyor. Önemli sayılar büyük, gerisi geride duruyor.',
+      },
+      {
+        title: 'Verilmeyen söz yok',
+        text: 'Yoldaki dillerin yanında tarih yazmıyor. Tarih yazsaydık geçtiğinde sayfa sana yalan söylemeye başlardı.',
+      },
+    ],
+  },
+  {
     version: '1.21.0',
     date: '2026-09-17',
     releasedAt: '2026-09-17T02:13:19+03:00',

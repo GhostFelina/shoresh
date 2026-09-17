@@ -131,8 +131,17 @@ describe('bileşenlerde elle yazılmış renk yok', () => {
           continue;
         }
         if (!/\.(ts|tsx)$/.test(ad)) continue;
-        // Paletin KENDİSİ renk tanımlamak zorunda; tek muafiyet o.
+
+        /*
+         * İKİ MUAFİYET, ikisi de gerekçeli:
+         *  palette.ts — renkleri TANIMLAYAN dosya; burada renk yazmak
+         *    zorunda.
+         *  Flags.tsx  — bayrak renkleri temaya ait değil, ÜLKEYE ait.
+         *    İsrail bayrağının mavisi açık temada koyulaşamaz; o zaman
+         *    o bayrak olmaktan çıkar.
+         */
         if (p.endsWith(join('lib', 'palette.ts'))) continue;
+        if (p.endsWith(join('app', 'Flags.tsx'))) continue;
 
         const src = readFileSync(p, 'utf-8');
         for (const [i, satir] of src.split('\n').entries()) {

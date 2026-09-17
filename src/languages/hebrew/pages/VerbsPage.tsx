@@ -23,7 +23,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, MessageSquareText, Search, Volume2, X } from 'lucide-react';
+import { Filter, Languages, MessageSquareText, Search, Volume2, X } from 'lucide-react';
 import { CATALOG_STATS, VERBS, siblingsOf } from '@he/data/catalog';
 import { sentenceSet } from '@he/engine/sentence';
 import { writtenFor } from '@he/data/sentences';
@@ -290,14 +290,44 @@ export default function VerbsPage() {
 
   return (
     <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="title-gradient text-2xl font-bold tracking-tight">VERB Hebrew</h1>
+      {/*
+        GİRİŞ ŞERİDİ. Eskiden burada çıplak bir başlık ve bir paragraf
+        vardı; sayfa "nerede başlıyorum" hissi vermiyordu. Şerit hem
+        sayfayı açıyor hem de motorun ölçeğini sayıyla söylüyor — bu
+        sayfanın bütün iddiası o iki sayının çarpımı.
+      */}
+      <header className="hero flex flex-wrap items-center gap-x-6 gap-y-4 p-5 sm:p-6">
+        <span className="icon-chip icon-chip-lg">
+          <Languages className="size-6" />
+        </span>
+
+        <div className="min-w-0 flex-1 space-y-1">
+          <h1 className="title-gradient text-2xl font-bold tracking-tight sm:text-3xl">
+            VERB Hebrew
+          </h1>
           <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
-            {CATALOG_STATS.total} kök+binyan çifti · kural motoruyla üretilmiş{' '}
-            {CATALOG_STATS.totalForms.toLocaleString('tr-TR')} çekim biçimi. Her biçim tıklanınca
+            Kök + binyan çiftinden bütün çekim tablosu üretilir. Her biçim tıklanınca
             seslendirilir.
           </p>
+        </div>
+
+        <div className="flex items-center gap-6 sm:gap-8">
+          <div>
+            <div className="kpi text-2xl leading-none sm:text-3xl">
+              {CATALOG_STATS.total.toLocaleString('tr-TR')}
+            </div>
+            <div className="mt-1 text-[11px]" style={{ color: 'var(--text-dim)' }}>
+              kök + binyan
+            </div>
+          </div>
+          <div>
+            <div className="kpi text-2xl leading-none sm:text-3xl">
+              {CATALOG_STATS.totalForms.toLocaleString('tr-TR')}
+            </div>
+            <div className="mt-1 text-[11px]" style={{ color: 'var(--text-dim)' }}>
+              üretilmiş çekim biçimi
+            </div>
+          </div>
         </div>
       </header>
 

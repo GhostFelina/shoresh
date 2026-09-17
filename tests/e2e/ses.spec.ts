@@ -17,7 +17,7 @@ import { ac } from './yardim';
 const SELAM = '%D7%A9%D7%9C%D7%95%D7%9D';
 
 test('seslendirme ucu tarayıcıdan erişilebilir ve MP3 döndürüyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
 
   const sonuc = await page.evaluate(async (q) => {
     const res = await fetch(`/api/tts?q=${q}&slow=1`);
@@ -44,7 +44,7 @@ test('<audio> öğesi bu adresi gerçekten çalabiliyor', async ({ page }) => {
    * çözemeyebilir. Eski hatada tam olarak bu oluyordu — 404 gövdesi ses
    * sanılıyor ve "MEDIA_ELEMENT_ERROR: Format error" veriliyordu.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
 
   const sonuc = await page.evaluate(
     (q) =>
@@ -72,7 +72,7 @@ test('uç nokta İbranice olmayan metni reddediyor', async ({ page }) => {
    * kapı olurdu. Girdi kısıtı bir güvenlik önlemi; kaldırılırsa bu test
    * kırılır.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
   const durum = await page.evaluate(async () => {
     const res = await fetch('/api/tts?q=' + encodeURIComponent('merhaba dunya'));
     return res.status;
@@ -81,7 +81,7 @@ test('uç nokta İbranice olmayan metni reddediyor', async ({ page }) => {
 });
 
 test('boş istek 400 dönüyor, çökmüyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   const durum = await page.evaluate(async () => (await fetch('/api/tts')).status);
   expect(durum).toBe(400);
 });

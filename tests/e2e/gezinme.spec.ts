@@ -45,7 +45,8 @@ for (const [ad, yol, beklenen] of SAYFALAR) {
 }
 
 test('sol menüdeki her bağlantı tıklanabiliyor ve sayfayı değiştiriyor', async ({ page }) => {
-  await ac(page, '/');
+  // Kenar çubuğu DİLİN İÇİNDE; kök adreste karşılama sayfası var.
+  await ac(page, '/he');
 
   const baglantilar = page.locator('aside nav a');
   const sayi = await baglantilar.count();
@@ -70,15 +71,84 @@ test('bilinmeyen adres dilin ana sayfasına yönlendiriyor, beyaz ekran değil',
   expect(new URL(page.url()).pathname).toBe('/he');
 });
 
-test('kök adres öğrenilen dile gidiyor', async ({ page }) => {
+test('kök adres karşılama sayfasını açıyor, dile yönlendirmiyor', async ({ page }) => {
   /*
-   * BU TESTİN SEBEBİ: Adresler dil önekli hâle getirildi. Kök adres
-   * boşta kalsaydı uygulama açılışta beyaz ekran verirdi — ve bu
-   * yalnızca gerçek tarayıcıda görülürdü.
+   * BU TESTİN SEBEBİ: Kök adres önce son kullanılan dile YÖNLENDİRİYORDU.
+   * Tek dil varken doğruydu; dört dil görünür olunca kullanıcı
+   * uygulamayı "İbranice uygulaması" sanıyordu. Artık kök adres
+   * uygulamayı tanıtıp dil seçtiriyor.
    */
   await ac(page, '/');
+  expect(new URL(page.url()).pathname, 'kök adres hâlâ yönlendiriyor').toBe('/');
+  await expect(page.locator('main')).toContainText('Her dil, kökünden');
+
+  // Karşılama ekranında kabuk OLMAMALI: dil seçilmeden menü gösterilemez.
+  expect(await page.locator('aside nav a').count(), 'dil seçilmeden menü çıkıyor').toBe(0);
+});
+
+test('karşılama ekranı dört dili gösteriyor, yalnızca biri açılıyor', async ({ page }) => {
+  await ac(page, '/');
+  const metin = await page.locator('main').innerText();
+
+  for (const ad of ['İbranice', 'Korece', 'Arapça', 'Mandarin']) {
+    expect(metin, `${ad} kartı yok`).toContain(ad);
+  }
+  /*
+   * Rozetler CSS ile büyük harfe çevriliyor ve `innerText` çevrilmiş
+   * hâli döndürüyor: kaynakta "Yakında" yazıyor, ekranda "YAKINDA".
+   *
+   * BURADA `/yakında/i` KULLANILAMAZ — bir kez tam olarak buna takıldı.
+   * JavaScript'in harf küçültmesi Türkçe değil: "YAKINDA" içindeki I
+   * harfi "i"ye iner, aranan "ı" ile eşleşmez. Bayrak sessizce yanılır.
+   * Bu yüzden karşılaştırma Türkçe yerele göre yapılıyor.
+   *
+   * ("hazır" bu tuzağı gizliyordu: sayfada ayrıca küçük harfli
+   * "1 hazır, 3 yolda" yazdığı için o satır yanlışlıkla geçiyordu.)
+   */
+  const kucuk = metin.toLocaleLowerCase('tr');
+  expect(kucuk, 'hazır dil işaretlenmemiş').toContain('hazır');
+  expect(kucuk, 'yakında ibaresi yok').toContain('yakında');
+
+  /*
+   * Kurulmamış dile bağlantı OLMAMALI. Olsaydı kullanıcı tıklar,
+   * bulunamayan adrese düşer ve uygulama bozuk görünürdü.
+   */
+  for (const kod of ['/ko', '/ar', '/zh']) {
+    expect(await page.locator(`main a[href="${kod}"]`).count(), `${kod} tıklanabilir`).toBe(0);
+  }
+});
+
+test('karşılama ekranından İbranice seçilince çalışma alanı açılıyor', async ({ page }) => {
+  await ac(page, '/');
+  await page.locator('main a[href="/he"]').first().click();
   await beklenenIcerik(page);
+
   expect(new URL(page.url()).pathname).toBe('/he');
+
+  /*
+   * Artık kabuk var: dil seçildi. Ama `count()` BEKLEMEYEN bir okuma —
+   * bir kez tam olarak buna takıldı: kabuk çizilmişti, menü değil.
+   * Menü girişleri dil modülünden geliyor ve modül tembel yükleniyor,
+   * yani karşılama sayfasından geçişte kenar çubuğu bir an boş duruyor.
+   * Önce ilk girişin görünmesini bekle, sonra say.
+   */
+  const menu = page.locator('aside nav a');
+  await expect(menu.first(), 'dil seçildi ama menü çizilmedi').toBeVisible();
+  expect(await menu.count()).toBeGreaterThan(10);
+});
+
+test('markaya tıklayınca karşılama ekranına dönülüyor', async ({ page }) => {
+  /*
+   * Kullanıcının istediği: "markaya, logoya tıklayınca onboard ekranı
+   * açılsın". Dil değiştirmenin yolu bu; kenar çubuğundaki seçici
+   * yalnızca kurulu diller arasında geziyor.
+   */
+  await ac(page, '/he/verb');
+  await page.locator('aside a[href="/"]').first().click();
+  await beklenenIcerik(page);
+
+  expect(new URL(page.url()).pathname).toBe('/');
+  await expect(page.locator('main')).toContainText('Hangi dili');
 });
 
 test('dil önekli ama var olmayan sayfa o dilin ana sayfasına düşüyor', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
@@ -106,7 +106,18 @@ export default function Shell({ children }: { children: ReactNode }) {
         className="sticky top-0 hidden h-dvh w-64 shrink-0 overflow-y-auto border-l-0 border-r px-3 py-4 lg:block"
         style={{ background: 'var(--surface)' }}
       >
-        <div className="mb-4 flex items-center gap-2.5 px-2">
+        {/*
+          MARKA KARŞILAMA EKRANINA GİDİYOR. Kullanıcının istediği:
+          "markaya, logoya tıklayınca onboard ekranı açılsın". Dil
+          değiştirmenin yolu bu — kenar çubuğundaki seçici yalnızca
+          KURULU diller arasında geziyor, yol haritasındakileri
+          göstermiyor.
+        */}
+        <Link
+          to="/"
+          className="mb-4 flex items-center gap-2.5 rounded-lg px-2 py-1 transition hover:opacity-80"
+          title="Dil seçimine dön"
+        >
           <Logo />
           <div className="leading-tight">
             <div className="flex items-baseline gap-1.5">
@@ -122,7 +133,7 @@ export default function Shell({ children }: { children: ReactNode }) {
               {BRAND.motto}
             </div>
           </div>
-        </div>
+        </Link>
         <div className="mb-3 px-1">
           <LanguagePicker />
         </div>
@@ -145,7 +156,14 @@ export default function Shell({ children }: { children: ReactNode }) {
             style={{ background: 'var(--surface)' }}
           >
             <div className="mb-4 flex items-center gap-2.5 px-2">
-              <Logo />
+              <Link
+                to="/"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-2.5 transition hover:opacity-80"
+                title="Dil seçimine dön"
+              >
+                <Logo />
+              </Link>
               <div className="mr-auto flex items-baseline gap-1.5">
                 <span className="text-base font-bold">{BRAND.short}</span>
                 <span
@@ -187,7 +205,9 @@ export default function Shell({ children }: { children: ReactNode }) {
           >
             <Menu className="size-4" />
           </button>
-          <Logo className="size-7 lg:hidden" />
+          <Link to="/" className="lg:hidden" title="Dil seçimine dön">
+            <Logo className="size-7" />
+          </Link>
           <span className="mr-auto flex items-baseline gap-1.5 lg:hidden">
             <span className="text-sm font-bold">{BRAND.short}</span>
             <span className="text-[9px] tabular-nums" style={{ color: 'var(--text-dim)' }}>
@@ -199,12 +219,14 @@ export default function Shell({ children }: { children: ReactNode }) {
             burada שֹׁרֶשׁ sabit yazılıydı ve Korece açıldığında ekranın
             ortasında İbranice bir kelime kalacaktı.
           */}
-          <span
-            className="mr-auto hidden text-sm font-medium lg:block"
+          <Link
+            to="/"
+            className="mr-auto hidden text-sm font-medium transition hover:opacity-80 lg:block"
             style={{ color: 'var(--text-dim)' }}
+            title="Dil seçimine dön"
           >
             {BRAND.name}
-          </span>
+          </Link>
           <RewardHud />
           <FeedbackButton onOpen={() => setFeedbackOpen(true)} />
           <VersionHistoryButton onOpen={() => setHistoryOpen(true)} />

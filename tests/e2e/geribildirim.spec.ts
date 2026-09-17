@@ -23,7 +23,7 @@ async function kurulumDurumu(page: import('@playwright/test').Page): Promise<boo
 }
 
 test('yoklama ucu kimlik istemeden durum söylüyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   const sonuc = await page.evaluate(async () => {
     const r = await fetch('/api/feedback?probe=1');
     return { durum: r.status, govde: (await r.json()) as Record<string, unknown> };
@@ -33,7 +33,7 @@ test('yoklama ucu kimlik istemeden durum söylüyor', async ({ page }) => {
 });
 
 test('geri bildirim düğmesi üst bantta ve kutuyu açıyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   await page.getByRole('button', { name: 'Geri bildirim gönder' }).click();
 
   const kutu = page.getByRole('dialog');
@@ -47,7 +47,7 @@ test('geri bildirim düğmesi üst bantta ve kutuyu açıyor', async ({ page }) 
 });
 
 test('boş mesajla gönderilemiyor', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   await page.getByRole('button', { name: 'Geri bildirim gönder' }).click();
 
   const gonder = page.getByRole('button', { name: /Gönder/ });
@@ -55,7 +55,7 @@ test('boş mesajla gönderilemiyor', async ({ page }) => {
 });
 
 test('kurulum eksikse ÖNCEDEN söylüyor, yazdırdıktan sonra değil', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   const hazir = await kurulumDurumu(page);
 
   await page.getByRole('button', { name: 'Geri bildirim gönder' }).click();
@@ -77,7 +77,7 @@ test('kurulum eksikse ÖNCEDEN söylüyor, yazdırdıktan sonra değil', async (
 
 test('yazılan metin taslak olarak saklanıyor', async ({ page }) => {
   // Kaybolan bir yazıyı kimse ikinci kez yazmaz.
-  await ac(page, '/');
+  await ac(page, '/he');
   await page.getByRole('button', { name: 'Geri bildirim gönder' }).click();
   await page.getByRole('dialog').locator('textarea').fill('yarım kalan bildirim');
   await page.waitForTimeout(300);
@@ -93,7 +93,7 @@ test('sunucu geçersiz türü ve kısa mesajı reddediyor', async ({ page }) => 
    * Doğrulama İSTEMCİDE değil sunucuda da olmalı: istemciyi atlayan biri
    * için istemci doğrulaması hiç yoktur.
    */
-  await ac(page, '/');
+  await ac(page, '/he');
   const sonuc = await page.evaluate(async () => {
     const gonder = (body: unknown) =>
       fetch('/api/feedback', {
@@ -131,7 +131,7 @@ test('gelen kutusu parolasız açılmıyor', async ({ page }) => {
 });
 
 test('gelen kutusu menüde görünmüyor — öğrenciye ait bir sayfa değil', async ({ page }) => {
-  await ac(page, '/');
+  await ac(page, '/he');
   const adresler = await page.locator('aside nav a').evaluateAll((els) =>
     els.map((e) => e.getAttribute('href')),
   );
